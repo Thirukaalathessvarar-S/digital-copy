@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<style_prompt>
+
+  <purpose>
+    Rules for how to style this project. Follow every rule exactly whenever
+    you write or edit markup, Tailwind classes, or CSS.
+  </purpose>
+
+  <stack>
+    <rule>Use only Tailwind CSS. No other styling library, no inline style objects, no CSS-in-JS.</rule>
+    <rule>Reference file for code style: src/App.css. Glance at it before styling and copy its way of writing.</rule>
+  </stack>
+
+  <where_to_write>
+    <rule>
+      Put Tailwind classes directly in the className of .tsx / .ts files.
+      This is the default and the preferred place.
+    </rule>
+    <rule>
+      Use @apply inside App.css ONLY when the user explicitly asks for a
+      Tailwind class to be written with @apply. Never decide this on your own.
+    </rule>
+    <app_css_allowed>
+      <item>@theme</item>
+      <item>:root</item>
+      <item>class selectors (.name)</item>
+      <item>@media (min-width: ...) or @media (max-width: ...)</item>
+    </app_css_allowed>
+    <rule>
+      Do not add anything else to App.css: no new Tailwind utilities outside
+      those blocks, no new resets, no new element or id rules.
+    </rule>
+  </where_to_write>
+
+  <units>
+    <rule>Use px only for every size: font-size, line-height, padding, margin, gap, width, max-width, min-width, radius, border.</rule>
+    <forbidden>
+      <item>rem, em, vw, vh, svh, dvh, ch, fr</item>
+      <item>fractions such as w-1/2, basis-1/3</item>
+      <item>fluid sizing such as clamp(), min(), max() with viewport units</item>
+      <item>Tailwind spacing scale numbers when a px value is meant (write p-[20px], not p-5)</item>
+    </forbidden>
+    <rule>Sizes change per breakpoint by writing a new fixed px value, never by scaling.</rule>
+    <exception>
+      The only relative value allowed is a percentage on flex-basis,
+      for example basis-[25%] or max-md:basis-[33.33%]. Percentages are
+      preferred for basis. Do not use a percentage for any other property.
+    </exception>
+  </units>
+
+  <layout>
+    <rule>Use flex only. Do not use grid (no grid, grid-cols-*, col-span-*, row-span-*, place-*, grid-template).</rule>
+    <rule>Rows and columns: flex, flex-row, flex-col, flex-wrap.</rule>
+    <rule>Control item width with basis-[N%] on the flex child, plus shrink-0 or min-w-0 when needed.</rule>
+    <rule>Spacing between flex items: gap-[Npx] or gap-x-[Npx] / gap-y-[Npx].</rule>
+    <rule>Alignment: items-*, justify-*, self-*.</rule>
+  </layout>
+
+  <height>
+    <rule>Never add an h-[...] property.</rule>
+    <rule>Never touch or change an h-[...] that already exists. Leave it exactly as it is.</rule>
+    <rule>Let content, padding and flex decide height.</rule>
+  </height>
+
+  <breakpoints>
+    <rule>Prefer exactly three breakpoints: lg, md, sm. Use these before any other.</rule>
+    <scale>
+      <breakpoint name="lg" width="1024px">max-lg: applies at 1023px and below (tablet landscape)</breakpoint>
+      <breakpoint name="md" width="768px">max-md: applies at 767px and below (tablet portrait)</breakpoint>
+      <breakpoint name="sm" width="640px">max-sm: applies at 639px and below (phone)</breakpoint>
+    </scale>
+    <rule>Write desktop first: the base class is the desktop value, then override downward with max-lg:, max-md:, max-sm:.</rule>
+    <rule>Order the variants in className from largest to smallest: base, max-lg:, max-md:, max-sm:. Each smaller one overrides the larger one.</rule>
+    <rule>Only add a variant when the value actually changes. Do not repeat the same value at a smaller breakpoint.</rule>
+    <rule>Every value at every breakpoint is a fixed px number. Never scale with %, vw, rem or clamp(). The only percentage allowed is flex-basis.</rule>
+    <rule>Use an arbitrary variant such as max-[720px]: only when lg, md and sm cannot do the job. Say why in a short comment.</rule>
+    <rule>In App.css, use only @media (min-width: Npx) or @media (max-width: Npx) with px values. Match the lg, md, sm widths: 1024px, 768px, 640px (max-width: 1023px, 767px, 639px).</rule>
+  </breakpoints>
+
+  <responsive_logic>
+    <layout>
+      <rule>lg: keep the row, reduce gaps and padding a step.</rule>
+      <rule>md: allow flex-wrap, and cut the number of items per row by changing basis-[N%], for example basis-[25%] to max-lg:basis-[33.33%] to max-md:basis-[50%].</rule>
+      <rule>sm: switch to flex-col, or one item per row (basis-[100%]), and center with items-center.</rule>
+    </layout>
+    <spacing>
+      <rule>Step padding and gap down by about 4px to 8px per breakpoint, for example p-[20px] max-md:p-[16px] max-sm:p-[12px].</rule>
+    </spacing>
+    <typography>
+      <rule>Font size and line height are reduced per screen ONLY through @media queries in src/App.css. See font_size_responsive below. This replaces the old habit of writing max-md:text-[length:..] in className.</rule>
+    </typography>
+    <media>
+      <rule>Images keep their ratio. Do not add h-[...]. Reduce the padding around the image instead, and never change an existing pt-[...] unless asked.</rule>
+    </media>
+    <visibility>
+      <rule>Hide or show with max-lg:hidden, max-md:hidden or max-sm:hidden. Do not remove content that only matters on desktop without telling the user.</rule>
+    </visibility>
+  </responsive_logic>
+
+  <font_size_responsive>
+    <description>How font size and line height shrink on smaller screens.</description>
+    <rule>Do it only with @media (max-width: ...) blocks in src/App.css. Never write max-lg:, max-md:, max-sm: font-size or leading classes in .tsx / .ts, and never use ! overrides to fight a class from App.css.</rule>
+    <rule>Use the same widths as the breakpoints: @media (max-width:1023px) for lg, (max-width:767px) for md, (max-width:639px) for sm.</rule>
+    <rule>Inside each @media block put ONLY a :root rule. Nothing else goes in the block: no class selectors, no element selectors, no @apply.</rule>
+    <rule>The :root rule inside the @media only reassigns size variables, for example --h2-size: 22px;. Classes already read these variables, so every class using them shrinks by itself.</rule>
+    <rule>If the size is an existing value, reuse the existing variable name (--h2-size, --price-lg-size, --btn-size, ...) and only change its value inside the @media. Do not create a duplicate.</rule>
+    <rule>If the size is a new value that has no variable yet, first add a named variable to the base :root (for example --size-pill-size: 16px), use it in the class or className, then reassign it inside the @media blocks. Name it after the element and end it with -size.</rule>
+    <rule>Line height follows the same way. By default it is calc(var(--x-size)+4px), so it updates when --x-size changes and needs no extra rule. Only if a line height must differ from size plus 4px, add a named variable ending with -leading in the base :root, use it as leading-[var(--x-leading)], and reassign it inside the @media blocks.</rule>
+    <rule>Reduce 1px to 2px per breakpoint. Write the blocks from largest to smallest (1023px, then 767px, then 639px) so the smaller one wins.</rule>
+    <example>
+:root {
+  --price-lg-size: 36px;
+  --pill-size: 16px;
+}
+
+@media (max-width:1023px){
+  :root { --price-lg-size: 34px; }
+}
+
+@media (max-width:767px){
+  :root { --price-lg-size: 32px; --pill-size: 15px; }
+}
+
+@media (max-width:639px){
+  :root { --price-lg-size: 28px; --pill-size: 14px; }
+}
+    </example>
+  </font_size_responsive>
+
+  <code_style>
+    <description>Copy these patterns from src/App.css. Do not invent other forms.</description>
+    <pattern name="font size">text-[length:var(--h1-size)]</pattern>
+    <pattern name="line height">leading-[calc(var(--h1-size)+4px)]</pattern>
+    <pattern name="text color">text-[color:var(--muted)]</pattern>
+    <pattern name="background color">bg-(color:--surface)</pattern>
+    <pattern name="border color">border-(color:--line-strong)</pattern>
+    <pattern name="outline color">outline-(color:--primary)</pattern>
+    <pattern name="arbitrary padding">p-[16px_56px]</pattern>
+    <pattern name="arbitrary radius">rounded-[10px]</pattern>
+    <rule>Sizes and colors come from the variables in :root, for example var(--card-title-size), var(--ink), var(--primary), var(--line).</rule>
+    <rule>Line height is always the font-size variable plus 4px: leading-[calc(var(--x-size)+4px)].</rule>
+    <rule>If a size or color is needed in more than one place, add a variable to :root first, then use it.</rule>
+    <rule>Font families come from @theme: font-manrope, font-inter, font-satoshi.</rule>
+    <rule>Multi-line @apply lists put one utility per line, ending with a semicolon on the last one.</rule>
+  </code_style>
+
+  <before_you_finish>
+    <check>No rem, em, vw, vh, fr, fractions, clamp().</check>
+    <check>Percentage used only on flex-basis.</check>
+    <check>No grid utilities anywhere.</check>
+    <check>Responsive overrides use max-lg, max-md, max-sm, written largest to smallest.</check>
+    <check>No new h-[...] added and no existing h-[...] changed.</check>
+    <check>Classes are in the .tsx / .ts file, not in App.css, unless the user asked for @apply.</check>
+    <check>Anything added to App.css is only @theme, :root, a class, or a min/max-width @media.</check>
+    <check>Font sizes, line heights and colors follow the patterns above.</check>
+    <check>No max-lg / max-md / max-sm font-size or leading classes in .tsx / .ts. Screen-based size changes live only in App.css @media blocks.</check>
+    <check>Every font-size @media block contains only :root, and only reassigns variables. New sizes have a named variable in the base :root.</check>
+  </before_you_finish>
+
+</style_prompt>

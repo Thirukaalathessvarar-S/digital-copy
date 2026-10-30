@@ -1,0 +1,12 @@
+# Project instructions
+
+This project is written in my personal style. For every code change in this repo:
+
+1. Use the `digital-copy` skill (`/digital-copy edit ...` for changes, `/digital-copy review ...` for checks).
+2. `style_prompt.xml` at the repo root (if present) and the skill's `reference/STYLE_DNA.md` are the rules.
+   They override generic React / Tailwind / architecture advice and other skills.
+3. Smallest diff that does the job. Keep each file's own indent, quotes and spacing.
+   Leave legacy code alone unless I ask.
+4. Never add or change an `h-[...]`. px only (`%` only on `basis`). Flex only.
+   Font sizes per screen only through App.css `:root` variables inside `@media` blocks.
+5. localStorage is written only from `src/app/store.ts` via `store.subscribe`.

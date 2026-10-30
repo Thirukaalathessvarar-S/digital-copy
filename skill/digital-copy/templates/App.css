@@ -1,0 +1,670 @@
+@import "tailwindcss";
+@source inline("w-[{0..100}%]");
+
+:root {
+  --h1-size: 40px;
+  --h1-page-size: 32px;
+  --h2-size: 24px;
+  --h3-size: 18px;
+  --eyebrow-size: 12px;
+  --text-muted-sm-size: 14px;
+  --card-title-size: 16px;
+  --price-size: 20px;
+  --price-lg-size: 36px;
+  --price-was-size: 14px;
+  --price-save-size: 14px;
+  --btn-size: 15px;
+  --btn-lg-size: 16px;
+  --btn-outline-size: 15px;
+  --btn-new-size: 16px;
+  --chip-size: 15px;
+  --chip-active-size: 15px;
+  --btn-text-size: 14px;
+  --btn-icon-size: 20px;
+  --badge-size: 12px;
+  --badge-pill-size: 13px;
+  --badge-count-size: 13px;
+  --tag-size: 13px;
+  --status-ok-size: 15px;
+  --label-size: 14px;
+  --input-size: 16px;
+  --img-placeholder-size: 12px;
+  --rating-size: 13px;
+  --price-off-size: 16px;
+  --size-title-size: 20px;
+  --size-btn-size: 20px;
+  --breadcrumb-size: 14px;
+
+  --btn-px: 20px;
+  --btn-py: 12px;
+  --btn-lg-py: 16px;
+  --btn-outline-px: 16px;
+  --btn-icon-py: 8px;
+  --btn-new-px: 56px;
+  --btn-new-py: 16px;
+
+  --primary: #FFFFFF;
+  --secondary: #424846;
+  --tertiary: #D99A2B;
+  --button: #151823;
+
+  --surface: #ffffff;
+  --ink: #151823;
+  --heading: #2a3878;
+  --muted: #5A5F6D;
+  --muted-strong: #3f4659;
+  --muted-soft: #A09292;
+  --line: #e3e6ef;
+  --line-strong: #8a92a6;
+  --tint: #e9ecf8;
+  --bg-soft: #F5F6FA;
+
+  --accent-coral: #E8604C;
+  --accent-coral-tint: #FCE9E5;
+  --accent-sky: #3B9AE1;
+  --accent-sky-tint: #E4F1FB;
+  --accent-violet: #6B4FD8;
+  --accent-violet-tint: #EEE9FB;
+  --accent-amber: #E8A92E;
+  --accent-amber-tint: #FCF3DF;
+  --secondary-tint: #E2F3EE;
+  --tertiary-tint: #F6EDE1;
+
+  --dark-soft: #1E2233;
+  --dark-softer: #2B3047;
+}
+
+@theme {
+  --font-manrope: "Manrope", system-ui, sans-serif;
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-satoshi: "Satoshi", system-ui, sans-serif;
+  --color-muted: var(--muted);
+  --color-muted-strong: var(--muted-strong);
+  --color-muted-soft: var(--muted-soft);
+}
+
+body {
+  @apply font-manrope;
+}
+
+.container{
+    @apply
+    w-[1120px]
+    max-xl:w-[960px]
+    max-lg:w-[720px]
+    max-md:w-[600px]
+    max-sm:w-[340px]
+    mx-auto;
+}
+
+a:focus-visible, button:focus-visible,input:focus-visible {
+   @apply
+   outline-2
+   outline-offset-2
+   outline-(color:--primary);
+}
+
+body:has(#menu[data-open="true"]){
+    overflow:hidden;
+}
+
+h1 {
+    @apply
+    text-[length:var(--h1-size)]
+    leading-[calc(var(--h1-size)+4px)]
+    font-extrabold
+    text-[color:var(--heading)];}
+
+.h1-page {
+    @apply
+    text-[length:var(--h1-page-size)]
+    leading-[calc(var(--h1-page-size)+4px)]
+    font-extrabold;}
+
+h2 {
+    @apply
+    text-[length:var(--h2-size)]
+    leading-[calc(var(--h2-size)+4px)]
+    font-extrabold
+    text-[color:var(--secondary)];}
+
+h3 {
+    @apply
+    text-[length:var(--h3-size)]
+    leading-[calc(var(--h3-size)+4px)]
+    font-extrabold;}
+
+.eyebrow {
+    @apply
+    text-[length:var(--eyebrow-size)]
+    leading-[calc(var(--eyebrow-size)+4px)]
+    font-bold
+    uppercase;
+}
+
+.text-muted-sm {
+    @apply
+    text-[length:var(--text-muted-sm-size)]
+    leading-[calc(var(--text-muted-sm-size)+4px)]
+    font-semibold
+    text-[color:var(--muted)];
+}
+
+.link {
+    @apply
+    font-bold
+    text-[color:var(--muted)]
+    underline
+    decoration-transparent
+    underline-offset-4
+    hover:text-[color:var(--primary)]
+    hover:decoration-current
+    transition-[color,text-decoration-color]
+    duration-400;
+}
+
+.link-active{
+    @apply
+    cursor-pointer
+    text-[color:var(--primary)]
+    decoration-current
+}
+
+.card-title {
+    @apply
+    text-[length:var(--card-title-size)]
+    leading-[calc(var(--card-title-size)+4px)]
+    font-bold
+    text-[var(--heading)]
+    no-underline;
+}
+
+.price {
+    @apply
+    text-[length:var(--price-size)]
+    leading-[calc(var(--price-size)+4px)]
+    font-extrabold
+    text-[var(--ink)];
+}
+
+.price-lg {
+    @apply
+    text-[length:var(--price-lg-size)]
+    leading-[calc(var(--price-lg-size)+4px)]
+    font-extrabold
+    text-[var(--ink)];
+}
+
+.price-was {
+    @apply
+    text-[length:var(--price-was-size)]
+    leading-[calc(var(--price-was-size)+4px)]
+    text-[color:var(--muted)]
+    line-through;
+}
+
+.green-text {
+    @apply
+    text-[length:var(--price-save-size)]
+    leading-[calc(var(--price-save-size)+4px)]
+    font-semibold
+    text-[color:var(--secondary)];
+}
+
+.red-text {
+    @apply
+    text-[length:var(--price-save-size)]
+    leading-[calc(var(--price-save-size)+4px)]
+    font-semibold
+    text-red-600;
+}
+
+.btn {
+    @apply
+    inline-flex
+    py-[var(--btn-py)]
+    cursor-pointer
+    items-center
+    justify-center
+    rounded-[10px]
+    border-0
+    border-transparent
+    bg-[var(--ink)]
+    px-[var(--btn-px)]
+    text-[length:var(--btn-size)]
+    leading-[calc(var(--btn-size)+4px)]
+    font-bold
+    !text-white
+    no-underline
+    hover:bg-[var(--heading)]
+    hover:text-white;
+}
+
+.btn-plain {
+    @apply
+    inline-flex
+    py-[var(--btn-py)]
+    cursor-pointer
+    items-center
+    justify-center
+    rounded-[10px]
+    border-0
+    bg-[var(--ink)]
+    px-[var(--btn-px)]
+    text-[length:var(--btn-size)]
+    leading-[calc(var(--btn-size)+4px)]
+    font-bold
+    !text-white
+    no-underline;
+}
+
+.btn-lg {
+    @apply
+    py-[var(--btn-lg-py)]
+    text-[length:var(--btn-lg-size)]
+    leading-[calc(var(--btn-lg-size)+4px)];
+}
+
+.btn-block {
+    @apply
+    w-full;
+}
+
+.btn-new{
+    @apply
+    py-[var(--btn-new-py)]
+    px-[var(--btn-new-px)]
+    rounded-[6px]
+    border-[#000000]
+    border-[1px]
+    border-solid
+    text-[length:var(--btn-new-size)]
+    leading-[calc(var(--btn-new-size)+8px)]
+    font-inter
+    font-medium
+    text-[#000000]
+    hover:bg-[#000000]
+    hover:text-[#ffffff];
+}
+
+.btn-reverse{
+    @apply
+    py-[var(--btn-new-py)]
+    px-[var(--btn-new-px)]
+    rounded-[6px]
+    border-[#ffffff]
+    border-[1px]
+    border-solid
+    text-[length:var(--btn-new-size)]
+    leading-[calc(var(--btn-new-size)+8px)]
+    font-inter
+    font-medium
+    text-[#ffffff]
+    hover:border-[#000000]
+    hover:bg-[#ffffff]
+    hover:text-[#000000];
+}
+
+.btn-outline {
+    @apply
+    inline-flex
+    py-[var(--btn-py)]
+    cursor-pointer
+    items-center
+    justify-center
+    rounded-[10px]
+    border
+    !border-[var(--ink)]
+    bg-(color:--surface)
+    px-[var(--btn-outline-px)]
+    text-[length:var(--btn-outline-size)]
+    leading-[calc(var(--btn-outline-size)+4px)]
+    font-bold
+    !text-[color:var(--ink)]
+    no-underline
+    hover:!border-[var(--tertiary)]
+    hover:!bg-[var(--surface)];
+}
+
+.outline {
+    @apply
+    inline-flex
+    py-[var(--btn-py)]
+    cursor-pointer
+    items-center
+    justify-center
+    rounded-[10px]
+    border
+    !border-[var(--muted-soft)]
+    bg-(color:--surface)
+    px-[var(--btn-outline-px)]
+    text-[length:var(--btn-outline-size)]
+    leading-[calc(var(--btn-outline-size)+4px)]
+    font-bold
+    !text-[color:var(--ink)]
+    no-underline;
+}
+
+.chip {
+    @apply
+    py-[12px]
+    cursor-pointer
+    rounded-full
+    border
+    border-(color:--line-strong)
+    bg-(color:--surface)
+    px-[18px]
+    text-[length:var(--chip-size)]
+    leading-[calc(var(--chip-size)+4px)]
+    font-bold
+    text-[color:var(--ink)];
+}
+
+.chip-check {
+    @apply
+    inline-flex
+    items-center
+    gap-[4px]
+    py-[4px]
+    cursor-pointer
+    rounded-full
+    border
+    border-(color:--line-strong)
+    bg-(color:--surface)
+    px-[12px]
+    text-[length:calc(var(--chip-size)-2px)]
+    leading-[calc(var(--chip-size)+2px)]
+    font-bold
+    text-[color:var(--muted)]
+    hover:border-(color:--ink)
+    has-[:checked]:border-(color:--primary)
+    has-[:checked]:bg-(color:--secondary)
+    has-[:checked]:text-white;
+}
+
+.chip-check input {
+    @apply sr-only;
+}
+
+.chip-sm {
+    @apply
+    py-[4px]
+    cursor-pointer
+    rounded-full
+    border
+    border-(color:--line-strong)
+    bg-(color:--surface)
+    px-[12px]
+    text-[length:calc(var(--chip-size)-2px)]
+    leading-[calc(var(--chip-size)+2px)]
+    font-bold
+    text-[color:var(--ink)];
+}
+
+.chip-active {
+    @apply
+    py-[12px]
+    cursor-pointer
+    rounded-full
+    border
+    border-(color:--primary)
+    bg-(color:--primary)
+    px-[18px]
+    text-[length:var(--chip-active-size)]
+    leading-[calc(var(--chip-active-size)+4px)]
+    font-bold
+    text-white;
+}
+
+.btn-text {
+    @apply
+    py-[var(--btn-py)]
+    cursor-pointer
+    border-0
+    bg-transparent
+    px-[4px]
+    text-[length:var(--btn-text-size)]
+    leading-[calc(var(--btn-text-size)+4px)]
+    font-bold
+    text-[color:var(--primary)]
+    underline;
+}
+
+.btn-icon {
+    @apply
+    py-[var(--btn-icon-py)]
+    w-[44px]
+    cursor-pointer
+    border-0
+    bg-transparent
+    text-[length:var(--btn-icon-size)]
+    leading-[calc(var(--btn-icon-size)+4px)]
+    font-bold
+    text-[color:var(--ink)];
+}
+
+.badge,
+.badge-discount,
+.badge-warning {
+    @apply
+    inline-flex
+    items-center
+    rounded-full
+    px-[10px]
+    py-[4px]
+    text-[length:var(--badge-size)]
+    leading-[calc(var(--badge-size)+4px)]
+    font-extrabold;
+}
+
+.badge-discount {
+    @apply
+    bg-(color:--secondary)
+    text-white;
+}
+
+.badge-warning {
+    @apply
+    bg-(color:--tertiary)
+    text-[color:var(--ink)];
+}
+
+.badge-pill {
+    @apply
+    inline-flex
+    items-center
+    rounded-full
+    bg-(color:--tertiary)
+    px-[12px]
+    py-[6px]
+    text-[length:var(--badge-pill-size)]
+    font-extrabold
+    text-[color:var(--ink)];
+}
+
+.badge-count {
+    @apply
+    inline-flex
+    py-[2px]
+    w-[22px]
+    items-center
+    justify-center
+    rounded-full
+    bg-(color:--tertiary)
+    px-[6px]
+    text-[length:var(--badge-count-size)]
+    leading-[calc(var(--badge-count-size)+4px)]
+    font-extrabold
+    text-[color:var(--ink)];
+}
+
+.tag {
+    @apply
+    inline-flex
+    items-center
+    rounded-full
+    bg-(color:--tint)
+    px-[12px]
+    py-[6px]
+    text-[length:var(--tag-size)]
+    font-bold
+    text-[color:var(--ink)];
+}
+
+.status-ok {
+    @apply
+    inline-flex
+    items-center
+    gap-[8px]
+    text-[length:var(--status-ok-size)]
+    font-bold
+    text-[color:var(--secondary)];
+}
+
+.label {
+    @apply
+    text-[length:var(--label-size)]
+    leading-[calc(var(--label-size)+4px)]
+    font-bold
+    text-[color:var(--ink)];
+}
+
+.input {
+    @apply
+    box-border
+    py-[11px]
+    w-full
+    rounded-[10px]
+    border
+    border-(color:--line-strong)
+    bg-(color:--surface)
+    px-[12px]
+    text-[length:var(--input-size)]
+    leading-[calc(var(--input-size)+4px)]
+    text-[color:var(--ink)];
+}
+
+.card {
+    @apply
+    rounded-[16px]
+    border
+    border-(color:--line)
+    bg-(color:--surface);
+}
+
+.img-placeholder {
+    @apply
+    flex
+    items-center
+    justify-center
+    bg-(color:--tint)
+    text-[length:var(--img-placeholder-size)]
+    leading-[calc(var(--img-placeholder-size)+4px)]
+    font-semibold
+    text-[color:var(--muted)];
+}
+
+@media (max-width:1023px){
+    :root {
+        --h1-size: 38px;
+        --h1-page-size: 30px;
+        --h2-size: 23px;
+        --h3-size: 17px;
+        --card-title-size: 15px;
+        --price-size: 19px;
+        --price-lg-size: 34px;
+        --price-was-size: 13px;
+        --price-save-size: 13px;
+        --btn-size: 14px;
+        --btn-lg-size: 15px;
+        --btn-outline-size: 14px;
+        --chip-size: 14px;
+        --chip-active-size: 14px;
+        --btn-text-size: 13px;
+        --btn-icon-size: 19px;
+        --badge-pill-size: 12px;
+        --badge-count-size: 12px;
+        --tag-size: 12px;
+        --status-ok-size: 14px;
+        --label-size: 13px;
+        --rating-size: 12px;
+        --price-off-size: 15px;
+        --size-title-size: 19px;
+        --size-btn-size: 19px;
+        --breadcrumb-size: 13px;
+
+        --btn-px: 18px;
+        --btn-py: 11px;
+        --btn-lg-py: 14px;
+        --btn-outline-px: 14px;
+        --btn-new-px: 40px;
+        --btn-new-py: 14px;
+    }
+}
+
+@media (max-width:767px){
+    :root {
+        --h1-size: 28px;
+        --h1-page-size: 28px;
+        --h2-size: 22px;
+        --h3-size: 16px;
+        --eyebrow-size: 11px;
+        --text-muted-sm-size: 13px;
+        --price-size: 18px;
+        --price-lg-size: 32px;
+        --btn-icon-size: 18px;
+        --badge-size: 11px;
+        --price-off-size: 14px;
+        --size-title-size: 18px;
+        --size-btn-size: 18px;
+        --btn-new-size: 15px;
+
+        --btn-px: 16px;
+        --btn-py: 10px;
+        --btn-lg-py: 12px;
+        --btn-outline-px: 12px;
+        --btn-icon-py: 7px;
+        --btn-new-px: 20px;
+        --btn-new-py: 10px;
+    }
+}
+
+@media (max-width:639px){
+    :root {
+        --h1-size: 26px;
+        --h1-page-size: 26px;
+        --h2-size: 20px;
+        --h3-size: 15px;
+        --text-muted-sm-size: 12px;
+        --card-title-size: 14px;
+        --price-size: 17px;
+        --price-lg-size: 28px;
+        --price-was-size: 12px;
+        --price-save-size: 12px;
+        --btn-size: 13px;
+        --btn-lg-size: 14px;
+        --btn-outline-size: 13px;
+        --btn-new-size: 14px;
+        --chip-size: 13px;
+        --chip-active-size: 13px;
+        --btn-text-size: 12px;
+        --btn-icon-size: 17px;
+        --badge-pill-size: 11px;
+        --badge-count-size: 11px;
+        --tag-size: 11px;
+        --status-ok-size: 13px;
+        --label-size: 12px;
+        --rating-size: 11px;
+        --price-off-size: 12px;
+        --size-title-size: 16px;
+        --size-btn-size: 16px;
+        --breadcrumb-size: 12px;
+
+        --btn-px: 14px;
+        --btn-py: 9px;
+        --btn-lg-py: 11px;
+        --btn-icon-py: 6px;
+        --btn-new-px: 16px;
+        --btn-new-py: 8px;
+    }
+}
