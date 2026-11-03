@@ -229,8 +229,8 @@ Observed files: `glowing-skin.png`, `bottle-perfume.png`, `desk-lamp.png`, `armc
 | Section `id` | kebab-case | `product-listing`, `special-category`, `small-banner`, `cart-empty`, `related-product` |
 | Route path | lowercase, kebab, `:param` | `/product/:id`, `/special/:category`, `/sample-image/:id` |
 | localStorage key | the store key | `'cart'`, `'order'` |
-| Class-string const | short noun | `crumb`, `crumbSeparator`, `crumbCurrent` |
-| Class-string prop | short noun or `variant` | `variant`, `bg`, `color` |
+| Reused class (App.css) | kebab-case, what the element is | `.nav-link`, `.crumb`, `.crumb-current` |
+| Class-name prop | short noun or `variant`, carries an App.css class name | `variant`, `bg`, `color` |
 
 ---
 
@@ -804,15 +804,29 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
   `has-[:checked]:`, `group-has-[:checked]:`, `disabled:`, `active:`, `last:`, `focus:`.
   Transitions: `transition-colors duration-300`, `transition-[opacity,visibility] duration-300 ease-in-out`,
   `transition-transform duration-300`, `transition-opacity hover:opacity-70`.
-- `[W12]` Repeated class strings in one file go in a `const` with a comment
-  (`.ts`-side Tailwind):
-  ```tsx
-  // bread crumb text , size follows --breadcrumb-size from App.css
-  const crumb = "shrink-0 hover:underline text-[length:var(--breadcrumb-size)] leading-[calc(var(--breadcrumb-size)+4px)] font-semibold text-[color:var(--muted)]";
+- `[W12]` **Never put Tailwind utilities in a `.tsx` / `.ts` variable**: no class-string
+  `const`, `let`, object field or default prop value, however short. A class list used more than
+  once (or that you want to name) becomes an App.css class with `@apply`:
+  ```css
+  .nav-link {
+      @apply
+      p-[13px_10px]
+      text-[length:var(--nav-size)]
+      leading-[calc(var(--nav-size)+4px)]
+      font-semibold
+      underline
+      decoration-transparent
+      underline-offset-4
+      hover:decoration-current
+      transition-[text-decoration-color]
+      duration-300;
+  }
   ```
-  Use as `className={crumb}` or ``className={`${crumb} capitalize`}``.
-- `[W13]` Components accept class strings as props, with a default:
-  `bg = 'text-[var(--muted-soft)]'`, `variant?:string` applied as ``className={`${variant} flex ...`}``.
+  Used as `className="nav-link"` or ``className={`nav-link ${isActive ? 'link-active' : ''}`}``.
+  Never `const navLink = "p-[13px_10px] ..."` + `className={navLink}`.
+- `[W13]` Components may accept a class-name prop, but it carries an **App.css class name**, not
+  utilities: `variant = 'btn-outline'`, `bg = 'muted-soft-text'`, applied as
+  ``className={`${variant} flex ...`}``.
 - `[W14]` Dynamic arbitrary classes are built by a helper and **safelisted** in App.css:
   `function widthClass(percent:number){ return \`w-[${percent}%]\`; }` +
   `@source inline("w-[{0..100}%]");`. Any helper that builds class names needs a matching `@source inline(...)`.
@@ -1047,6 +1061,7 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L15 | `aria-label`, `aria-hidden`, `role` | old components | no ARIA; `title` on icon-only buttons |
 | L16 | `yup.InferType`, `Partial<Record<keyof ...>>`, other utility types | old forms | hand-written types (T15) |
 | L17 | `{/* label */}` on every block, `//action creator`, banner comments | everywhere in old code | comments only when necessary, one short line |
+| L18 | class-string consts (`const crumb = "shrink-0 ..."`, `const navLink = "p-[13px_10px] ..."`) and utility defaults on props | Header, breadcrumb, old components | a named App.css class (W12) |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
@@ -1060,6 +1075,7 @@ It is positioning, not sizing, appears everywhere, and is not a violation.
 - [ ] Files in the right place and named per F / A / N.
 - [ ] Formatting: indent of the file, ` , ` commas, `if(`, `else{` on a new line, `()=>`, no semicolon on imports, `.tsx` extensions on local imports.
 - [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 12 utilities (longer → App.css class).
+- [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are App.css classes.
 - [ ] No `aria-*` or `role`; every `img` has a descriptive `alt` and no `loading="lazy"`.
 - [ ] Flex child widths are `basis-[N%]` only.
 - [ ] Types with `type`, beginner-friendly only (T15), explicit `useState<T>`, no useMemo/useCallback.

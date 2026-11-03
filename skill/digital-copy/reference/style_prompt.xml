@@ -30,6 +30,11 @@
       Shorter class lists stay in className. Use @apply for a shorter list only when the
       user asks for it.
     </rule>
+    <rule>
+      Never store Tailwind utilities in a .tsx / .ts variable, const, object or default prop
+      value (const navLink = "p-[13px_10px] ..."). Write them as a named class in App.css
+      with @apply and use the class name in className, whatever the length.
+    </rule>
     <app_css_allowed>
       <item>@theme</item>
       <item>:root</item>
@@ -175,6 +180,7 @@
     <check>No aria-* and no role attribute anywhere.</check>
     <check>Every img has a descriptive, non-empty alt and no loading="lazy".</check>
     <check>No className has more than 12 utilities; longer lists live in a named App.css class.</check>
+    <check>No Tailwind utilities stored in a .tsx / .ts variable, const, object or default prop; reused class lists are App.css classes.</check>
     <check>No grid utilities anywhere.</check>
     <check>Responsive overrides use max-lg, max-md, max-sm, written largest to smallest.</check>
     <check>No new h-[...] added and no existing h-[...] changed.</check>

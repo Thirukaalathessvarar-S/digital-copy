@@ -41,6 +41,7 @@ no `pages/` folder, no barrel files, no `interface`, no `cn()`, no `useCallback`
 - a flex child width in px: `basis-[120px]`, `basis-[calc(...)]`, `w-[Npx]` on a flex child (use `basis-[25%]`)
 - any `aria-*` or `role` attribute · an `img` with empty or missing `alt` · `loading="lazy"`
 - a className with more than 12 utilities (move it to a named App.css class with `@apply`)
+- Tailwind utilities in a `.tsx` / `.ts` variable (`const navLink = "p-[13px_10px] ..."`): write a named App.css class instead
 - utility types (`Omit`, `Pick`, `Partial`, `Record`, `keyof`, `yup.InferType` ...): beginner-friendly types only
 - comments that are not necessary; keep the needed ones to one short line
 - add an `h-[...]` or change an existing one

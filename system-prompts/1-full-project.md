@@ -56,6 +56,7 @@ The user describes an app (pages, features, data source). You deliver **every fi
      no `useMemo` / `useCallback` / `interface` / `React.FC` / `clsx`.
    - Explicit closing tags: `<Footer></Footer>`, `<img ...></img>`, `<input ...></input>`.
    - className on one line, at most 12 utilities; longer → a named App.css class with `@apply`.
+     Never store utilities in a variable (`const navLink = "..."`): reused lists are App.css classes.
      Every list prop passed explicitly.
    - Comments only where necessary, one short lowercase line. No block labels, no `//action creator`.
    - Types: beginner-friendly only, written by hand (STYLE_DNA T15). No `Omit`, `Partial`, `Record`,
