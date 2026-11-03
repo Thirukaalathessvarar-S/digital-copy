@@ -234,7 +234,7 @@ h3 {
     text-[length:var(--btn-size)]
     leading-[calc(var(--btn-size)+4px)]
     font-bold
-    !text-white
+    text-white
     no-underline
     hover:bg-[var(--heading)]
     hover:text-white;
@@ -254,7 +254,7 @@ h3 {
     text-[length:var(--btn-size)]
     leading-[calc(var(--btn-size)+4px)]
     font-bold
-    !text-white
+    text-white
     no-underline;
 }
 
@@ -314,16 +314,16 @@ h3 {
     justify-center
     rounded-[10px]
     border
-    !border-[var(--ink)]
+    border-[var(--ink)]
     bg-(color:--surface)
     px-[var(--btn-outline-px)]
     text-[length:var(--btn-outline-size)]
     leading-[calc(var(--btn-outline-size)+4px)]
     font-bold
-    !text-[color:var(--ink)]
+    text-[color:var(--ink)]
     no-underline
-    hover:!border-[var(--tertiary)]
-    hover:!bg-[var(--surface)];
+    hover:border-[var(--tertiary)]
+    hover:bg-[var(--surface)];
 }
 
 .outline {
@@ -335,13 +335,13 @@ h3 {
     justify-center
     rounded-[10px]
     border
-    !border-[var(--muted-soft)]
+    border-[var(--muted-soft)]
     bg-(color:--surface)
     px-[var(--btn-outline-px)]
     text-[length:var(--btn-outline-size)]
     leading-[calc(var(--btn-outline-size)+4px)]
     font-bold
-    !text-[color:var(--ink)]
+    text-[color:var(--ink)]
     no-underline;
 }
 

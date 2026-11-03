@@ -795,11 +795,22 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
   breakpoint overrides, largest to smallest:
   `p-[20px] max-md:p-[16px] max-sm:p-[12px]`, `gap-[40px] max-lg:gap-[24px] max-md:gap-[20px]`,
   `flex-row ... max-md:flex-col`.
-- `[W9]` Overriding a reusable class from App.css in one place uses the `!` prefix:
-  `!text-[var(--primary)]`, `!py-[11px]`, `!px-[20px]`, `!pl-[40px]`, `!p-2` (never for font size
-  at breakpoints, see `style_prompt.xml`).
+- `[W9]` **Never use important**: no `!` modifier (`!py-[11px]`, `!text-[var(--primary)]`,
+  `max-sm:!rounded-[28px]`, `hover:!bg-...`) in className or `@apply`, and no `!important` in CSS.
+  To change a value a reusable class sets, write a new class:
+  - a **modifier class** right below the base class in App.css (a later App.css class wins):
+    ```css
+    .input-icon {
+        @apply
+        pl-[40px];
+    }
+    ```
+    used as `className="input input-icon"`;
+  - or a **separate class / class list** for that element without the base class, when it differs a lot;
+  - to **hide** an element whose class sets `display`, swap the class:
+    ``className={isHidden ? 'hidden' : 'product-card'}``.
 - `[W10]` Reusable classes compose with utilities: `className="btn-outline gap-[8px]"`,
-  `className="card flex-1 self-start p-[30px] max-sm:p-[20px]"`, `className="input !pl-[40px]"`.
+  `className="card flex-1 self-start p-[30px] max-sm:p-[20px]"`, `className="input input-icon"`.
 - `[W11]` State variants used: `hover:`, `group` / `group-hover:`, `peer` / `peer-checked:`,
   `has-[:checked]:`, `group-has-[:checked]:`, `disabled:`, `active:`, `last:`, `focus:`.
   Transitions: `transition-colors duration-300`, `transition-[opacity,visibility] duration-300 ease-in-out`,
@@ -917,8 +928,8 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 - `[X7]` A `className` with **more than 8 utilities** moves into a new App.css class with
   `@apply` (one utility per line, same order as in className). Name it kebab-case after what the
   element is (`.search-bar`, `.rating-chip`). Conditional parts (`${isOpen ? ... : ''}`) stay in
-  `className`. App.css classes are unlayered, so a utility that must override one still needs `!`
-  (`[W9]`): a class that sets `flex` is hidden with ``${isHidden ? '!hidden' : ''}``. Shorter lists stay in `className` unless the user asks for `@apply`. Reuse existing
+  `className`. App.css classes are unlayered and beat utilities, so a utility in className cannot
+  override them: write a modifier class or swap the class instead (`[W9]`). Shorter lists stay in `className` unless the user asks for `@apply`. Reuse existing
   classes freely.
   ```css
   .search-bar {
@@ -1062,6 +1073,7 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L16 | `yup.InferType`, `Partial<Record<keyof ...>>`, other utility types | old forms | hand-written types (T15) |
 | L17 | `{/* label */}` on every block, `//action creator`, banner comments | everywhere in old code | comments only when necessary, one short line |
 | L18 | class-string consts (`const crumb = "shrink-0 ..."`, `const navLink = "p-[13px_10px] ..."`) and utility defaults on props | Header, breadcrumb, old components | a named App.css class (W12) |
+| L19 | `!` modifiers (`!py-[11px]`, `max-sm:!rounded-[28px]`, `hover:!bg-...`) and `!important` | old components, App.css classes | a modifier class or a separate class (W9) |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
@@ -1078,6 +1090,7 @@ It is positioning, not sizing, appears everywhere, and is not a violation.
 - [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are App.css classes.
 - [ ] No `aria-*` or `role`; every `img` has a descriptive `alt` and no `loading="lazy"`.
 - [ ] Flex child widths are `basis-[N%]` only.
+- [ ] No `!` important modifier and no `!important`; overrides are new classes (W9).
 - [ ] Types with `type`, beginner-friendly only (T15), explicit `useState<T>`, no useMemo/useCallback.
 - [ ] Redux: slice pattern R1..R6, persistence only via `store.subscribe` R7..R9.
 - [ ] Every `style_prompt.xml` `<before_you_finish>` check passes.

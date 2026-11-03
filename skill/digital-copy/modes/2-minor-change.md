@@ -34,10 +34,10 @@ They sit in `reference/` next to this file, or are attached. If missing, say so 
   each override placed right after its base property. Flex only. px only, `%` only on `basis`.
 - **New file** → follow STYLE_DNA §2 to §4 for place and name, and copy the closest `templates/` file's shape.
 - **Lines you add** follow the newest rules even when the file around them does not: flex child
-  widths `basis-[N%]` only, no `aria-*` / `role`, descriptive `alt`, no `loading="lazy"`,
+  widths `basis-[N%]` only, no `!` important modifier or `!important` (write a modifier class), no `aria-*` / `role`, descriptive `alt`, no `loading="lazy"`,
   beginner-friendly types, comments only when necessary, a className of more than 8 utilities
   goes into a named App.css class, and no utilities are stored in a variable (reused lists are
-  App.css classes). Old code nearby is legacy (STYLE_DNA L14 to L18): leave it.
+  App.css classes). Old code nearby is legacy (STYLE_DNA L14 to L19): leave it.
 - **New dependency** → only if the user names it.
 - **Assets** → new images are kebab-case and named after what they show (STYLE_DNA §3); the
   import path matches the file's case exactly.

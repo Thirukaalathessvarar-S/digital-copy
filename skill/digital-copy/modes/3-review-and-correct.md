@@ -25,7 +25,7 @@ Decide the scope from the request:
 
 | Level | Meaning | Examples |
 |---|---|---|
-| **MUST** | breaks `style_prompt.xml`, or breaks the app | grid, rem/vw/vh/svh, clamp, size fractions, new `h-[...]`, changed `h-[...]`, font size via `max-*:text-[...]` in className, new non-allowed App.css content, `localStorage.setItem` outside `store.ts`, missing `key`, import path case mismatch, `basis-[Npx]` / `basis-[calc(...)]` / `w-[Npx]` on a flex child, any `aria-*` or `role`, empty or missing `alt`, `loading="lazy"` |
+| **MUST** | breaks `style_prompt.xml`, or breaks the app | grid, rem/vw/vh/svh, clamp, size fractions, new `h-[...]`, changed `h-[...]`, font size via `max-*:text-[...]` in className, new non-allowed App.css content, `localStorage.setItem` outside `store.ts`, missing `key`, import path case mismatch, `basis-[Npx]` / `basis-[calc(...)]` / `w-[Npx]` on a flex child, any `!` important modifier or `!important`, any `aria-*` or `role`, empty or missing `alt`, `loading="lazy"` |
 | **SHOULD** | breaks a STYLE_DNA habit in new or changed code | className over 8 utilities, Tailwind utilities stored in a variable or default prop, utility types (`Omit`, `Partial`, `Record`, `keyof`, `InferType`), unnecessary or long comments, `interface`, `React.FC`, arrow component, `clsx`, `useMemo`, untyped `useState`, `if (` spacing, `} else {` on one line, self-closed `<Footer />`, missing `{/* label */}`, spread props in lists, wrong file place or name, kebab-case violation in assets, new dependency |
 | **LEGACY** | old pattern from STYLE_DNA §16 that already existed | only in full-project scope; listed separately, never mixed with MUST/SHOULD |
 | **OK** | looks odd but is the developer's style | `top-[50%] -translate-y-1/2` centring, ` , ` commas, 2-space indent in main.tsx/store.ts, empty `catch{}` in store.ts, `[useCategory , setCategory]` naming, explicit `0px`, `RootState = ReturnType<...>` in `store.ts`, `max-w-[Npx]` on images |
@@ -50,6 +50,7 @@ interface |React\.FC|=\s*\(\{[^)]*\}\)\s*=>\s*\(|clsx|classnames|cn\(|useMemo|us
 localStorage\.setItem                                           → MUST unless in src/app/store.ts (auth excluded)
 basis-\[(\d+(\.\d+)?px|calc)                                     → MUST  flex child width in px / W7
 \baria-[a-z]+=|\brole=                                          → MUST  no ARIA / C28
+!important|(^|[\s"'`:])![a-z\[-]                                → MUST  no important / W9 (skip JS `!x` logic: check it is a class)
 loading=["']lazy|alt=(""|'')|<img(?![^>]*\balt=)               → MUST  images / C29
 Omit<|Pick<|Partial<|Record\s*<|Required<|Readonly<|keyof |InferType|ReturnType<   → SHOULD types / T15 (RootState in store.ts is OK)
 className="([^" ]+ ){8,}[^" ]+"                                 → SHOULD className over 8 utilities / X7 (App.css class names do not count)

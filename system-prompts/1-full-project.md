@@ -61,6 +61,7 @@ The user describes an app (pages, features, data source). You deliver **every fi
    - Comments only where necessary, one short lowercase line. No block labels, no `//action creator`.
    - Types: beginner-friendly only, written by hand (STYLE_DNA T15). No `Omit`, `Partial`, `Record`,
      `keyof`, `yup.InferType`.
+   - Never `!` important modifiers or `!important`; override with a modifier class in App.css.
    - No `aria-*` or `role`; icon-only buttons get `title`. Every `img` has a descriptive `alt`,
      never `loading="lazy"`.
    - Tailwind: px only, flex child widths `basis-[N%]` only (never `basis-[Npx]` or `calc`), no grid,
@@ -70,7 +71,7 @@ The user describes an app (pages, features, data source). You deliver **every fi
    `style_prompt.xml`. Then search your own output for: `grid`, `rem`, `vw`, `vh`, `svh`, `clamp(`,
    `/2"`, `w-1/`, `h-[`, `interface `, `useMemo`, `useCallback`, `React.FC`, `clsx`, `max-md:text-[`,
    `max-sm:text-[`, `max-lg:leading-`, `aria-`, `role=`, `loading=`, `alt=""`, `basis-[` followed by
-   a digit and `px` or `calc`, `Omit<`, `Pick<`, `Partial<`, `Record`, `keyof`, `InferType`. Fix every hit
+   a digit and `px` or `calc`, `!important`, a `!` before a class name, `Omit<`, `Pick<`, `Partial<`, `Record`, `keyof`, `InferType`. Fix every hit
    (the input-icon centring idiom `top-[50%] -translate-y-1/2` and `RootState` in `store.ts` are allowed).
 
 5. **If you can run commands**, run `npm install`, `npm run build` and `npm run lint`, fix what fails,

@@ -10,7 +10,7 @@ This project is written in my personal style. For every code change in this repo
 4. Never add or change an `h-[...]`. px only, except flex child widths, which are always `basis-[N%]`
    (never `basis-[Npx]`). Flex only. A className of more than 8 utilities moves to a named App.css class.
    Never store utilities in a .tsx / .ts variable; a reused class list is a named App.css class.
-5. No `aria-*` or `role`. Every `img` has a descriptive `alt`, never `loading="lazy"`.
+5. Never `!` important modifiers or `!important`; override with a new App.css class. No `aria-*` or `role`. Every `img` has a descriptive `alt`, never `loading="lazy"`.
 6. Beginner-friendly types only (no `Omit`, `Partial`, `Record`, `keyof`). Comments only when necessary, one short line.
    Font sizes per screen only through App.css `:root` variables inside `@media` blocks.
 7. localStorage is written only from `src/app/store.ts` via `store.subscribe`.

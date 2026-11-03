@@ -35,6 +35,17 @@
       value (const navLink = "p-[13px_10px] ..."). Write them as a named class in App.css
       with @apply and use the class name in className, whatever the length.
     </rule>
+    <rule>
+      Never use important: no ! modifier on a Tailwind class (!py-[11px], max-sm:!rounded-[28px],
+      hover:!bg-...) in className or in @apply, and never write !important in CSS.
+    </rule>
+    <rule>
+      To change a value that an App.css class already sets, write a new class instead: a modifier
+      class placed right below the base class in App.css (.input-icon { @apply pl-[40px]; } used as
+      className="input input-icon"), or a separate class / class list for that element without the
+      base class. To hide an element whose class sets display, swap the class:
+      className={isHidden ? 'hidden' : 'product-card'}.
+    </rule>
     <app_css_allowed>
       <item>@theme</item>
       <item>:root</item>
@@ -178,6 +189,7 @@
     <check>Percentage used only on flex-basis.</check>
     <check>Every flex child width is basis-[N%]: no basis-[Npx], no basis-[calc(...)], no w-[Npx] on a flex child.</check>
     <check>No aria-* and no role attribute anywhere.</check>
+    <check>No ! important modifier on any Tailwind class and no !important anywhere; overrides are new classes.</check>
     <check>Every img has a descriptive, non-empty alt and no loading="lazy".</check>
     <check>No className has more than 8 utilities; longer lists live in a named App.css class.</check>
     <check>No Tailwind utilities stored in a .tsx / .ts variable, const, object or default prop; reused class lists are App.css classes.</check>
