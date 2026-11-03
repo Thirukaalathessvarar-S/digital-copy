@@ -55,7 +55,7 @@ The user describes an app (pages, features, data source). You deliver **every fi
    - `export function Name(){`; handlers as inner `function handleX(){`; `useState<T>(...)` always typed;
      no `useMemo` / `useCallback` / `interface` / `React.FC` / `clsx`.
    - Explicit closing tags: `<Footer></Footer>`, `<img ...></img>`, `<input ...></input>`.
-   - className on one line, at most 12 utilities; longer → a named App.css class with `@apply`.
+   - className on one line, at most 8 utilities; longer → a named App.css class with `@apply`.
      Never store utilities in a variable (`const navLink = "..."`): reused lists are App.css classes.
      Every list prop passed explicitly.
    - Comments only where necessary, one short lowercase line. No block labels, no `//action creator`.

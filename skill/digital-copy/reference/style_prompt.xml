@@ -17,7 +17,7 @@
       This is the default and the preferred place.
     </rule>
     <rule>
-      A className with more than 12 utilities (each variant such as max-md:p-[16px]
+      A className with more than 8 utilities (each variant such as max-md:p-[16px]
       counts as one) is too long. Move its static utilities into a named class in
       App.css with @apply and use that class in className. Conditional or dynamic
       parts stay in className.
@@ -179,12 +179,12 @@
     <check>Every flex child width is basis-[N%]: no basis-[Npx], no basis-[calc(...)], no w-[Npx] on a flex child.</check>
     <check>No aria-* and no role attribute anywhere.</check>
     <check>Every img has a descriptive, non-empty alt and no loading="lazy".</check>
-    <check>No className has more than 12 utilities; longer lists live in a named App.css class.</check>
+    <check>No className has more than 8 utilities; longer lists live in a named App.css class.</check>
     <check>No Tailwind utilities stored in a .tsx / .ts variable, const, object or default prop; reused class lists are App.css classes.</check>
     <check>No grid utilities anywhere.</check>
     <check>Responsive overrides use max-lg, max-md, max-sm, written largest to smallest.</check>
     <check>No new h-[...] added and no existing h-[...] changed.</check>
-    <check>Short class lists are in the .tsx / .ts file; only lists of more than 12 utilities (or ones the user asked for) are in App.css with @apply.</check>
+    <check>Short class lists are in the .tsx / .ts file; only lists of more than 8 utilities (or ones the user asked for) are in App.css with @apply.</check>
     <check>Anything added to App.css is only @theme, :root, a class, or a min/max-width @media.</check>
     <check>Font sizes, line heights and colors follow the patterns above.</check>
     <check>No max-lg / max-md / max-sm font-size or leading classes in .tsx / .ts. Screen-based size changes live only in App.css @media blocks.</check>

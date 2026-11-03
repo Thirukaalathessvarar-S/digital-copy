@@ -23,12 +23,12 @@ export function ProductCard({id , title , price , category , rating , images , d
     }
 
     return(
-        <Link to={`/product/${id}`} className={`basis-[23%] max-md:basis-[31%] max-sm:mx-auto max-sm:basis-[70%] ${(index ?? 0)>3 ? 'hidden' : ''} rounded-[24px] flex flex-col gap-[15px] border-solid border-[1px] border-[var(--line)] overflow-hidden`}>
+        <Link to={`/product/${id}`} className={`product-card ${(index ?? 0)>3 ? '!hidden' : ''}`}>
             <div className="relative bg-[var(--tint)] p-[40px_0px_0px_0px]">
                 <img className="w-full aspect-square object-contain" src={images?.[0]} alt={title}></img>
                 <p className="chip rating-chip"><i className="fa-solid fa-star text-[var(--tertiary)]"></i>{rating}</p>
             </div>
-            <div className="flex flex-col gap-[15px] max-md:gap-[12px] max-sm:gap-[10px] mt-auto p-[20px] max-md:p-[16px] max-sm:p-[12px]">
+            <div className="product-card-body">
                 <div className="flex flex-col gap-[5px]">
                     <p className="eyebrow !text-[var(--muted)]">{category}</p>
                     <p className="card-title line-clamp-1" title={title}>{title}</p>

@@ -360,6 +360,35 @@ h3 {
     text-[color:var(--ink)];
 }
 
+.product-card {
+    @apply
+    basis-[23%]
+    max-md:basis-[31%]
+    max-sm:mx-auto
+    max-sm:basis-[70%]
+    rounded-[24px]
+    flex
+    flex-col
+    gap-[15px]
+    border-solid
+    border-[1px]
+    border-[var(--line)]
+    overflow-hidden;
+}
+
+.product-card-body {
+    @apply
+    flex
+    flex-col
+    gap-[15px]
+    max-md:gap-[12px]
+    max-sm:gap-[10px]
+    mt-auto
+    p-[20px]
+    max-md:p-[16px]
+    max-sm:p-[12px];
+}
+
 .rating-chip {
     @apply
     py-[4px]
@@ -561,6 +590,36 @@ h3 {
     text-[length:var(--input-size)]
     leading-[calc(var(--input-size)+4px)]
     text-[color:var(--ink)];
+}
+
+.contact-form {
+    @apply
+    basis-[50%]
+    max-md:basis-[80%]
+    max-sm:basis-[100%]
+    flex
+    flex-col
+    gap-[20px]
+    bg-[#ffffff]
+    rounded-[24px]
+    p-[30px]
+    max-sm:p-[20px];
+}
+
+.empty-card {
+    @apply
+    basis-[40%]
+    max-md:basis-[70%]
+    max-sm:basis-[100%]
+    flex
+    flex-col
+    items-center
+    gap-[20px]
+    text-center
+    bg-[#ffffff]
+    rounded-[24px]
+    p-[30px]
+    max-sm:p-[20px];
 }
 
 .card {

@@ -64,7 +64,7 @@ export function Contact(){
             <Header isSearch={false}></Header>
             <section id="contact" className="bg-[var(--bg-soft)] p-[30px_0px]">
                 <div className="container flex justify-center">
-                    <form onSubmit={handleSubmit} className="basis-[50%] max-md:basis-[80%] max-sm:basis-[100%] flex flex-col gap-[20px] bg-[#ffffff] rounded-[24px] p-[30px] max-sm:p-[20px]">
+                    <form onSubmit={handleSubmit} className="contact-form">
                         <div>
                             <h2>Contact us</h2>
                             <p className="text-muted-sm">We reply within a day</p>

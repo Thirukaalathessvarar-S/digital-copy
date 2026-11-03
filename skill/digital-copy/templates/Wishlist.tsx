@@ -22,7 +22,7 @@ export function Wishlist(){
                 <Header isSearch={false}></Header>
                 <section id="wishlist-empty" className="bg-[var(--bg-soft)] p-[30px_0px]">
                     <div className="container flex justify-center">
-                        <div className="basis-[40%] max-md:basis-[70%] max-sm:basis-[100%] flex flex-col items-center gap-[20px] text-center bg-[#ffffff] rounded-[24px] p-[30px] max-sm:p-[20px]">
+                        <div className="empty-card">
                             <img src={notFound} alt="No items in wishlist" className="block max-w-[320px] max-sm:max-w-[240px]"></img>
                             <div>
                                 <h2 className="mb-[8px]">Your wishlist is empty</h2>

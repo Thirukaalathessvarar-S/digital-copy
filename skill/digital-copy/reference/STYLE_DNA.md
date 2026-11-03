@@ -341,7 +341,7 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   `<Route path="/x" element={<X/>}></Route>`.
 - `[C6]` (retired) JSX blocks no longer get a label comment. Existing `{/* label */}` comments in a
   file you edit stay as they are.
-- `[C7]` `className` is **one line**. No line breaks inside it, no `clsx`. More than 12 utilities
+- `[C7]` `className` is **one line**. No line breaks inside it, no `clsx`. More than 8 utilities
   → move the static part into a named App.css class (`[X7]`).
 - `[C8]` Short rows are written on a single line:
   `<div className="flex justify-between items-center"><span className="label">Subtotal</span><span className="label">₹ {subtotal.toFixed(2)}</span></div>`.
@@ -914,11 +914,11 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
   `.price` `.price-lg` `.price-was`, `.link` `.link-active`.
   Semantic text classes: `.text-muted-sm`, `.green-text`, `.red-text`, `.label`, `.card-title`.
   Box classes: `.card`, `.input`, `.img-placeholder`, `.container`.
-- `[X7]` A `className` with **more than 12 utilities** moves into a new App.css class with
+- `[X7]` A `className` with **more than 8 utilities** moves into a new App.css class with
   `@apply` (one utility per line, same order as in className). Name it kebab-case after what the
   element is (`.search-bar`, `.rating-chip`). Conditional parts (`${isOpen ? ... : ''}`) stay in
   `className`. App.css classes are unlayered, so a utility that must override one still needs `!`
-  (`[W9]`). Shorter lists stay in `className` unless the user asks for `@apply`. Reuse existing
+  (`[W9]`): a class that sets `flex` is hidden with ``${isHidden ? '!hidden' : ''}``. Shorter lists stay in `className` unless the user asks for `@apply`. Reuse existing
   classes freely.
   ```css
   .search-bar {
@@ -1074,7 +1074,7 @@ It is positioning, not sizing, appears everywhere, and is not a violation.
 - [ ] Stack and dependencies unchanged (S1). No new library.
 - [ ] Files in the right place and named per F / A / N.
 - [ ] Formatting: indent of the file, ` , ` commas, `if(`, `else{` on a new line, `()=>`, no semicolon on imports, `.tsx` extensions on local imports.
-- [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 12 utilities (longer → App.css class).
+- [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 8 utilities (longer → App.css class).
 - [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are App.css classes.
 - [ ] No `aria-*` or `role`; every `img` has a descriptive `alt` and no `loading="lazy"`.
 - [ ] Flex child widths are `basis-[N%]` only.
