@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
-// ready : true once the page content has loaded for the first time (the page height is final then)
+// ready : true after the first load , so the page height is final
 export default function useScroll(ready:boolean = true) {
   const { pathname, hash, key } = useLocation();
 

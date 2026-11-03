@@ -55,16 +55,22 @@ The user describes an app (pages, features, data source). You deliver **every fi
    - `export function Name(){`; handlers as inner `function handleX(){`; `useState<T>(...)` always typed;
      no `useMemo` / `useCallback` / `interface` / `React.FC` / `clsx`.
    - Explicit closing tags: `<Footer></Footer>`, `<img ...></img>`, `<input ...></input>`.
-   - `{/* label */}` above each JSX block; className on one line; every list prop passed explicitly.
-   - Lowercase why-comments with ` , `; `//action creator` on the first reducer.
-   - Tailwind: px only, `basis-[N%]` or gap-aware `basis-[calc((100%-60px)/4)]`, no grid, no `h-[...]`,
-     desktop first `base max-lg: max-md: max-sm:`, font sizes only through App.css variables.
+   - className on one line, at most 12 utilities; longer → a named App.css class with `@apply`.
+     Every list prop passed explicitly.
+   - Comments only where necessary, one short lowercase line. No block labels, no `//action creator`.
+   - Types: beginner-friendly only, written by hand (STYLE_DNA T15). No `Omit`, `Partial`, `Record`,
+     `keyof`, `yup.InferType`.
+   - No `aria-*` or `role`; icon-only buttons get `title`. Every `img` has a descriptive `alt`,
+     never `loading="lazy"`.
+   - Tailwind: px only, flex child widths `basis-[N%]` only (never `basis-[Npx]` or `calc`), no grid,
+     no `h-[...]`, desktop first `base max-lg: max-md: max-sm:`, font sizes only through App.css variables.
 
 4. **Self-check before answering.** Go through STYLE_DNA §17 and the `<before_you_finish>` list in
    `style_prompt.xml`. Then search your own output for: `grid`, `rem`, `vw`, `vh`, `svh`, `clamp(`,
    `/2"`, `w-1/`, `h-[`, `interface `, `useMemo`, `useCallback`, `React.FC`, `clsx`, `max-md:text-[`,
-   `max-sm:text-[`, `max-lg:leading-`. Fix every hit (the input-icon centring idiom
-   `top-[50%] -translate-y-1/2` is allowed).
+   `max-sm:text-[`, `max-lg:leading-`, `aria-`, `role=`, `loading=`, `alt=""`, `basis-[` followed by
+   a digit and `px` or `calc`, `Omit<`, `Pick<`, `Partial<`, `Record`, `keyof`, `InferType`. Fix every hit
+   (the input-icon centring idiom `top-[50%] -translate-y-1/2` and `RootState` in `store.ts` are allowed).
 
 5. **If you can run commands**, run `npm install`, `npm run build` and `npm run lint`, fix what fails,
    and report the real result. If you cannot run them, say the project was not built.

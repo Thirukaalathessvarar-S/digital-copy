@@ -15,11 +15,10 @@ export function Deals(){
     const [loading , setLoading] = useState<boolean>(true);
     const [minDiscount , setMinDiscount] = useState<number>(0);
 
-    // only products with at least the chosen discount
     const visibleProducts = products.filter((product)=>product.discountPercentage >= minDiscount);
 
     useEffect(()=>{
-        let ignore = false;      // drop a response that arrives after a newer request
+        let ignore = false;      // skip a stale response
         setLoading(true);
         fetch('https://dummyjson.com/products?limit=20&sortBy=discountPercentage&order=desc')
             .then(res => res.json())
@@ -47,14 +46,12 @@ export function Deals(){
             <Header isSearch={false}></Header>
 
             <section id="deals" className="bg-[var(--bg-soft)] p-[60px_0px] max-md:p-[40px_0px]">
-                {/* heading */}
                 <div className="container flex flex-wrap items-center justify-between gap-x-[20px] gap-y-[12px] mb-[40px] max-md:mb-[24px]">
                     <div className="flex flex-col gap-[4px]">
                         <p className="eyebrow text-[color:var(--muted)]">Offers</p>
                         <h2>Today's Deals</h2>
                     </div>
 
-                    {/* discount filter */}
                     <div className="flex flex-wrap gap-[10px] max-sm:gap-[8px]">
                         {[0 , 10 , 20].map((discount)=>(
                             <button key={discount} onClick={()=>handleDiscount(discount)} className={`${minDiscount===discount ? 'chip-active' : 'chip'}`}>{discount===0 ? 'All' : `${discount}%+`}</button>

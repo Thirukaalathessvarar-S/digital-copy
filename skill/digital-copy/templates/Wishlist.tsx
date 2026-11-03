@@ -22,7 +22,7 @@ export function Wishlist(){
                 <Header isSearch={false}></Header>
                 <section id="wishlist-empty" className="bg-[var(--bg-soft)] p-[30px_0px]">
                     <div className="container flex justify-center">
-                        <div className="basis-[480px] max-sm:basis-[100%] flex flex-col items-center gap-[20px] text-center bg-[#ffffff] rounded-[24px] p-[30px] max-sm:p-[20px]">
+                        <div className="basis-[40%] max-md:basis-[70%] max-sm:basis-[100%] flex flex-col items-center gap-[20px] text-center bg-[#ffffff] rounded-[24px] p-[30px] max-sm:p-[20px]">
                             <img src={notFound} alt="No items in wishlist" className="block max-w-[320px] max-sm:max-w-[240px]"></img>
                             <div>
                                 <h2 className="mb-[8px]">Your wishlist is empty</h2>
@@ -48,15 +48,14 @@ export function Wishlist(){
                 <div className="container flex flex-col gap-[16px]">
                     {wishItems.map((wishItem)=>(
                         <div key={wishItem.id} className="flex items-center gap-[20px] max-sm:gap-[12px] bg-[#ffffff] rounded-[24px] p-[20px] max-sm:p-[12px]">
-                            <div className="w-[80px] max-sm:w-[60px] shrink-0"><img src={wishItem.image} alt={wishItem.title} className="block w-full"></img></div>
+                            <div className="basis-[10%] max-sm:basis-[20%] shrink-0"><img src={wishItem.image} alt={wishItem.title} className="block w-full"></img></div>
 
-                            {/* details */}
                             <div className="flex flex-col gap-[5px] flex-1 min-w-0">
                                 <p className="card-title">{wishItem.title}</p>
                                 <p className="text-muted-sm">₹ {wishItem.price.toFixed(2)}</p>
                             </div>
 
-                            <button onClick={()=>handleRemove(wishItem.id)} aria-label="Remove" className="btn-outline gap-[8px]"><i className="fa-solid fa-trash"></i><span className="max-sm:hidden">Remove</span></button>
+                            <button onClick={()=>handleRemove(wishItem.id)} title="Remove" className="btn-outline gap-[8px]"><i className="fa-solid fa-trash"></i><span className="max-sm:hidden">Remove</span></button>
                         </div>
                     ))}
                 </div>

@@ -5,7 +5,6 @@ import * as yup from 'yup'
 import toast from 'react-hot-toast'
 import {useNavigate} from 'react-router-dom'
 
-// schema
 const schema = yup.object({
     name:yup.string().required('name is required'),
     email:yup.string().email('please enter valid email').required('email is required'),
@@ -13,8 +12,14 @@ const schema = yup.object({
     message:yup.string().required('message is required').min(10 , 'message must be at least 10 characters')
 })
 
-type FormValues = yup.InferType<typeof schema>
-type FormErrors = Partial<Record <keyof FormValues , string>>
+type FormErrors = {
+    name?:string;
+    email?:string;
+    phone?:string;
+    message?:string;
+}
+
+type Field = 'name' | 'email' | 'phone' | 'message'
 
 export function Contact(){
     const [errors , setErrors] = useState<FormErrors>({});
@@ -41,7 +46,7 @@ export function Contact(){
                 const newErrors: FormErrors = {};
 
                 err.inner.forEach((error) => {
-                    const field = error.path as keyof FormValues;
+                    const field = error.path as Field;
 
                     if (field && !newErrors[field]) {
                         newErrors[field] = error.message;
@@ -59,13 +64,12 @@ export function Contact(){
             <Header isSearch={false}></Header>
             <section id="contact" className="bg-[var(--bg-soft)] p-[30px_0px]">
                 <div className="container flex justify-center">
-                    <form onSubmit={handleSubmit} className="basis-[560px] max-sm:basis-[100%] flex flex-col gap-[20px] bg-[#ffffff] rounded-[24px] p-[30px] max-sm:p-[20px]">
+                    <form onSubmit={handleSubmit} className="basis-[50%] max-md:basis-[80%] max-sm:basis-[100%] flex flex-col gap-[20px] bg-[#ffffff] rounded-[24px] p-[30px] max-sm:p-[20px]">
                         <div>
                             <h2>Contact us</h2>
                             <p className="text-muted-sm">We reply within a day</p>
                         </div>
 
-                        {/* name + phone */}
                         <div className="flex flex-wrap gap-[20px]">
                             <div className="flex-1 min-w-[150px]">
                                 <label htmlFor="name" className="block eyebrow">Name</label>

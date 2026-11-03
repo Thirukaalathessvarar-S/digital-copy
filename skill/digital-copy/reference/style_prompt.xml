@@ -17,8 +17,18 @@
       This is the default and the preferred place.
     </rule>
     <rule>
-      Use @apply inside App.css ONLY when the user explicitly asks for a
-      Tailwind class to be written with @apply. Never decide this on your own.
+      A className with more than 12 utilities (each variant such as max-md:p-[16px]
+      counts as one) is too long. Move its static utilities into a named class in
+      App.css with @apply and use that class in className. Conditional or dynamic
+      parts stay in className.
+    </rule>
+    <rule>
+      Name the class in kebab-case after what the element is (.search-bar, .rating-chip),
+      never after how it looks. Keep the utilities in the same order as they were in className.
+    </rule>
+    <rule>
+      Shorter class lists stay in className. Use @apply for a shorter list only when the
+      user asks for it.
     </rule>
     <app_css_allowed>
       <item>@theme</item>
@@ -43,15 +53,22 @@
     <rule>Sizes change per breakpoint by writing a new fixed px value, never by scaling.</rule>
     <exception>
       The only relative value allowed is a percentage on flex-basis,
-      for example basis-[25%] or max-md:basis-[33.33%]. Percentages are
-      preferred for basis. Do not use a percentage for any other property.
+      for example basis-[25%] or max-md:basis-[33.33%]. Do not use a
+      percentage for any other property.
+    </exception>
+    <exception>
+      Centring an absolute icon or button inside a relative input wrapper with
+      top-[50%] -translate-y-1/2 (or top-1/2 -translate-y-1/2) is allowed. It is
+      positioning, not sizing.
     </exception>
   </units>
 
   <layout>
     <rule>Use flex only. Do not use grid (no grid, grid-cols-*, col-span-*, row-span-*, place-*, grid-template).</rule>
     <rule>Rows and columns: flex, flex-row, flex-col, flex-wrap.</rule>
-    <rule>Control item width with basis-[N%] on the flex child, plus shrink-0 or min-w-0 when needed.</rule>
+    <rule>A flex child's width is set ONLY with basis-[N%], plus shrink-0 or min-w-0 when needed.</rule>
+    <rule>Never set a flex child's width in px: no basis-[120px], no basis-[calc(...)], no w-[Npx] on a flex child. Images may still use max-w-[Npx].</rule>
+    <rule>For N items per row with a gap, round the percentage down so the gaps fit: 4 per row basis-[23%], 3 per row basis-[31%], 2 per row basis-[48%], 1 per row basis-[100%].</rule>
     <rule>Spacing between flex items: gap-[Npx] or gap-x-[Npx] / gap-y-[Npx].</rule>
     <rule>Alignment: items-*, justify-*, self-*.</rule>
   </layout>
@@ -144,13 +161,24 @@
     <rule>Multi-line @apply lists put one utility per line, ending with a semicolon on the last one.</rule>
   </code_style>
 
+  <markup>
+    <rule>Never use any ARIA attribute: no aria-label, aria-hidden, aria-expanded or any other aria-*, and no role attribute.</rule>
+    <rule>An icon-only button or link gets a short title attribute instead, for example title="Remove".</rule>
+    <rule>Every img has an alt that describes the picture. Never alt="" and never an img without alt.</rule>
+    <rule>Never add loading="lazy" to an img.</rule>
+  </markup>
+
   <before_you_finish>
     <check>No rem, em, vw, vh, fr, fractions, clamp().</check>
     <check>Percentage used only on flex-basis.</check>
+    <check>Every flex child width is basis-[N%]: no basis-[Npx], no basis-[calc(...)], no w-[Npx] on a flex child.</check>
+    <check>No aria-* and no role attribute anywhere.</check>
+    <check>Every img has a descriptive, non-empty alt and no loading="lazy".</check>
+    <check>No className has more than 12 utilities; longer lists live in a named App.css class.</check>
     <check>No grid utilities anywhere.</check>
     <check>Responsive overrides use max-lg, max-md, max-sm, written largest to smallest.</check>
     <check>No new h-[...] added and no existing h-[...] changed.</check>
-    <check>Classes are in the .tsx / .ts file, not in App.css, unless the user asked for @apply.</check>
+    <check>Short class lists are in the .tsx / .ts file; only lists of more than 12 utilities (or ones the user asked for) are in App.css with @apply.</check>
     <check>Anything added to App.css is only @theme, :root, a class, or a min/max-width @media.</check>
     <check>Font sizes, line heights and colors follow the patterns above.</check>
     <check>No max-lg / max-md / max-sm font-size or leading classes in .tsx / .ts. Screen-based size changes live only in App.css @media blocks.</check>

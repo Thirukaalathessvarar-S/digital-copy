@@ -21,8 +21,7 @@ const wishSlice = createSlice({
     name:'wish',
     initialState,
     reducers:{
-        addWish(state , action : PayloadAction<Wish>){  //action creator
-            // already saved , so nothing to add
+        addWish(state , action : PayloadAction<Wish>){
             if(state.some((wishItem)=>wishItem.id===action.payload.id)){
                 return;
             }

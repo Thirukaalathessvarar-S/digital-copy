@@ -360,6 +360,25 @@ h3 {
     text-[color:var(--ink)];
 }
 
+.rating-chip {
+    @apply
+    py-[4px]
+    max-sm:py-[2px]
+    px-[8px]
+    max-sm:px-[6px]
+    absolute
+    top-[10px]
+    right-[10px]
+    max-sm:top-[6px]
+    max-sm:right-[6px]
+    text-[var(--muted)]
+    font-[400]
+    inline-flex
+    gap-[5px]
+    max-sm:gap-[3px]
+    items-center;
+}
+
 .chip-check {
     @apply
     inline-flex

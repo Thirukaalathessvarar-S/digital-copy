@@ -215,7 +215,7 @@ Observed files: `glowing-skin.png`, `bottle-perfume.png`, `desk-lamp.png`, `armc
 | Props type | `<Component>Props` | `HeaderProps`, `MovingLinkProps`, `CategoryButtonProps` |
 | Data type | PascalCase, singular | `Product`, `Cart`, `Order`, `Auth` |
 | Constant data type | camelCase + `Type` | `categoryType` |
-| Form types | `FormValues`, `FormErrors`, `LoginValues`, `CardErrors` | from yup `InferType` |
+| Form types | `FormValues`, `FormErrors`, `LoginValues`, `CardErrors` | written by hand, field by field (T15) |
 | Handler | `handle` + Noun/Verb | `handleCategory`, `handleSearch`, `handleBar`, `handleLink`, `handleAdd`, `handleMinus`, `handleFilter`, `handleLogout`, `handleViewCount` |
 | Other actions | plain verb phrase | `reduceCategory`, `increaseCategory`, `placeOrder`, `change` |
 | Boolean state | `[isX , setX]` (setter drops `is`) | `[isOpen,setOpen]`, `[isLoading , setLoading]`, `[isBreadCrumb , setBreadCrumb]` |
@@ -301,6 +301,13 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   optional refs and callbacks (`resultRef?.current?.scrollIntoView(...)`, `onSearch?.(...)`).
 - `[T13]` No `useMemo`, no `useCallback`, no `React.memo`. Derived values are plain `const`s
   computed in the body.
+- `[T15]` **Beginner-friendly types only.** Allowed: `type X = {...}` with plain members,
+  optional `?`, unions (`'cart' | 'wish'`, `number | null`), arrays (`Product[]`), `A & {x?:number}`,
+  and the generics a library needs (`useState<T>`, `PayloadAction<T>`, `React.FormEvent<HTMLFormElement>`,
+  `React.RefObject<HTMLElement | null>`). Never: `Omit`, `Pick`, `Partial`, `Record`, `Required`,
+  `Readonly`, `Exclude`, `Extract`, `ReturnType`, `Parameters`, `keyof`, `typeof` in a type,
+  `yup.InferType`, mapped or conditional types, or a generic you write yourself.
+  The one exception is `RootState` / `AppDispatch` at the end of `store.ts` (Redux needs them).
 - `[T14]` Money: `₹` sign, `.toFixed(2)`. Written `₹ {total.toFixed(2)}` in cart/order lists and
   `₹{actualPrice}` on product cards and product page.
 
@@ -332,10 +339,10 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   `<img src={x} alt="..." className="..."></img>`, `<input name="city" ... className="input"></input>`.
   `<br/>` is self-closed. In `main.tsx` routes both forms appear; new routes use
   `<Route path="/x" element={<X/>}></Route>`.
-- `[C6]` Every block gets a lowercase label comment above it: `{/* banner */}`, `{/* image */}`,
-  `{/* text */}`, `{/* search */}`, `{/* outline menu */}`, `{/* summary */}`, `{/* bread crumb */}`,
-  `{/* city + pin code */}`, `{/* menu modal */}`, `{/* round */}`.
-- `[C7]` `className` is **one line**, however long. No line breaks inside it, no `clsx`.
+- `[C6]` (retired) JSX blocks no longer get a label comment. Existing `{/* label */}` comments in a
+  file you edit stay as they are.
+- `[C7]` `className` is **one line**. No line breaks inside it, no `clsx`. More than 12 utilities
+  → move the static part into a named App.css class (`[X7]`).
 - `[C8]` Short rows are written on a single line:
   `<div className="flex justify-between items-center"><span className="label">Subtotal</span><span className="label">₹ {subtotal.toFixed(2)}</span></div>`.
   Icons inside buttons on the same line: `<button ... className="btn-outline gap-[8px]"><i className="fa-solid fa-xmark"></i>Clear search</button>`.
@@ -377,7 +384,11 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   Small fixed data may be an inline array literal mapped in JSX (`[{label:'Excellent' , rating:5}, ...].map((row)=>{ ... return( ... ) })`).
 - `[C12]` Skeletons while loading: `Array.from({length:4}).map((_ , i)=>(<ProductCardSkeleton key={i}></ProductCardSkeleton>))`.
 - `[C13]` Icons: Font Awesome `<i className="fa-solid fa-cart-shopping"></i>`,
-  `fa-regular`, `fa-brands`. Icon-only buttons and links get `aria-label`.
+  `fa-regular`, `fa-brands`. Icon-only buttons and links get a short `title` (`title="Remove"`).
+- `[C28]` **No ARIA at all**: no `aria-label`, `aria-hidden`, `aria-expanded` or any `aria-*`, and
+  no `role`.
+- `[C29]` **Images**: every `<img>` has an `alt` that describes the picture (`alt={title}`,
+  `alt="No deals found"`); never `alt=""`, never a missing `alt`, never `loading="lazy"`.
 
 ### 6.3 Page template
 
@@ -393,9 +404,7 @@ return(
             </div>
 
             <div className="container flex flex-wrap gap-[30px] max-lg:gap-[20px]">
-                {/* counter */}
                 ...
-                {/* summary */}
                 ...
             </div>
         </section>
@@ -419,7 +428,7 @@ return(
   `ignore` flag with its comment:
   ```tsx
   useEffect(()=>{
-    let ignore = false;      // drop a response that arrives after a newer request
+    let ignore = false;      // skip a stale response
     setLoading(true);
     fetch(url)
         .then(res => res.json())
@@ -455,11 +464,17 @@ const schema = yup.object({
     pincode:yup.string().required('pincode is required').matches(/^\d+$/ , 'pincode must contain only digits').min(6 , 'pincode must be at least 6 digits'),
 })
 
-type FormValues = yup.InferType<typeof schema>
-type FormErrors = Partial<Record <keyof FormValues , string>>
+type FormErrors = {
+    name?:string;
+    phone?:string;
+    pincode?:string;
+}
+
+type Field = 'name' | 'phone' | 'pincode'
 ```
 
-- `[C22]` Schema and its types at module top, above the component. Note `Record <` with a space.
+- `[C22]` Schema and its types at module top, above the component. Types are written by hand
+  (`[T15]`): one optional `string` per field in `FormErrors`, and a `Field` union of the field names.
 - `[C23]` Inputs are uncontrolled (`name`, `id`, `placeholder`, `defaultValue`). Submit handler:
   ```tsx
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>){
@@ -477,7 +492,7 @@ type FormErrors = Partial<Record <keyof FormValues , string>>
               const newErrors: FormErrors = {};
 
               err.inner.forEach((error) => {
-                  const field = error.path as keyof FormValues;
+                  const field = error.path as Field;
 
                   if (field && !newErrors[field]) {
                       newErrors[field] = error.message;
@@ -514,17 +529,14 @@ type FormErrors = Partial<Record <keyof FormValues , string>>
 
 ## 7. Comments `[K]`
 
-- `[K1]` Lowercase, short, plain English; explain **why**, not what. Space before commas:
-  `// item exist , button follows the cart so it changes right after the click`,
-  `// last one removed , so drop the whole cart entry`,
-  `// both checked means the whole list , so no half filter`.
-- `[K2]` Trailing comments on state and props, aligned with spaces:
-  `const [hasLoaded , setHasLoaded] = useState<boolean>(false);   // true after the first load , never goes back`.
-- `[K3]` `//action creator` (no space after `//`) trails the first reducer of each slice.
-- `[K4]` Section banners in long files: `// ============fallback==============`.
-- `[K5]` JSX block labels `{/* name */}` (see C6). A longer note above a tricky element:
-  `{/* the photo has empty black space above the bottle , so the top and bottom are trimmed with negative margins and clipped by the container */}`.
-- `[K6]` Comments that point to App.css: `// bread crumb text , size follows --breadcrumb-size from App.css`.
+- `[K1]` **Comment only when necessary**: when the code alone does not show *why* (a race guard,
+  a workaround, a non-obvious rule). Never comment what the code already says.
+- `[K2]` **Short**: one line, lowercase, plain English, space before commas:
+  `// last one removed , so drop the whole cart entry`, `// currentTarget is null after an await`.
+- `[K3]` (retired) No `//action creator` on reducers.
+- `[K4]` (retired) No section banners.
+- `[K5]` (retired) No JSX block labels. A tricky element may get one short `{/* ... */}` line.
+- `[K6]` A size that comes from App.css may get a short pointer: `// size from --breadcrumb-size`.
 - `[K7]` A file may end with a note listing API fields:
   ```ts
   // tages = string[]
@@ -564,7 +576,7 @@ const cartSlice = createSlice({
     name:'cart',
     initialState,
     reducers:{
-        addItems(state , action : PayloadAction<Cart>){  //action creator
+        addItems(state , action : PayloadAction<Cart>){
             if(action.payload.quantity==undefined){
                 action.payload.quantity=1;
             }
@@ -592,7 +604,7 @@ export default cartSlice.reducer
 - `[R4]` Reducers are method shorthand. Replace state by `return action.payload;` / `return [];`.
   Unused state param is `_state`. Payload is typed `action : PayloadAction<X>` (spaces around the
   colon on the first reducer; later reducers may be `state,action:PayloadAction<X>`).
-- `[R5]` Guard clauses with early `return;` and a why-comment before a structural change.
+- `[R5]` Guard clauses with early `return;`; a short why-comment only when the reason is not obvious.
 - `[R6]` Bottom two lines, no semicolons: `export const {...} = xSlice.actions` and
   `export default xSlice.reducer`.
 
@@ -774,11 +786,11 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
 - `[W6]` Weights: `font-bold`, `font-extrabold`, `font-medium`, `font-semibold`, numeric
   `font-[100]`, `font-[300]`, `font-[400]`. Families: `font-inter`, `font-satoshi`
   (Manrope is the body default).
-- `[W7]` Flex children widths: `basis-[N%]` (`basis-[45%]` + `basis-[55%]`, `basis-[50%]`,
-  `basis-[66.66%]` + `basis-[33.33%]`, `basis-[100%]`) or the **gap-aware** form
-  `basis-[calc((100%-{gap*(n-1)}px)/{n})]`:
-  `basis-[calc((100%-60px)/4)] max-md:basis-[calc((100%-40px)/3)] max-sm:basis-[70%]` for 4 per row
-  with `gap-[20px]`. `min-w-0` / `shrink-0` beside them. `flex-1` for "take the rest".
+- `[W7]` Flex children widths: **only** `basis-[N%]` (`basis-[45%]` + `basis-[55%]`, `basis-[50%]`,
+  `basis-[66.66%]` + `basis-[33.33%]`, `basis-[100%]`). Never `basis-[Npx]`, never `basis-[calc(...)]`,
+  never `w-[Npx]` on a flex child. With a gap, round down so the gaps fit:
+  `basis-[23%] max-md:basis-[31%] max-sm:basis-[70%]` for 4 / 3 per row with `gap-[20px]`.
+  `min-w-0` / `shrink-0` beside them. `flex-1` for "take the rest".
 - `[W8]` Property groups in a className: each property is followed **immediately** by its own
   breakpoint overrides, largest to smallest:
   `p-[20px] max-md:p-[16px] max-sm:p-[12px]`, `gap-[40px] max-lg:gap-[24px] max-md:gap-[20px]`,
@@ -888,8 +900,37 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
   `.price` `.price-lg` `.price-was`, `.link` `.link-active`.
   Semantic text classes: `.text-muted-sm`, `.green-text`, `.red-text`, `.label`, `.card-title`.
   Box classes: `.card`, `.input`, `.img-placeholder`, `.container`.
-- `[X7]` Per `style_prompt.xml`, write a new class in App.css **only when the user asks for
-  `@apply`**. Otherwise put utilities in `className`. Reuse existing classes freely.
+- `[X7]` A `className` with **more than 12 utilities** moves into a new App.css class with
+  `@apply` (one utility per line, same order as in className). Name it kebab-case after what the
+  element is (`.search-bar`, `.rating-chip`). Conditional parts (`${isOpen ? ... : ''}`) stay in
+  `className`. App.css classes are unlayered, so a utility that must override one still needs `!`
+  (`[W9]`). Shorter lists stay in `className` unless the user asks for `@apply`. Reuse existing
+  classes freely.
+  ```css
+  .search-bar {
+      @apply
+      self-end
+      ms-auto
+      flex
+      items-center
+      gap-[10px]
+      basis-[40%]
+      max-lg:basis-[30%]
+      max-md:basis-[100%]
+      max-md:order-4
+      shrink
+      p-[0px_20px]
+      rounded-full
+      border-solid
+      border-[1px]
+      border-(color:--line)
+      bg-(color:--surface)
+      focus-within:outline-2
+      focus-within:outline-offset-2
+      focus-within:outline-(color:--primary);
+  }
+  ```
+  Used as `<form className="search-bar">`.
 
 ### 12.5 Font-size `@media` blocks
 
@@ -1002,6 +1043,10 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L11 | `.map` without `key` (`Review` list, stars) | Product.tsx, Review.tsx | always `key` |
 | L12 | duplicate `.btn` block in App.css | App.css | one block per class |
 | L13 | `rem`, `em`, size fractions `w-1/2`, `basis-1/3` | none yet, keep it that way | px values / `basis-[N%]` |
+| L14 | `basis-[480px]`, `basis-[calc((100%-60px)/4)]`, `w-[80px]` on a flex child | ProductCard, Wishlist, Contact (old code) | `basis-[N%]` only |
+| L15 | `aria-label`, `aria-hidden`, `role` | old components | no ARIA; `title` on icon-only buttons |
+| L16 | `yup.InferType`, `Partial<Record<keyof ...>>`, other utility types | old forms | hand-written types (T15) |
+| L17 | `{/* label */}` on every block, `//action creator`, banner comments | everywhere in old code | comments only when necessary, one short line |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
@@ -1014,9 +1059,11 @@ It is positioning, not sizing, appears everywhere, and is not a violation.
 - [ ] Stack and dependencies unchanged (S1). No new library.
 - [ ] Files in the right place and named per F / A / N.
 - [ ] Formatting: indent of the file, ` , ` commas, `if(`, `else{` on a new line, `()=>`, no semicolon on imports, `.tsx` extensions on local imports.
-- [ ] Explicit closing tags on components and `img` / `input`; `{/* label */}` above blocks; className on one line.
-- [ ] Types with `type`, explicit `useState<T>`, no useMemo/useCallback.
+- [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 12 utilities (longer → App.css class).
+- [ ] No `aria-*` or `role`; every `img` has a descriptive `alt` and no `loading="lazy"`.
+- [ ] Flex child widths are `basis-[N%]` only.
+- [ ] Types with `type`, beginner-friendly only (T15), explicit `useState<T>`, no useMemo/useCallback.
 - [ ] Redux: slice pattern R1..R6, persistence only via `store.subscribe` R7..R9.
 - [ ] Every `style_prompt.xml` `<before_you_finish>` check passes.
 - [ ] No legacy pattern from section 16 newly written; no legacy pattern silently changed.
-- [ ] Comments lowercase, explain why, ` , ` before commas.
+- [ ] Comments only where necessary, one short lowercase line, ` , ` before commas.
