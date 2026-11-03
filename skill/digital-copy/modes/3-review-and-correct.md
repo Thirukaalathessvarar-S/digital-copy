@@ -50,7 +50,7 @@ interface |React\.FC|=\s*\(\{[^)]*\}\)\s*=>\s*\(|clsx|classnames|cn\(|useMemo|us
 localStorage\.setItem                                           → MUST unless in src/app/store.ts (auth excluded)
 basis-\[(\d+(\.\d+)?px|calc)                                     → MUST  flex child width in px / W7
 \baria-[a-z]+=|\brole=                                          → MUST  no ARIA / C28
-!important|(^|[\s"'`:])![a-z\[-]                                → MUST  no important / W9 (skip JS `!x` logic: check it is a class)
+!important|className=.*[\s"'`{:]![a-z\[-]|^\s+([a-z-]+:)*![a-z\[-]   → MUST  no important / W9 (className and @apply lines only)
 loading=["']lazy|alt=(""|'')|<img(?![^>]*\balt=)               → MUST  images / C29
 Omit<|Pick<|Partial<|Record\s*<|Required<|Readonly<|keyof |InferType|ReturnType<   → SHOULD types / T15 (RootState in store.ts is OK)
 className="([^" ]+ ){8,}[^" ]+"                                 → SHOULD className over 8 utilities / X7 (App.css class names do not count)
