@@ -52,7 +52,7 @@ basis-\[(\d+(\.\d+)?px|calc)                                     → MUST  flex 
 \baria-[a-z]+=|\brole=                                          → MUST  no ARIA / C28
 !important|className=.*[\s"'`{:]![a-z\[-]|^\s+([a-z-]+:)*![a-z\[-]   → MUST  no important / W9 (className and @apply lines only)
 loading=["']lazy|alt=(""|'')|<img(?![^>]*\balt=)               → MUST  images / C29
-Omit<|Pick<|Partial<|Record\s*<|Required<|Readonly<|keyof |InferType|ReturnType<   → SHOULD types / T15 (RootState in store.ts is OK)
+Omit<|Pick<|Partial<|Record\s*<|Required<|Readonly<|keyof |InferType|ReturnType<   → SHOULD types / T15 (RootState in store.ts is OK; a C22 `FormValues = yup.InferType<...>` used outside the submit handler is OK)
 className="([^" ]+ ){8,}[^" ]+"                                 → SHOULD className over 8 utilities / X7 (App.css class names do not count)
 (const|let|var)\s+\w+\s*=\s*["'`][^"'`]*\b(p|px|py|m|mt|mb|gap|w|max-w|text|bg|border|rounded|font|leading)-\[   → SHOULD utilities in a variable / W12 (confirm it is a class list)
 \{/\* [a-z +]+ \*/\}|//action creator|// =+                     → SHOULD unnecessary comment / K1 (LEGACY L17 outside changed lines)

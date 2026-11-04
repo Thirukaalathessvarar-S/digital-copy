@@ -306,8 +306,10 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   and the generics a library needs (`useState<T>`, `PayloadAction<T>`, `React.FormEvent<HTMLFormElement>`,
   `React.RefObject<HTMLElement | null>`). Never: `Omit`, `Pick`, `Partial`, `Record`, `Required`,
   `Readonly`, `Exclude`, `Extract`, `ReturnType`, `Parameters`, `keyof`, `typeof` in a type,
-  `yup.InferType`, mapped or conditional types, or a generic you write yourself.
-  The one exception is `RootState` / `AppDispatch` at the end of `store.ts` (Redux needs them).
+  mapped or conditional types, or a generic you write yourself.
+  Exceptions: `RootState` / `AppDispatch` at the end of `store.ts` (Redux needs them), and
+  `type FormValues = yup.InferType<typeof schema>` when a form's values type is used outside the
+  submit handler (C22). Never wrap it in `Partial<Record<keyof ...>>`.
 - `[T14]` Money: `₹` sign, `.toFixed(2)`. Written `₹ {total.toFixed(2)}` in cart/order lists and
   `₹{actualPrice}` on product cards and product page.
 
@@ -475,6 +477,11 @@ type Field = 'name' | 'phone' | 'pincode'
 
 - `[C22]` Forms with two or more fields (one-field forms: C30). Schema and its types at module top, above the component. Types are written by hand
   (`[T15]`): one optional `string` per field in `FormErrors`, and a `Field` union of the field names.
+  Never `Partial<Record<keyof FormValues , string>>` and never `error.path as keyof FormValues`:
+  write `FormErrors` and `Field` out and cast with `error.path as Field`.
+  `type FormValues = yup.InferType<typeof schema>` is allowed only when the values type is needed
+  outside the submit handler, e.g. `useState<FormValues | null>(null)` to keep a saved address or a
+  prop typed with it. `schema.validate(...)` already returns typed values, so do not add it just for `values`.
 - `[C23]` Inputs are uncontrolled (`name`, `id`, `placeholder`, `defaultValue`). Submit handler:
   ```tsx
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>){
@@ -1106,7 +1113,7 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L13 | `rem`, `em`, size fractions `w-1/2`, `basis-1/3` | none yet, keep it that way | px values / `basis-[N%]` |
 | L14 | `basis-[480px]`, `basis-[calc((100%-60px)/4)]`, `w-[80px]` on a flex child | ProductCard, Wishlist, Contact (old code) | `basis-[N%]` only |
 | L15 | `aria-label`, `aria-hidden`, `role` | old components | no ARIA; `title` on icon-only buttons |
-| L16 | `yup.InferType`, `Partial<Record<keyof ...>>`, other utility types | old forms | hand-written types (T15) |
+| L16 | `Partial<Record<keyof ...>>`, `as keyof FormValues`, `yup.InferType` used only to build `FormErrors`, other utility types | old forms | hand-written `FormErrors` + `Field` (T15, C22) |
 | L17 | `{/* label */}` on every block, `//action creator`, banner comments | everywhere in old code | comments only when necessary, one short line |
 | L18 | class-string consts (`const crumb = "shrink-0 ..."`, `const navLink = "p-[13px_10px] ..."`) and utility defaults on props | Header, breadcrumb, old components | a named App.css class (W12) |
 | L19 | `!` modifiers (`!py-[11px]`, `max-sm:!rounded-[28px]`, `hover:!bg-...`) and `!important` | old components, App.css classes | a modifier class or a separate class (W9) |
