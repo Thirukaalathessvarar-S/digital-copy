@@ -473,7 +473,7 @@ type FormErrors = {
 type Field = 'name' | 'phone' | 'pincode'
 ```
 
-- `[C22]` Schema and its types at module top, above the component. Types are written by hand
+- `[C22]` Forms with two or more fields (one-field forms: C30). Schema and its types at module top, above the component. Types are written by hand
   (`[T15]`): one optional `string` per field in `FormErrors`, and a `Field` union of the field names.
 - `[C23]` Inputs are uncontrolled (`name`, `id`, `placeholder`, `defaultValue`). Submit handler:
   ```tsx
@@ -516,6 +516,42 @@ type Field = 'name' | 'phone' | 'pincode'
   ```
   Clearing an error on type: `onChange={() => setErrors(prev => ({ ...prev, city: '' }))}`.
 - `[C25]` After success: `toast.success('...')`, `formElement.reset()`, `navigate('/')`.
+- `[C30]` **One-field forms** (newsletter, subscribe, single search box) do **not** use the object
+  schema, `FormErrors`, `Field` or the `err.inner` loop above. They validate the one value directly:
+  ```tsx
+  const emailSchema = yup.string().required('email is required').email('please enter valid email');
+
+  export function Footer(){
+      const [newsError , setNewsError] = useState<string>('');
+      const [isSubscribed , setSubscribed] = useState<boolean>(false);
+
+      async function handleSubscribe(event: React.FormEvent<HTMLFormElement>){
+          event.preventDefault();
+          const formElement = event.currentTarget;
+          const form = new FormData(formElement);
+          try{
+              await emailSchema.validate(form.get('email'));
+              setNewsError('');
+              setSubscribed(true);
+              formElement.reset();
+          }
+          catch(err){
+              if(err instanceof yup.ValidationError){
+                  setNewsError(err.message);
+                  setSubscribed(false);
+                  return;
+              }
+              throw err;
+          }
+      }
+  ```
+  - Schema is `<field>Schema = yup.string()...` at module top; error state is one
+    `useState<string>('')` named `<form>Error`; handler is named after the action (`handleSubscribe`).
+  - Read the value with `form.get('<name>')`; show `err.message`; no `abortEarly`.
+  - Input clears the error inline: `onChange={()=>setNewsError('')}`; button is `type="submit"`;
+    the form has `noValidate`.
+  - Error line: `{newsError!=='' && <p className="red-text">{newsError}</p>}`.
+  - Use C22 to C24 only when the form has two or more fields.
 
 ### 6.6 Copy and locale
 
@@ -1092,6 +1128,7 @@ It is positioning, not sizing, appears everywhere, and is not a violation.
 - [ ] Flex child widths are `basis-[N%]` only.
 - [ ] No `!` important modifier and no `!important`; overrides are new classes (W9).
 - [ ] Types with `type`, beginner-friendly only (T15), explicit `useState<T>`, no useMemo/useCallback.
+- [ ] Forms: two or more fields → object schema + `FormErrors` (C22 to C24); one field → `yup.string()` + one string error (C30).
 - [ ] Redux: slice pattern R1..R6, persistence only via `store.subscribe` R7..R9.
 - [ ] Every `style_prompt.xml` `<before_you_finish>` check passes.
 - [ ] No legacy pattern from section 16 newly written; no legacy pattern silently changed.
