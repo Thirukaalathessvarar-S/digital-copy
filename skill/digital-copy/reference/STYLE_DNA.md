@@ -829,10 +829,10 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
 - `[W6]` Weights: `font-bold`, `font-extrabold`, `font-medium`, `font-semibold`, numeric
   `font-[100]`, `font-[300]`, `font-[400]`. Families: `font-inter`, `font-satoshi`
   (Manrope is the body default).
-- `[W7]` Flex children widths: **only** `basis-[N%]` (`basis-[45%]` + `basis-[55%]`, `basis-[50%]`,
-  `basis-[66.66%]` + `basis-[33.33%]`, `basis-[100%]`). Never `basis-[Npx]`, never `basis-[calc(...)]`,
-  never `w-[Npx]` on a flex child. With a gap, round down so the gaps fit:
-  `basis-[23%] max-md:basis-[31%] max-sm:basis-[70%]` for 4 / 3 per row with `gap-[20px]`.
+- `[W7]` Flex children widths: **only** `w-[N%]` (`w-[45%]` + `w-[55%]`, `w-[50%]`,
+  `w-[66.66%]` + `w-[33.33%]`, `w-[100%]`). Never `basis-[...]` of any kind
+  (no `basis-[N%]`, `basis-[Npx]`, `basis-[calc(...)]`), never `w-[Npx]` or `w-[calc(...)]` on a flex child. With a gap, round down so the gaps fit:
+  `w-[23%] max-md:w-[31%] max-sm:w-[70%]` for 4 / 3 per row with `gap-[20px]`.
   `min-w-0` / `shrink-0` beside them. `flex-1` for "take the rest".
 - `[W8]` Property groups in a className: each property is followed **immediately** by its own
   breakpoint overrides, largest to smallest:
@@ -982,9 +982,9 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
       flex
       items-center
       gap-[10px]
-      basis-[40%]
-      max-lg:basis-[30%]
-      max-md:basis-[100%]
+      w-[40%]
+      max-lg:w-[30%]
+      max-md:w-[100%]
       max-md:order-4
       shrink
       p-[0px_20px]
@@ -1074,9 +1074,9 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 
 - **lg** (`max-lg:`): same row, smaller gap and padding (`gap-[40px] max-lg:gap-[24px]`), images get a smaller `max-w`.
 - **md** (`max-md:`): `flex-wrap` or `max-md:flex-col` (`flex-col-reverse` when the image should come
-  first), basis goes to fewer per row or `max-md:basis-[100%]`, desktop-only parts `max-md:hidden`,
+  first), widths go to fewer per row or `max-md:w-[100%]`, desktop-only parts `max-md:hidden`,
   mobile-only parts `hidden max-md:flex`.
-- **sm** (`max-sm:`): one per row or centered narrower card (`max-sm:mx-auto max-sm:basis-[70%]`),
+- **sm** (`max-sm:`): one per row or centered narrower card (`max-sm:mx-auto max-sm:w-[70%]`),
   `max-sm:flex-col max-sm:items-center`, padding to `12px`/`16px`/`20px`.
 - Section padding: `p-[90px_0px] max-md:p-[60px_0px]`; card padding `p-[30px] max-sm:p-[20px]`.
 
@@ -1098,8 +1098,8 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 
 | ID | Pattern in old code | Where | New code does |
 |---|---|---|---|
-| L1 | `grid grid-cols-4 col-span-2 row-span-2 col-start-3` | `App.tsx` SmallBanner | flex + `basis-[N%]` |
-| L2 | `w-[50%]`, `w-[40%]`, `w-[70%]`, `max-[1120px]:w-[90%]`, `w-full` on wrappers | Cart, Login, Order, User, `.container` | fixed `w-[Npx]` / `max-w-[Npx]` per breakpoint, or `basis-[N%]` on a flex child |
+| L1 | `grid grid-cols-4 col-span-2 row-span-2 col-start-3` | `App.tsx` SmallBanner | flex + `w-[N%]` |
+| L2 | `max-[1120px]:w-[90%]`, `w-full` on wrappers | Cart, Login, Order, User, `.container` | `w-[N%]` with `max-lg:` / `max-md:` / `max-sm:` overrides, or a fixed `max-w-[Npx]` |
 | L3 | `h-[100svh]`, `min-h-[100svh]`, `h-[70svh]`, `max-md:h-[10vh]`, `w-[100vw] h-[100vh]`, `w-[min(1100px,calc(100vw-96px))]` | Header, Cart, User, LoadingModal | no viewport units; height from content |
 | L4 | `max-md:!text-[length:15px] max-md:!leading-[19px]`, `max-lg:text-[56px]` in className | ProductCard, App.tsx | a `--x-size` variable reassigned in App.css `@media` |
 | L5 | spacing scale numbers `p-8`, `py-5`, `px-4`, `mt-3`, `gap-1`, `py-3`, `size-10`, `w-11` | various, App.css chips | `p-[32px]`, `py-[20px]` ... |
@@ -1110,8 +1110,8 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L10 | import path case not matching file (`playstation.png` for `PlayStation.png`) | App.tsx | exact case |
 | L11 | `.map` without `key` (`Review` list, stars) | Product.tsx, Review.tsx | always `key` |
 | L12 | duplicate `.btn` block in App.css | App.css | one block per class |
-| L13 | `rem`, `em`, size fractions `w-1/2`, `basis-1/3` | none yet, keep it that way | px values / `basis-[N%]` |
-| L14 | `basis-[480px]`, `basis-[calc((100%-60px)/4)]`, `w-[80px]` on a flex child | ProductCard, Wishlist, Contact (old code) | `basis-[N%]` only |
+| L13 | `rem`, `em`, size fractions `w-1/2`, `basis-1/3` | none yet, keep it that way | px values / `w-[N%]` |
+| L14 | any `basis-[...]` (`basis-[45%]`, `basis-[480px]`, `basis-[calc((100%-60px)/4)]`), `w-[80px]` on a flex child | ProductCard, Wishlist, Contact, all code before this rule | `w-[N%]` only |
 | L15 | `aria-label`, `aria-hidden`, `role` | old components | no ARIA; `title` on icon-only buttons |
 | L16 | `Partial<Record<keyof ...>>`, `as keyof FormValues`, `yup.InferType` used only to build `FormErrors`, other utility types | old forms | hand-written `FormErrors` + `Field` (T15, C22) |
 | L17 | `{/* label */}` on every block, `//action creator`, banner comments | everywhere in old code | comments only when necessary, one short line |
@@ -1132,7 +1132,7 @@ It is positioning, not sizing, appears everywhere, and is not a violation.
 - [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 8 utilities (longer → App.css class).
 - [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are App.css classes.
 - [ ] No `aria-*` or `role`; every `img` has a descriptive `alt` and no `loading="lazy"`.
-- [ ] Flex child widths are `basis-[N%]` only.
+- [ ] Flex child widths are `w-[N%]` only, never `basis-[...]`.
 - [ ] No `!` important modifier and no `!important`; overrides are new classes (W9).
 - [ ] Types with `type`, beginner-friendly only (T15), explicit `useState<T>`, no useMemo/useCallback.
 - [ ] Forms: two or more fields → object schema + `FormErrors` (C22 to C24); one field → `yup.string()` + one string error (C30).

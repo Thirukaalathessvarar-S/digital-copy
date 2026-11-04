@@ -64,14 +64,14 @@ The user describes an app (pages, features, data source). You deliver **every fi
    - Never `!` important modifiers or `!important`; override with a modifier class in App.css.
    - No `aria-*` or `role`; icon-only buttons get `title`. Every `img` has a descriptive `alt`,
      never `loading="lazy"`.
-   - Tailwind: px only, flex child widths `basis-[N%]` only (never `basis-[Npx]` or `calc`), no grid,
+   - Tailwind: px only, flex child widths `w-[N%]` only (never `basis-[...]`, never px or `calc`), no grid,
      no `h-[...]`, desktop first `base max-lg: max-md: max-sm:`, font sizes only through App.css variables.
 
 4. **Self-check before answering.** Go through STYLE_DNA §17 and the `<before_you_finish>` list in
    `style_prompt.xml`. Then search your own output for: `grid`, `rem`, `vw`, `vh`, `svh`, `clamp(`,
    `/2"`, `w-1/`, `h-[`, `interface `, `useMemo`, `useCallback`, `React.FC`, `clsx`, `max-md:text-[`,
-   `max-sm:text-[`, `max-lg:leading-`, `aria-`, `role=`, `loading=`, `alt=""`, `basis-[` followed by
-   a digit and `px` or `calc`, `!important`, a `!` before a class name, `Omit<`, `Pick<`, `Partial<`, `Record`, `keyof`, `InferType`. Fix every hit
+   `max-sm:text-[`, `max-lg:leading-`, `aria-`, `role=`, `loading=`, `alt=""`, `basis-[`, `w-[` followed by
+   a digit and `px` or `calc` on a flex child, `!important`, a `!` before a class name, `Omit<`, `Pick<`, `Partial<`, `Record`, `keyof`, `InferType`. Fix every hit
    (the input-icon centring idiom `top-[50%] -translate-y-1/2`, `RootState` in `store.ts` and a C22
    `type FormValues = yup.InferType<typeof schema>` used outside the submit handler are allowed).
 

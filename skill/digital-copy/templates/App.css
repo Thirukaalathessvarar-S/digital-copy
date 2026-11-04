@@ -362,10 +362,10 @@ h3 {
 
 .product-card {
     @apply
-    basis-[23%]
-    max-md:basis-[31%]
+    w-[23%]
+    max-md:w-[31%]
     max-sm:mx-auto
-    max-sm:basis-[70%]
+    max-sm:w-[70%]
     rounded-[24px]
     flex
     flex-col
@@ -594,9 +594,9 @@ h3 {
 
 .contact-form {
     @apply
-    basis-[50%]
-    max-md:basis-[80%]
-    max-sm:basis-[100%]
+    w-[50%]
+    max-md:w-[80%]
+    max-sm:w-[100%]
     flex
     flex-col
     gap-[20px]
@@ -608,9 +608,9 @@ h3 {
 
 .empty-card {
     @apply
-    basis-[40%]
-    max-md:basis-[70%]
-    max-sm:basis-[100%]
+    w-[40%]
+    max-md:w-[70%]
+    max-sm:w-[100%]
     flex
     flex-col
     items-center

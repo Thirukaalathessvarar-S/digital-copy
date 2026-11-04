@@ -25,7 +25,7 @@ Decide the scope from the request:
 
 | Level | Meaning | Examples |
 |---|---|---|
-| **MUST** | breaks `style_prompt.xml`, or breaks the app | grid, rem/vw/vh/svh, clamp, size fractions, new `h-[...]`, changed `h-[...]`, font size via `max-*:text-[...]` in className, new non-allowed App.css content, `localStorage.setItem` outside `store.ts`, missing `key`, import path case mismatch, `basis-[Npx]` / `basis-[calc(...)]` / `w-[Npx]` on a flex child, any `!` important modifier or `!important`, any `aria-*` or `role`, empty or missing `alt`, `loading="lazy"` |
+| **MUST** | breaks `style_prompt.xml`, or breaks the app | grid, rem/vw/vh/svh, clamp, size fractions, new `h-[...]`, changed `h-[...]`, font size via `max-*:text-[...]` in className, new non-allowed App.css content, `localStorage.setItem` outside `store.ts`, missing `key`, import path case mismatch, any `basis-[...]`, `w-[Npx]` / `w-[calc(...)]` on a flex child, any `!` important modifier or `!important`, any `aria-*` or `role`, empty or missing `alt`, `loading="lazy"` |
 | **SHOULD** | breaks a STYLE_DNA habit in new or changed code | className over 8 utilities, Tailwind utilities stored in a variable or default prop, utility types (`Omit`, `Partial`, `Record`, `keyof`, `InferType`), unnecessary or long comments, `interface`, `React.FC`, arrow component, `clsx`, `useMemo`, untyped `useState`, `if (` spacing, `} else {` on one line, self-closed `<Footer />`, missing `{/* label */}`, spread props in lists, wrong file place or name, kebab-case violation in assets, new dependency |
 | **LEGACY** | old pattern from STYLE_DNA §16 that already existed | only in full-project scope; listed separately, never mixed with MUST/SHOULD |
 | **OK** | looks odd but is the developer's style | `top-[50%] -translate-y-1/2` centring, ` , ` commas, 2-space indent in main.tsx/store.ts, empty `catch{}` in store.ts, `[useCategory , setCategory]` naming, explicit `0px`, `RootState = ReturnType<...>` in `store.ts`, `max-w-[Npx]` on images |
@@ -48,7 +48,7 @@ max-(lg|md|sm|\[\d+px\]):!?(text-\[(length:)?\d|leading-\[\d)  → MUST  font si
 (^|[\s"'`])(sm|md|lg|xl|min-\[\d+px\]):[a-z!-]                 → SHOULD desktop-first max-* only / L9
 interface |React\.FC|=\s*\(\{[^)]*\}\)\s*=>\s*\(|clsx|classnames|cn\(|useMemo|useCallback   → SHOULD
 localStorage\.setItem                                           → MUST unless in src/app/store.ts (auth excluded)
-basis-\[(\d+(\.\d+)?px|calc)                                     → MUST  flex child width in px / W7
+basis-\[|\bw-\[calc                                            → MUST  no basis, flex child widths are w-[N%] / W7
 \baria-[a-z]+=|\brole=                                          → MUST  no ARIA / C28
 !important|className=.*[\s"'`{:]![a-z\[-]|^\s+([a-z-]+:)*![a-z\[-]   → MUST  no important / W9 (className and @apply lines only)
 loading=["']lazy|alt=(""|'')|<img(?![^>]*\balt=)               → MUST  images / C29
@@ -78,8 +78,8 @@ comments, structure, Redux pattern, App.css order, asset names).
 ## Review: <scope> (<n> files)
 
 ### MUST (<count>)
-1. `src/components/Wishlist.tsx:24` [SP:units] `w-[40%]` on the card wrapper
-   → `basis-[40%] max-sm:basis-[100%]` on a flex child inside `.container flex justify-center`
+1. `src/components/Wishlist.tsx:24` [SP:layout] `basis-[40%]` on the card wrapper
+   → `w-[40%] max-sm:w-[100%]`
 
 ### SHOULD (<count>)
 1. `src/components/Wish.tsx:12` [T5] `} else {`

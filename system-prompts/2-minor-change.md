@@ -31,10 +31,10 @@ They sit in `reference/` next to this file, or are attached. If missing, say so 
   - add to the blocks the project already has (`980 / 767 / 565` in the original project, `1023 / 767 / 639`
     in new ones). Never create a second parallel set.
 - **Responsive layout** → in className, desktop value first, then `max-lg:`, `max-md:`, `max-sm:`,
-  each override placed right after its base property. Flex only. px only, `%` only on `basis`.
+  each override placed right after its base property. Flex only. px only, `%` only on `w-[N%]`, never `basis-[...]`.
 - **New file** → follow STYLE_DNA §2 to §4 for place and name, and copy the closest `templates/` file's shape.
 - **Lines you add** follow the newest rules even when the file around them does not: flex child
-  widths `basis-[N%]` only, no `!` important modifier or `!important` (write a modifier class), no `aria-*` / `role`, descriptive `alt`, no `loading="lazy"`,
+  widths `w-[N%]` only (never `basis-[...]`), no `!` important modifier or `!important` (write a modifier class), no `aria-*` / `role`, descriptive `alt`, no `loading="lazy"`,
   beginner-friendly types, comments only when necessary, a className of more than 8 utilities
   goes into a named App.css class, and no utilities are stored in a variable (reused lists are
   App.css classes). Old code nearby is legacy (STYLE_DNA L14 to L19): leave it.

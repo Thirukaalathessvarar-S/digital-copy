@@ -68,9 +68,9 @@
     </forbidden>
     <rule>Sizes change per breakpoint by writing a new fixed px value, never by scaling.</rule>
     <exception>
-      The only relative value allowed is a percentage on flex-basis,
-      for example basis-[25%] or max-md:basis-[33.33%]. Do not use a
-      percentage for any other property.
+      The only relative value allowed is a percentage width,
+      for example w-[25%] or max-md:w-[33.33%]. Never use basis-[...]
+      (no flex-basis at all). Do not use a percentage for any other property.
     </exception>
     <exception>
       Centring an absolute icon or button inside a relative input wrapper with
@@ -82,9 +82,9 @@
   <layout>
     <rule>Use flex only. Do not use grid (no grid, grid-cols-*, col-span-*, row-span-*, place-*, grid-template).</rule>
     <rule>Rows and columns: flex, flex-row, flex-col, flex-wrap.</rule>
-    <rule>A flex child's width is set ONLY with basis-[N%], plus shrink-0 or min-w-0 when needed.</rule>
-    <rule>Never set a flex child's width in px: no basis-[120px], no basis-[calc(...)], no w-[Npx] on a flex child. Images may still use max-w-[Npx].</rule>
-    <rule>For N items per row with a gap, round the percentage down so the gaps fit: 4 per row basis-[23%], 3 per row basis-[31%], 2 per row basis-[48%], 1 per row basis-[100%].</rule>
+    <rule>A flex child's width is set ONLY with w-[N%], plus shrink-0 or min-w-0 when needed. Never use basis-[...].</rule>
+    <rule>Never set a flex child's width in px: no w-[120px], no w-[calc(...)], no basis-[...]. Images may still use max-w-[Npx].</rule>
+    <rule>For N items per row with a gap, round the percentage down so the gaps fit: 4 per row w-[23%], 3 per row w-[31%], 2 per row w-[48%], 1 per row w-[100%].</rule>
     <rule>Spacing between flex items: gap-[Npx] or gap-x-[Npx] / gap-y-[Npx].</rule>
     <rule>Alignment: items-*, justify-*, self-*.</rule>
   </layout>
@@ -105,7 +105,7 @@
     <rule>Write desktop first: the base class is the desktop value, then override downward with max-lg:, max-md:, max-sm:.</rule>
     <rule>Order the variants in className from largest to smallest: base, max-lg:, max-md:, max-sm:. Each smaller one overrides the larger one.</rule>
     <rule>Only add a variant when the value actually changes. Do not repeat the same value at a smaller breakpoint.</rule>
-    <rule>Every value at every breakpoint is a fixed px number. Never scale with %, vw, rem or clamp(). The only percentage allowed is flex-basis.</rule>
+    <rule>Every value at every breakpoint is a fixed px number. Never scale with %, vw, rem or clamp(). The only percentage allowed is a w-[N%] width.</rule>
     <rule>Use an arbitrary variant such as max-[720px]: only when lg, md and sm cannot do the job. Say why in a short comment.</rule>
     <rule>In App.css, use only @media (min-width: Npx) or @media (max-width: Npx) with px values. Match the lg, md, sm widths: 1024px, 768px, 640px (max-width: 1023px, 767px, 639px).</rule>
   </breakpoints>
@@ -113,8 +113,8 @@
   <responsive_logic>
     <layout>
       <rule>lg: keep the row, reduce gaps and padding a step.</rule>
-      <rule>md: allow flex-wrap, and cut the number of items per row by changing basis-[N%], for example basis-[25%] to max-lg:basis-[33.33%] to max-md:basis-[50%].</rule>
-      <rule>sm: switch to flex-col, or one item per row (basis-[100%]), and center with items-center.</rule>
+      <rule>md: allow flex-wrap, and cut the number of items per row by changing w-[N%], for example w-[25%] to max-lg:w-[33.33%] to max-md:w-[50%].</rule>
+      <rule>sm: switch to flex-col, or one item per row (w-[100%]), and center with items-center.</rule>
     </layout>
     <spacing>
       <rule>Step padding and gap down by about 4px to 8px per breakpoint, for example p-[20px] max-md:p-[16px] max-sm:p-[12px].</rule>
@@ -186,8 +186,8 @@
 
   <before_you_finish>
     <check>No rem, em, vw, vh, fr, fractions, clamp().</check>
-    <check>Percentage used only on flex-basis.</check>
-    <check>Every flex child width is basis-[N%]: no basis-[Npx], no basis-[calc(...)], no w-[Npx] on a flex child.</check>
+    <check>Percentage used only on w-[N%] widths; no basis-[...] anywhere.</check>
+    <check>Every flex child width is w-[N%]: no basis-[...], no w-[Npx], no w-[calc(...)] on a flex child.</check>
     <check>No aria-* and no role attribute anywhere.</check>
     <check>No ! important modifier on any Tailwind class and no !important anywhere; overrides are new classes.</check>
     <check>Every img has a descriptive, non-empty alt and no loading="lazy".</check>

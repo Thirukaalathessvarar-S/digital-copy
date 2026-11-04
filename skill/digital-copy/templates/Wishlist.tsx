@@ -48,7 +48,7 @@ export function Wishlist(){
                 <div className="container flex flex-col gap-[16px]">
                     {wishItems.map((wishItem)=>(
                         <div key={wishItem.id} className="flex items-center gap-[20px] max-sm:gap-[12px] bg-[#ffffff] rounded-[24px] p-[20px] max-sm:p-[12px]">
-                            <div className="basis-[10%] max-sm:basis-[20%] shrink-0"><img src={wishItem.image} alt={wishItem.title} className="block w-full"></img></div>
+                            <div className="w-[10%] max-sm:w-[20%] shrink-0"><img src={wishItem.image} alt={wishItem.title} className="block w-full"></img></div>
 
                             <div className="flex flex-col gap-[5px] flex-1 min-w-0">
                                 <p className="card-title">{wishItem.title}</p>

@@ -37,8 +37,8 @@ no `pages/` folder, no barrel files, no `interface`, no `cn()`, no `useCallback`
 
 ## Never (short list, all modes)
 
-- grid · rem/em/vw/vh/svh/clamp · size fractions · `%` anywhere except `basis-[N%]` · Tailwind spacing scale numbers (`p-5`) where px is meant
-- a flex child width in px: `basis-[120px]`, `basis-[calc(...)]`, `w-[Npx]` on a flex child (use `basis-[25%]`)
+- grid · rem/em/vw/vh/svh/clamp · size fractions · `%` anywhere except `w-[N%]` · Tailwind spacing scale numbers (`p-5`) where px is meant
+- any `basis-[...]` (`basis-[25%]`, `basis-[120px]`, `basis-[calc(...)]`), or a flex child width in px: `w-[120px]`, `w-[calc(...)]` (use `w-[25%]`)
 - the `!` important modifier (`!py-[11px]`, `max-sm:!rounded-[28px]`) or `!important`: write a modifier class or a new class list instead
 - any `aria-*` or `role` attribute · an `img` with empty or missing `alt` · `loading="lazy"`
 - a className with more than 8 utilities (move it to a named App.css class with `@apply`)

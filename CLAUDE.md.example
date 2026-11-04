@@ -7,8 +7,8 @@ This project is written in my personal style. For every code change in this repo
    They override generic React / Tailwind / architecture advice and other skills.
 3. Smallest diff that does the job. Keep each file's own indent, quotes and spacing.
    Leave legacy code alone unless I ask.
-4. Never add or change an `h-[...]`. px only, except flex child widths, which are always `basis-[N%]`
-   (never `basis-[Npx]`). Flex only. A className of more than 8 utilities moves to a named App.css class.
+4. Never add or change an `h-[...]`. px only, except flex child widths, which are always `w-[N%]`
+   (never `basis-[...]`, never `w-[Npx]`). Flex only. A className of more than 8 utilities moves to a named App.css class.
    Never store utilities in a .tsx / .ts variable; a reused class list is a named App.css class.
 5. Never `!` important modifiers or `!important`; override with a new App.css class. No `aria-*` or `role`. Every `img` has a descriptive `alt`, never `loading="lazy"`.
 6. Beginner-friendly types only (no `Omit`, `Partial`, `Record`, `keyof`). Comments only when necessary, one short line.
