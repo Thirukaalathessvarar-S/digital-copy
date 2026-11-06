@@ -8,12 +8,12 @@ This project is written in my personal style. For every code change in this repo
 3. Smallest diff that does the job. Keep each file's own indent, quotes and spacing.
    Leave legacy code alone unless I ask.
 4. Never add or change an `h-[...]`. px only, except flex child widths, which are always `w-[N%]`
-   (never `basis-[...]`, never `w-[Npx]`). Flex only. A className of more than 8 utilities moves to a named App.css class.
-   Never store utilities in a .tsx / .ts variable; a reused class list is a named App.css class.
-5. Never `!` important modifiers or `!important`; override with a new App.css class. No `aria-*` or `role`. Every `img` has a descriptive `alt`, never `loading="lazy"`.
+   (never `basis-[...]`, never `w-[Npx]`). Flex only. A className of more than 8 utilities moves to a named index.css class.
+   Never store utilities in a .tsx / .ts variable; a reused class list is a named index.css class.
+5. Never `!` important modifiers or `!important`; override with a new index.css class. No `aria-*` or `role`. Every `img` has a descriptive `alt`, never `loading="lazy"`.
 6. Beginner-friendly types only (no `Omit`, `Partial`, `Record`, `keyof`). Comments only when necessary, one short line.
-   Font sizes per screen only through App.css `:root` variables inside `@media` blocks.
+   Font sizes per screen only through index.css `:root` variables inside `@media` blocks.
 7. localStorage is written only from `src/store/store.ts` via `store.subscribe`.
 8. Layout: `src/store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `src/helpers/` (axios),
    `src/constants/` (props, api urls), `src/interfaces/` (all types, written with `type`),
-   `src/component/` (`card/`, `common/`, `pages/`), `src/assets/images/` + `src/assets/vector/`.
+   `src/components/` (`layout/`, `card/`, `common/`, `pages/`), all css in `src/index.css` (no App.css), `src/assets/images/` + `src/assets/vector/`.

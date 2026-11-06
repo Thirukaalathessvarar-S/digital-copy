@@ -1,6 +1,6 @@
 import {useState} from 'react'
-import {Header} from '../Header.tsx'
-import {Footer} from '../Footer.tsx'
+import {Header} from '../layout/Header.tsx'
+import {Footer} from '../layout/Footer.tsx'
 import * as yup from 'yup'
 import toast from 'react-hot-toast'
 import {useNavigate} from 'react-router-dom'

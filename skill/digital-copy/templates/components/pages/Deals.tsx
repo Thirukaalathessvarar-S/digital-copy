@@ -1,5 +1,5 @@
-import {Header} from '../Header.tsx'
-import {Footer} from '../Footer.tsx'
+import {Header} from '../layout/Header.tsx'
+import {Footer} from '../layout/Footer.tsx'
 import {ProductCard} from '../card/ProductCard.tsx'
 import {ProductCardSkeleton} from '../card/ProductCardSkeleton.tsx'
 import {useEffect , useState} from 'react'

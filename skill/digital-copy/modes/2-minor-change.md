@@ -7,14 +7,14 @@ like they typed it.
 ## Sources of truth
 
 1. `style_prompt.xml`: styling law for every line you add or change.
-2. `STYLE_DNA.md`: how they write React, Redux, files, names, comments, Tailwind and App.css.
+2. `STYLE_DNA.md`: how they write React, Redux, files, names, comments, Tailwind and index.css.
 3. **The file you are editing**: its indent, quotes, spacing and habits win over both for formatting.
 
 They sit in `reference/` next to this file, or are attached. If missing, say so and stop.
 
 ## Rules for small changes
 
-- **Read before you write.** Read the target file(s) in full, plus `src/App.css` `:root` and the
+- **Read before you write.** Read the target file(s) in full, plus `src/index.css` `:root` and the
   `@media` blocks whenever you touch sizes, colors or typography. Look for an existing class,
   variable, component or helper before creating one.
 - **Smallest diff that does the job.** Touch only lines the request needs. No reformatting, no
@@ -23,7 +23,7 @@ They sit in `reference/` next to this file, or are attached. If missing, say so 
   font overrides in className, spacing-scale classes) is left exactly as it is unless the user asks.
   Do not copy it into the lines you add, either.
 - **Never add an `h-[...]` and never change an existing one** (style_prompt.xml `<height>`).
-- **Font size or line height that changes per screen** → do it only in App.css:
+- **Font size or line height that changes per screen** → do it only in index.css:
   - existing size: reassign the existing `--x-size` in the `@media` blocks;
   - new size: add `--<element>-size` to `:root`, use
     `text-[length:var(--<element>-size)] leading-[calc(var(--<element>-size)+4px)]` in className,
@@ -42,8 +42,8 @@ They sit in `reference/` next to this file, or are attached. If missing, say so 
 - **Lines you add** follow the newest rules even when the file around them does not: flex child
   widths `w-[N%]` only (never `basis-[...]`), no `!` important modifier or `!important` (write a modifier class), no `aria-*` / `role`, descriptive `alt`, no `loading="lazy"`,
   beginner-friendly types, comments only when necessary, a className of more than 8 utilities
-  goes into a named App.css class, and no utilities are stored in a variable (reused lists are
-  App.css classes). Old code nearby is legacy (STYLE_DNA L14 to L19): leave it.
+  goes into a named index.css class, and no utilities are stored in a variable (reused lists are
+  index.css classes). Old code nearby is legacy (STYLE_DNA L14 to L19): leave it.
 - **New dependency** → only if the user names it.
 - **Assets** → new images are kebab-case and named after what they show (STYLE_DNA §3), png / jpg in
   `src/assets/images/`, svg in `src/assets/vector/`, never in `public/images/`; the import path

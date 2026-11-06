@@ -11,7 +11,7 @@ Rule IDs in brackets (`[T3]`, `[C7]` ...) are used by the review mode to cite vi
 ## 0. Authority (read first)
 
 1. **`style_prompt.xml` wins** over everything here for styling (units, layout, breakpoints,
-   heights, font-size handling, App.css content). It is the developer's newest, explicit rulebook.
+   heights, font-size handling, index.css content). It is the developer's newest, explicit rulebook.
 2. **This file** is the second authority: how they write React, TypeScript, Redux, files, names,
    comments and Tailwind strings.
 3. **Generic skills** (react, tailwind, typescript, feature-arch, impeccable, ...) and "best
@@ -30,7 +30,7 @@ Rule IDs in brackets (`[T3]`, `[C7]` ...) are used by the review mode to cite vi
 | Build | Vite 8, `@vitejs/plugin-react` | CRA, Next.js, Webpack |
 | UI | React 19, function components | class components |
 | Language | TypeScript ~6 (`.tsx` / `.ts`) | plain JS |
-| Styling | Tailwind CSS v4 via `@tailwindcss/vite` + `src/App.css` | tailwind.config.js, CSS modules, styled-components, inline `style={{}}` |
+| Styling | Tailwind CSS v4 via `@tailwindcss/vite` + `src/index.css` | tailwind.config.js, CSS modules, styled-components, inline `style={{}}` |
 | State | Redux Toolkit 2 + react-redux 9 (`createSlice`, `createAsyncThunk`, `configureStore`) | Zustand, Context-for-state, RTK Query |
 | Persistence | `store.subscribe` → `localStorage` | redux-persist |
 | Routing | react-router-dom 7, `BrowserRouter` + `Routes` + `Route` | data routers, file routing |
@@ -133,8 +133,9 @@ link, `<title>`.
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 ```
 
-`src/index.css` holds one line: `@import "tailwindcss";` and is imported by `main.tsx`.
-`src/App.css` is imported by `App.tsx` (first import line: `import './App.css'`).
+There is no `App.css`. `src/index.css` is the only stylesheet: it starts with `@import "tailwindcss";`
+and holds the design tokens, reusable classes and font-size `@media` blocks (section 12). It is
+imported once, by `main.tsx` (`import './index.css'`); `App.tsx` imports no css.
 
 ---
 
@@ -144,8 +145,7 @@ link, `<title>`.
 src/
 ├── main.tsx                      root render, providers, router, routes, global wrappers (ScrollToTop)
 ├── App.tsx                       home page (default export) + extra home sections as named exports (Trending, SmallBanner)
-├── App.css                       design tokens (:root, @theme), reusable classes, font-size @media
-├── index.css                     @import "tailwindcss";
+├── index.css                     @import "tailwindcss" + design tokens (:root, @theme), reusable classes, font-size @media (no App.css)
 ├── store/
 │   ├── store.ts                  configureStore + store.subscribe persistence + RootState / AppDispatch
 │   ├── slice/                    one folder per feature
@@ -164,8 +164,9 @@ src/
 │   ├── product.ts  cart.ts  order.ts  auth.ts  category.ts
 │   ├── props.ts                  component props types (HeaderProps ...)
 │   └── form.ts                   FormErrors , Field ...
-├── component/                    shared pieces, PascalCase.tsx
-│   ├── Header.tsx  Footer.tsx  CategoryButton.tsx ...
+├── components/                   shared pieces, PascalCase.tsx
+│   ├── layout/                   Header.tsx  Footer.tsx  Heading.tsx (parts every page repeats)
+│   ├── CategoryButton.tsx ...    other shared pieces
 │   ├── card/                     cards: ProductCard.tsx  PetCard.tsx  ProductCardSkeleton.tsx ...
 │   ├── common/                   small reusable bits: buttons, spans, badges (Button.tsx  Badge.tsx ...)
 │   └── pages/                    every page except home: Cart.tsx  Login.tsx  Order.tsx  Product.tsx ...
@@ -176,12 +177,14 @@ src/
     └── vector/                   .svg
 ```
 
-- `[F1]` Pages live in `component/pages/`. The home page is the only exception: it stays in
-  `App.tsx`. The folder is `component` (singular), never `components`. A page file is named after
+- `[F1]` Pages live in `components/pages/`. The home page is the only exception: it stays in
+  `App.tsx`. The folder is `components` (plural). A page file is named after
   the thing (`Cart.tsx`, `Order.tsx`, `Special.tsx`); the exported function may differ
   (`Product.tsx` exports `ProductPage`, `CheckoutNew.tsx` exports `CheckOutNew`).
-  Cards go in `component/card/`, small reusable buttons / spans / badges in `component/common/`,
-  everything else shared (`Header`, `Footer`, `CategoryButton`) sits directly in `component/`.
+  `Header`, `Footer` and `Heading` (the section heading) go in `components/layout/`, cards in
+  `components/card/`, small reusable buttons / spans / badges in `components/common/`; anything else
+  shared (`CategoryButton`) sits directly in `components/`. Pages import them as
+  `import {Header} from '../layout/Header.tsx'`.
 - `[F2]` One slice per feature folder: `store/slice/<feature>/<feature>Slice.ts`, short and
   singular: `slice/auth/authSlice.ts`, `slice/product/productSlice.ts`. Its thunks go in
   `store/asyncThunk/<feature>Thunk.ts`.
@@ -261,8 +264,8 @@ Observed files: `glowing-skin.png`, `bottle-perfume.png`, `desk-lamp.png`, `armc
 | Section `id` | kebab-case | `product-listing`, `special-category`, `small-banner`, `cart-empty`, `related-product` |
 | Route path | lowercase, kebab, `:param` | `/product/:id`, `/special/:category`, `/sample-image/:id` |
 | localStorage key | the store key | `'cart'`, `'order'` |
-| Reused class (App.css) | kebab-case, what the element is | `.nav-link`, `.crumb`, `.crumb-current` |
-| Class-name prop | short noun or `variant`, carries an App.css class name | `variant`, `bg`, `color` |
+| Reused class (index.css) | kebab-case, what the element is | `.nav-link`, `.crumb`, `.crumb-current` |
+| Class-name prop | short noun or `variant`, carries an index.css class name | `variant`, `bg`, `color` |
 
 ---
 
@@ -281,7 +284,7 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   import {addItems} from '../../store/slice/cart/cartSlice.ts'
   import {fetchProducts} from '../../store/asyncThunk/productThunk.ts'
   import type {Product} from '../../interfaces/product.ts'
-  import {Header} from '../Header.tsx'
+  import {Header} from '../layout/Header.tsx'
   import notFound from '../../assets/images/not-found.jpg'
   import {createSlice , type PayloadAction} from '@reduxjs/toolkit'
   import * as yup from 'yup'
@@ -379,7 +382,7 @@ This is hand formatting; no Prettier. Reproduce it character for character.
 - `[C6]` (retired) JSX blocks no longer get a label comment. Existing `{/* label */}` comments in a
   file you edit stay as they are.
 - `[C7]` `className` is **one line**. No line breaks inside it, no `clsx`. More than 8 utilities
-  → move the static part into a named App.css class (`[X7]`).
+  → move the static part into a named index.css class (`[X7]`).
 - `[C8]` Short rows are written on a single line:
   `<div className="flex justify-between items-center"><span className="label">Subtotal</span><span className="label">₹ {subtotal.toFixed(2)}</span></div>`.
   Icons inside buttons on the same line: `<button ... className="btn-outline gap-[8px]"><i className="fa-solid fa-xmark"></i>Clear search</button>`.
@@ -633,7 +636,7 @@ export type Field = 'name' | 'phone' | 'pincode'
 - `[K3]` (retired) No `//action creator` on reducers.
 - `[K4]` (retired) No section banners.
 - `[K5]` (retired) No JSX block labels. A tricky element may get one short `{/* ... */}` line.
-- `[K6]` A size that comes from App.css may get a short pointer: `// size from --breadcrumb-size`.
+- `[K6]` A size that comes from index.css may get a short pointer: `// size from --breadcrumb-size`.
 - `[K7]` A file may end with a note listing API fields:
   ```ts
   // tages = string[]
@@ -889,7 +892,7 @@ import { BrowserRouter, Routes, Route , useLocation } from 'react-router-dom'
 import App from './App.tsx'
 import {Provider} from 'react-redux'
 import {store} from './store/store.ts'
-import {Cart} from './component/pages/Cart.tsx'
+import {Cart} from './components/pages/Cart.tsx'
 import {Toaster} from 'react-hot-toast'
 import {useEffect} from 'react'
 
@@ -927,7 +930,7 @@ createRoot(document.getElementById('root')!).render(
 - `[M2]` Behaviour-only wrappers (render `null`) are plain `function` declarations **inside
   main.tsx** above `createRoot`, not exported, not in their own file. This file keeps the Vite
   template spacing (`{ useLocation }`, `if (...) {`, 2-space indent).
-- `[M3]` Every page is imported on its own line with its extension (`./component/pages/<Name>.tsx`),
+- `[M3]` Every page is imported on its own line with its extension (`./components/pages/<Name>.tsx`),
   then listed as a `Route`.
   Flat routes, no nested layouts.
 - `[M4]` Hash sections: the Header links to `/#product-listing`, `/#special-category`; the
@@ -952,7 +955,7 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
   `text-[#909090]`, `bg-[#EDEDED]`, `bg-[#ffffff]`.
 - `[W5]` Font size + line height always together:
   `text-[length:var(--breadcrumb-size)] leading-[calc(var(--breadcrumb-size)+4px)]`.
-  Typography otherwise comes from App.css classes (`h2`, `.eyebrow`, `.card-title`, `.price`,
+  Typography otherwise comes from index.css classes (`h2`, `.eyebrow`, `.card-title`, `.price`,
   `.text-muted-sm`, `.label`) placed in `className`.
 - `[W6]` Weights: `font-bold`, `font-extrabold`, `font-medium`, `font-semibold`, numeric
   `font-[100]`, `font-[300]`, `font-[400]`. Families: `font-inter`, `font-satoshi`
@@ -969,7 +972,7 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
 - `[W9]` **Never use important**: no `!` modifier (`!py-[11px]`, `!text-[var(--primary)]`,
   `max-sm:!rounded-[28px]`, `hover:!bg-...`) in className or `@apply`, and no `!important` in CSS.
   To change a value a reusable class sets, write a new class:
-  - a **modifier class** right below the base class in App.css (a later App.css class wins):
+  - a **modifier class** right below the base class in index.css (a later index.css class wins):
     ```css
     .input-icon {
         @apply
@@ -988,7 +991,7 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
   `transition-transform duration-300`, `transition-opacity hover:opacity-70`.
 - `[W12]` **Never put Tailwind utilities in a `.tsx` / `.ts` variable**: no class-string
   `const`, `let`, object field or default prop value, however short. A class list used more than
-  once (or that you want to name) becomes an App.css class with `@apply`:
+  once (or that you want to name) becomes an index.css class with `@apply`:
   ```css
   .nav-link {
       @apply
@@ -1006,10 +1009,10 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
   ```
   Used as `className="nav-link"` or ``className={`nav-link ${isActive ? 'link-active' : ''}`}``.
   Never `const navLink = "p-[13px_10px] ..."` + `className={navLink}`.
-- `[W13]` Components may accept a class-name prop, but it carries an **App.css class name**, not
+- `[W13]` Components may accept a class-name prop, but it carries an **index.css class name**, not
   utilities: `variant = 'btn-outline'`, `bg = 'muted-soft-text'`, applied as
   ``className={`${variant} flex ...`}``.
-- `[W14]` Dynamic arbitrary classes are built by a helper and **safelisted** in App.css:
+- `[W14]` Dynamic arbitrary classes are built by a helper and **safelisted** in index.css:
   `function widthClass(percent:number){ return \`w-[${percent}%]\`; }` +
   `@source inline("w-[{0..100}%]");`. Any helper that builds class names needs a matching `@source inline(...)`.
 - `[W15]` Images keep ratio with `aspect-square object-contain`, sized by `max-w-[...]` per
@@ -1018,7 +1021,7 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
 
 ---
 
-## 12. App.css `[X]`
+## 12. index.css `[X]`
 
 ### 12.1 File order
 
@@ -1096,10 +1099,10 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
   `.price` `.price-lg` `.price-was`, `.link` `.link-active`.
   Semantic text classes: `.text-muted-sm`, `.green-text`, `.red-text`, `.label`, `.card-title`.
   Box classes: `.card`, `.input`, `.img-placeholder`, `.container`.
-- `[X7]` A `className` with **more than 8 utilities** moves into a new App.css class with
+- `[X7]` A `className` with **more than 8 utilities** moves into a new index.css class with
   `@apply` (one utility per line, same order as in className). Name it kebab-case after what the
   element is (`.search-bar`, `.rating-chip`). Conditional parts (`${isOpen ? ... : ''}`) stay in
-  `className`. App.css classes are unlayered and beat utilities, so a utility in className cannot
+  `className`. index.css classes are unlayered and beat utilities, so a utility in className cannot
   override them: write a modifier class or swap the class instead (`[W9]`). Shorter lists stay in `className` unless the user asks for `@apply`. Reuse existing
   classes freely.
   ```css
@@ -1166,10 +1169,10 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 
 | Layer | Widths in the current project | Rule for new code |
 |---|---|---|
-| App.css `@media` (font/spacing variables) | `980px`, `767px`, `565px` (+ one legacy `480px` for `#banner`) | `1023px`, `767px`, `639px` (from `style_prompt.xml`) |
+| index.css `@media` (font/spacing variables) | `980px`, `767px`, `565px` (+ one legacy `480px` for `#banner`) | `1023px`, `767px`, `639px` (from `style_prompt.xml`) |
 | Tailwind in className | `max-lg:` (<1024), `max-md:` (<768), `max-sm:` (<640); also `max-[1120px]:` in `.container`, `max-[767px]:`, `max-[650px]:`, `max-xl:`, `md:` | `max-lg:`, `max-md:`, `max-sm:` only; arbitrary `max-[Npx]:` only with a comment saying why |
 | JS (`react-responsive`) | `isMobile` = `{minWidth:300, maxWidth:600}`, `isTablet` = `{minWidth:600, maxWidth:980}` | `isMobile` = `{maxWidth:639}`, `isTablet` = `{minWidth:640, maxWidth:1023}` |
-| Page width | `.container` = `w-[1120px] max-[1120px]:w-[90%] mx-auto` | fixed px per step: `w-[1120px] max-xl:w-[960px] max-lg:w-[720px] max-md:w-[600px] max-sm:w-[340px] mx-auto` (see `templates/App.css`) |
+| Page width | `.container` = `w-[1120px] max-[1120px]:w-[90%] mx-auto` | fixed px per step: `w-[1120px] max-xl:w-[960px] max-lg:w-[720px] max-md:w-[600px] max-sm:w-[340px] mx-auto` (see `templates/index.css`) |
 
 - `[B1]` Desktop first. The base class is the desktop value; overrides go down with `max-*`.
 - `[B2]` JS breakpoints exist only to change **counts** (how many categories show), written as:
@@ -1217,7 +1220,7 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 - Hover on cards / tiles: `hover:bg-[var(--line)] hover:border-[var(--line-strong)] transition-colors duration-300`.
 - Arrow nudge: `group` on the link, `group-hover:translate-x-[4px] transition-transform duration-300` on the icon.
 - Mobile menu: absolute full-screen overlay with `data-open={isOpen}`, opacity/visibility transition,
-  and the `body:has(#menu[data-open="true"]){ overflow:hidden; }` rule in App.css.
+  and the `body:has(#menu[data-open="true"]){ overflow:hidden; }` rule in index.css.
 - Cart count badge on the cart icon (`absolute -bottom-[3px] -right-[3px] ... rounded-full`).
 
 ---
@@ -1229,24 +1232,25 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L1 | `grid grid-cols-4 col-span-2 row-span-2 col-start-3` | `App.tsx` SmallBanner | flex + `w-[N%]` |
 | L2 | `max-[1120px]:w-[90%]`, `w-full` on wrappers | Cart, Login, Order, User, `.container` | `w-[N%]` with `max-lg:` / `max-md:` / `max-sm:` overrides, or a fixed `max-w-[Npx]` |
 | L3 | `h-[100svh]`, `min-h-[100svh]`, `h-[70svh]`, `max-md:h-[10vh]`, `w-[100vw] h-[100vh]`, `w-[min(1100px,calc(100vw-96px))]` | Header, Cart, User, LoadingModal | no viewport units; height from content |
-| L4 | `max-md:!text-[length:15px] max-md:!leading-[19px]`, `max-lg:text-[56px]` in className | ProductCard, App.tsx | a `--x-size` variable reassigned in App.css `@media` |
-| L5 | spacing scale numbers `p-8`, `py-5`, `px-4`, `mt-3`, `gap-1`, `py-3`, `size-10`, `w-11` | various, App.css chips | `p-[32px]`, `py-[20px]` ... |
+| L4 | `max-md:!text-[length:15px] max-md:!leading-[19px]`, `max-lg:text-[56px]` in className | ProductCard, App.tsx | a `--x-size` variable reassigned in index.css `@media` |
+| L5 | spacing scale numbers `p-8`, `py-5`, `px-4`, `mt-3`, `gap-1`, `py-3`, `size-10`, `w-11` | various, index.css chips | `p-[32px]`, `py-[20px]` ... |
 | L6 | `h-[...]` on boxes | various | never add one; never change an existing one |
-| L7 | `@media (max-width:980px)`, `(max-width:565px)`, `(max-width:480px)` | App.css | `1023px`, `767px`, `639px` (see B3 for edits) |
-| L8 | element rules in App.css (`h1 {`, `h2 {`, `body {`, `#banner {`, `a:focus-visible`) and raw CSS (`font-size:60px;`) | App.css | only `@theme`, `:root`, classes, min/max-width `@media` |
+| L7 | `@media (max-width:980px)`, `(max-width:565px)`, `(max-width:480px)` | index.css | `1023px`, `767px`, `639px` (see B3 for edits) |
+| L8 | element rules in index.css (`h1 {`, `h2 {`, `body {`, `#banner {`, `a:focus-visible`) and raw CSS (`font-size:60px;`) | index.css | only `@theme`, `:root`, classes, min/max-width `@media` |
 | L9 | `md:` (min-width) variants mixed with `max-*` | Special.tsx | `max-*` only, desktop first |
 | L10 | import path case not matching file (`playstation.png` for `PlayStation.png`) | App.tsx | exact case |
 | L11 | `.map` without `key` (`Review` list, stars) | Product.tsx, Review.tsx | always `key` |
-| L12 | duplicate `.btn` block in App.css | App.css | one block per class |
+| L12 | duplicate `.btn` block in index.css | index.css | one block per class |
 | L13 | `rem`, `em`, size fractions `w-1/2`, `basis-1/3` | none yet, keep it that way | px values / `w-[N%]` |
 | L14 | any `basis-[...]` (`basis-[45%]`, `basis-[480px]`, `basis-[calc((100%-60px)/4)]`), `w-[80px]` on a flex child | ProductCard, Wishlist, Contact, all code before this rule | `w-[N%]` only |
 | L15 | `aria-label`, `aria-hidden`, `role` | old components | no ARIA; `title` on icon-only buttons |
 | L16 | `Partial<Record<keyof ...>>`, `as keyof FormValues`, `yup.InferType` used only to build `FormErrors`, other utility types | old forms | hand-written `FormErrors` + `Field` (T15, C22) |
 | L17 | `{/* label */}` on every block, `//action creator`, banner comments | everywhere in old code | comments only when necessary, one short line |
-| L18 | class-string consts (`const crumb = "shrink-0 ..."`, `const navLink = "p-[13px_10px] ..."`) and utility defaults on props | Header, breadcrumb, old components | a named App.css class (W12) |
-| L19 | `!` modifiers (`!py-[11px]`, `max-sm:!rounded-[28px]`, `hover:!bg-...`) and `!important` | old components, App.css classes | a modifier class or a separate class (W9) |
+| L18 | class-string consts (`const crumb = "shrink-0 ..."`, `const navLink = "p-[13px_10px] ..."`) and utility defaults on props | Header, breadcrumb, old components | a named index.css class (W12) |
+| L19 | `!` modifiers (`!py-[11px]`, `max-sm:!rounded-[28px]`, `hover:!bg-...`) and `!important` | old components, index.css classes | a modifier class or a separate class (W9) |
 | L20 | old layout: `src/app/store.ts`, `src/features/<folder>/<name>Slice.ts`, flat `src/components/` with pages inside, `components/constants/`, flat `src/assets/`, images in `public/images/`, types exported from `App.tsx` / slices / constants | e-commerce project | the section 2 layout (F1 to F8) |
 | L21 | `fetch(...).then(res => res.json())` in `useEffect`, the `ignore` flag, `setItems(data.products)`, page `loading` state for API lists, urls written inside components | e-commerce project | constants url → `helpers/` axios → `asyncThunk/` → `extraReducers` (C18, R12, R13) |
+| L22 | a separate `src/App.css` imported by `App.tsx`, `index.css` holding only `@import "tailwindcss";`, Header / Footer directly in `components/`, a singular `component/` folder | older projects | everything in `index.css`; `components/layout/` |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
@@ -1261,12 +1265,12 @@ the same kind of file (like B3 for breakpoints). Do not move files, rename folde
 ## 17. Final checklist (run before you answer)
 
 - [ ] Stack and dependencies unchanged (S1). No new library.
-- [ ] Files in the right place and named per F / A / N: `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `component/` (`card/`, `common/`, `pages/`), `assets/images/` + `assets/vector/`.
+- [ ] Files in the right place and named per F / A / N: `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `components/` (`card/`, `common/`, `pages/`), `assets/images/` + `assets/vector/`.
 - [ ] Every type in `interfaces/` (except `RootState` / `AppDispatch` and a C22 `FormValues`); every url in `constants/api.ts`.
 - [ ] API data: axios only in `helpers/`, thunk in `asyncThunk/`, `pending` / `fulfilled` / `rejected` in the slice, `request.abort()` in the effect cleanup (C18, R12, R13).
 - [ ] Formatting: indent of the file, ` , ` commas, `if(`, `else{` on a new line, `()=>`, no semicolon on imports, `.tsx` extensions on local imports.
-- [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 8 utilities (longer → App.css class).
-- [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are App.css classes.
+- [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 8 utilities (longer → index.css class).
+- [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are index.css classes.
 - [ ] No `aria-*` or `role`; every `img` has a descriptive `alt` and no `loading="lazy"`.
 - [ ] Flex child widths are `w-[N%]` only, never `basis-[...]`.
 - [ ] No `!` important modifier and no `!important`; overrides are new classes (W9).

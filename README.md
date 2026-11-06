@@ -29,21 +29,21 @@ digital-copy/
     │   ├── STYLE_DNA.md           the full style, with rule IDs ([T3], [C7], [R8] ...)
     │   └── style_prompt.xml       my original styling rules (highest authority)
     └── templates/                 real files written in the style, laid out like src/
-        ├── App.css  main.tsx
+        ├── index.css  main.tsx    index.css is the only stylesheet (no App.css)
         ├── store/                 store.ts · slice/product/productSlice.ts · slice/wish/wishSlice.ts · asyncThunk/productThunk.ts
         ├── helpers/api.ts         axios fetch method
         ├── constants/             api.ts (urls) · categoryProps.ts
         ├── interfaces/            product.ts · wish.ts · category.ts · props.ts · form.ts
-        ├── component/             card/ProductCard.tsx · common/Button.tsx · pages/Deals.tsx Wishlist.tsx Contact.tsx
+        ├── components/             card/ProductCard.tsx · common/Button.tsx · pages/Deals.tsx Wishlist.tsx Contact.tsx
         └── hooks/UseScroll.ts
 ```
 
 `STYLE_DNA.md` covers: stack and exact `package.json`, config files, folder layout
-(`store/` · `helpers/` · `constants/` · `interfaces/` · `component/` · `assets/images` + `assets/vector`), asset naming,
+(`store/` · `helpers/` · `constants/` · `interfaces/` · `components/` · `assets/images` + `assets/vector`), asset naming,
 naming table, character-level formatting (` , ` commas, `if(`, `else{` on a new line, `()=>`,
 no semicolons on imports), component anatomy, JSX habits, forms with yup, comments, Redux slices,
 axios helpers + `createAsyncThunk`, `store.subscribe` + localStorage, `constants/categoryProps.ts`, `main.tsx` + `ScrollToTop`,
-Tailwind in `.tsx` / `.ts`, App.css (`:root`, `@theme`, classes, `@media`), screen widths in CSS,
+Tailwind in `.tsx` / `.ts`, index.css (`:root`, `@theme`, classes, `@media`), screen widths in CSS,
 Tailwind and JS, and a list of legacy patterns not to repeat.
 
 ## Use in Claude Code
@@ -89,7 +89,7 @@ unless asked.
 
 - The templates show the shape of each kind of file. They import `Header`, `Footer` and others that
   are not included, so they are a reference, not a runnable app.
-- Breakpoints: the original App.css uses `980 / 767 / 565px`; `style_prompt.xml` sets
+- Breakpoints: the original index.css uses `980 / 767 / 565px`; `style_prompt.xml` sets
   `1023 / 767 / 639px`. New projects use `1023 / 767 / 639`. Edits to a project that already has
   `980 / 767 / 565` blocks add to those blocks instead of creating a second set.
 - Out of scope by choice: theme feature (`store/slice/theme/`) and the login/auth localStorage approach.

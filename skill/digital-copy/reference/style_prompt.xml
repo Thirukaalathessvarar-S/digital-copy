@@ -8,7 +8,7 @@
 
   <stack>
     <rule>Use only Tailwind CSS. No other styling library, no inline style objects, no CSS-in-JS.</rule>
-    <rule>Reference file for code style: src/App.css. Glance at it before styling and copy its way of writing.</rule>
+    <rule>Reference file for code style: src/index.css. Glance at it before styling and copy its way of writing.</rule>
   </stack>
 
   <where_to_write>
@@ -19,7 +19,7 @@
     <rule>
       A className with more than 8 utilities (each variant such as max-md:p-[16px]
       counts as one) is too long. Move its static utilities into a named class in
-      App.css with @apply and use that class in className. Conditional or dynamic
+      index.css with @apply and use that class in className. Conditional or dynamic
       parts stay in className.
     </rule>
     <rule>
@@ -32,7 +32,7 @@
     </rule>
     <rule>
       Never store Tailwind utilities in a .tsx / .ts variable, const, object or default prop
-      value (const navLink = "p-[13px_10px] ..."). Write them as a named class in App.css
+      value (const navLink = "p-[13px_10px] ..."). Write them as a named class in index.css
       with @apply and use the class name in className, whatever the length.
     </rule>
     <rule>
@@ -40,8 +40,8 @@
       hover:!bg-...) in className or in @apply, and never write !important in CSS.
     </rule>
     <rule>
-      To change a value that an App.css class already sets, write a new class instead: a modifier
-      class placed right below the base class in App.css (.input-icon { @apply pl-[40px]; } used as
+      To change a value that an index.css class already sets, write a new class instead: a modifier
+      class placed right below the base class in index.css (.input-icon { @apply pl-[40px]; } used as
       className="input input-icon"), or a separate class / class list for that element without the
       base class. To hide an element whose class sets display, swap the class:
       className={isHidden ? 'hidden' : 'product-card'}.
@@ -53,7 +53,7 @@
       <item>@media (min-width: ...) or @media (max-width: ...)</item>
     </app_css_allowed>
     <rule>
-      Do not add anything else to App.css: no new Tailwind utilities outside
+      Do not add anything else to index.css: no new Tailwind utilities outside
       those blocks, no new resets, no new element or id rules.
     </rule>
   </where_to_write>
@@ -107,7 +107,7 @@
     <rule>Only add a variant when the value actually changes. Do not repeat the same value at a smaller breakpoint.</rule>
     <rule>Every value at every breakpoint is a fixed px number. Never scale with %, vw, rem or clamp(). The only percentage allowed is a w-[N%] width.</rule>
     <rule>Use an arbitrary variant such as max-[720px]: only when lg, md and sm cannot do the job. Say why in a short comment.</rule>
-    <rule>In App.css, use only @media (min-width: Npx) or @media (max-width: Npx) with px values. Match the lg, md, sm widths: 1024px, 768px, 640px (max-width: 1023px, 767px, 639px).</rule>
+    <rule>In index.css, use only @media (min-width: Npx) or @media (max-width: Npx) with px values. Match the lg, md, sm widths: 1024px, 768px, 640px (max-width: 1023px, 767px, 639px).</rule>
   </breakpoints>
 
   <responsive_logic>
@@ -120,7 +120,7 @@
       <rule>Step padding and gap down by about 4px to 8px per breakpoint, for example p-[20px] max-md:p-[16px] max-sm:p-[12px].</rule>
     </spacing>
     <typography>
-      <rule>Font size and line height are reduced per screen ONLY through @media queries in src/App.css. See font_size_responsive below. This replaces the old habit of writing max-md:text-[length:..] in className.</rule>
+      <rule>Font size and line height are reduced per screen ONLY through @media queries in src/index.css. See font_size_responsive below. This replaces the old habit of writing max-md:text-[length:..] in className.</rule>
     </typography>
     <media>
       <rule>Images keep their ratio. Do not add h-[...]. Reduce the padding around the image instead, and never change an existing pt-[...] unless asked.</rule>
@@ -132,7 +132,7 @@
 
   <font_size_responsive>
     <description>How font size and line height shrink on smaller screens.</description>
-    <rule>Do it only with @media (max-width: ...) blocks in src/App.css. Never write max-lg:, max-md:, max-sm: font-size or leading classes in .tsx / .ts, and never use ! overrides to fight a class from App.css.</rule>
+    <rule>Do it only with @media (max-width: ...) blocks in src/index.css. Never write max-lg:, max-md:, max-sm: font-size or leading classes in .tsx / .ts, and never use ! overrides to fight a class from index.css.</rule>
     <rule>Use the same widths as the breakpoints: @media (max-width:1023px) for lg, (max-width:767px) for md, (max-width:639px) for sm.</rule>
     <rule>Inside each @media block put ONLY a :root rule. Nothing else goes in the block: no class selectors, no element selectors, no @apply.</rule>
     <rule>The :root rule inside the @media only reassigns size variables, for example --h2-size: 22px;. Classes already read these variables, so every class using them shrinks by itself.</rule>
@@ -161,7 +161,7 @@
   </font_size_responsive>
 
   <code_style>
-    <description>Copy these patterns from src/App.css. Do not invent other forms.</description>
+    <description>Copy these patterns from src/index.css. Do not invent other forms.</description>
     <pattern name="font size">text-[length:var(--h1-size)]</pattern>
     <pattern name="line height">leading-[calc(var(--h1-size)+4px)]</pattern>
     <pattern name="text color">text-[color:var(--muted)]</pattern>
@@ -191,15 +191,15 @@
     <check>No aria-* and no role attribute anywhere.</check>
     <check>No ! important modifier on any Tailwind class and no !important anywhere; overrides are new classes.</check>
     <check>Every img has a descriptive, non-empty alt and no loading="lazy".</check>
-    <check>No className has more than 8 utilities; longer lists live in a named App.css class.</check>
-    <check>No Tailwind utilities stored in a .tsx / .ts variable, const, object or default prop; reused class lists are App.css classes.</check>
+    <check>No className has more than 8 utilities; longer lists live in a named index.css class.</check>
+    <check>No Tailwind utilities stored in a .tsx / .ts variable, const, object or default prop; reused class lists are index.css classes.</check>
     <check>No grid utilities anywhere.</check>
     <check>Responsive overrides use max-lg, max-md, max-sm, written largest to smallest.</check>
     <check>No new h-[...] added and no existing h-[...] changed.</check>
-    <check>Short class lists are in the .tsx / .ts file; only lists of more than 8 utilities (or ones the user asked for) are in App.css with @apply.</check>
-    <check>Anything added to App.css is only @theme, :root, a class, or a min/max-width @media.</check>
+    <check>Short class lists are in the .tsx / .ts file; only lists of more than 8 utilities (or ones the user asked for) are in index.css with @apply.</check>
+    <check>Anything added to index.css is only @theme, :root, a class, or a min/max-width @media.</check>
     <check>Font sizes, line heights and colors follow the patterns above.</check>
-    <check>No max-lg / max-md / max-sm font-size or leading classes in .tsx / .ts. Screen-based size changes live only in App.css @media blocks.</check>
+    <check>No max-lg / max-md / max-sm font-size or leading classes in .tsx / .ts. Screen-based size changes live only in index.css @media blocks.</check>
     <check>Every font-size @media block contains only :root, and only reassigns variables. New sizes have a named variable in the base :root.</check>
   </before_you_finish>
 

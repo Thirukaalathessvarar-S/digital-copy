@@ -7,7 +7,7 @@ A reader must not be able to tell your code from theirs.
 ## Sources of truth (load before writing anything)
 
 1. `style_prompt.xml`: styling law. Every rule, no exceptions.
-2. `STYLE_DNA.md`: everything else (stack, files, naming, formatting, React, Redux, App.css).
+2. `STYLE_DNA.md`: everything else (stack, files, naming, formatting, React, Redux, index.css).
 3. `templates/`: real files written in the style. Copy their shape; change only the content.
 
 They sit in `reference/` and `templates/` next to this file, or are attached to the conversation.
@@ -25,7 +25,7 @@ The user describes an app (pages, features, data source). You deliver **every fi
 ## Procedure
 
 1. **Plan (short, shown to the user)**
-   - Pages → `src/component/pages/<Name>.tsx` (home stays in `App.tsx`) and their routes.
+   - Pages → `src/components/pages/<Name>.tsx` (home stays in `App.tsx`) and their routes.
    - Data → which Redux slices (`store/slice/<feature>/<feature>Slice.ts`), which ones persist to
      localStorage, which ones are filled by a thunk (`store/asyncThunk/<feature>Thunk.ts`).
    - API urls → `src/constants/api.ts`; static lists with images → `src/constants/<camelName>.ts`.
@@ -39,23 +39,22 @@ The user describes an app (pages, features, data source). You deliver **every fi
    1. `package.json` (exact dependency set from STYLE_DNA §1, rename `"name"` only), `vite.config.ts`,
       `.oxlintrc.json`, `tsconfig*.json` (stock Vite React-TS), `.gitignore` (stock Vite), `index.html`
       (fonts + Font Awesome links from STYLE_DNA §1).
-   2. `src/index.css` → `@import "tailwindcss";`
-   3. `src/App.css` from `templates/App.css`: keep the whole token system and classes, add the new
+   2. `src/index.css` from `templates/index.css` (the only stylesheet, no `App.css`): keep the whole token system and classes, add the new
       variables the app needs to `:root` **and** to each of the three `@media` blocks (1023 / 767 / 639).
-   4. `src/interfaces/*.ts`: every type the app uses (`templates/interfaces/`).
-   5. `src/constants/api.ts` (urls) and `src/constants/*.ts` (props / data lists) (`templates/constants/`).
-   6. `src/helpers/api.ts`: the axios fetch methods (`templates/helpers/api.ts`).
-   7. `src/store/asyncThunk/<feature>Thunk.ts` (`templates/store/asyncThunk/productThunk.ts`).
-   8. `src/store/slice/<feature>/<feature>Slice.ts`: API slices with `extraReducers`
+   3. `src/interfaces/*.ts`: every type the app uses (`templates/interfaces/`).
+   4. `src/constants/api.ts` (urls) and `src/constants/*.ts` (props / data lists) (`templates/constants/`).
+   5. `src/helpers/api.ts`: the axios fetch methods (`templates/helpers/api.ts`).
+   6. `src/store/asyncThunk/<feature>Thunk.ts` (`templates/store/asyncThunk/productThunk.ts`).
+   7. `src/store/slice/<feature>/<feature>Slice.ts`: API slices with `extraReducers`
       (`templates/store/slice/product/productSlice.ts`), local / persisted slices with `load<Name>()`
       (`templates/store/slice/wish/wishSlice.ts`).
-   9. `src/store/store.ts` (`templates/store/store.ts`, one `store.subscribe` for every persisted slice).
-   10. `src/hooks/Use<Name>.ts` only if a page needs one (`templates/hooks/UseScroll.ts`).
-   11. Shared components: `component/Header.tsx`, `component/Footer.tsx`, cards in `component/card/`,
-       buttons / spans / badges in `component/common/` (`templates/component/`).
-   12. Pages in `component/pages/`, each one `Header` → `<section id="kebab-id">` → `.container` →
-       `Footer` (`templates/component/pages/`).
-   13. `src/App.tsx` (home page, default export) and `src/main.tsx` (`templates/main.tsx`, with
+   8. `src/store/store.ts` (`templates/store/store.ts`, one `store.subscribe` for every persisted slice).
+   9. `src/hooks/Use<Name>.ts` only if a page needs one (`templates/hooks/UseScroll.ts`).
+   10. Shared components: `components/layout/Header.tsx`, `Footer.tsx`, `Heading.tsx`, cards in `components/card/`,
+       buttons / spans / badges in `components/common/` (`templates/components/`).
+   11. Pages in `components/pages/`, each one `Header` → `<section id="kebab-id">` → `.container` →
+       `Footer` (`templates/components/pages/`).
+   12. `src/App.tsx` (home page, default export) and `src/main.tsx` (`templates/main.tsx`, with
        `ScrollToTop` inside it).
 
 3. **Write every file in the developer's hand** (STYLE_DNA §5 to §12). The ones models get wrong most:
@@ -64,8 +63,8 @@ The user describes an app (pages, features, data source). You deliver **every fi
    - `export function Name(){`; handlers as inner `function handleX(){`; `useState<T>(...)` always typed;
      no `useMemo` / `useCallback` / `interface` / `React.FC` / `clsx`.
    - Explicit closing tags: `<Footer></Footer>`, `<img ...></img>`, `<input ...></input>`.
-   - className on one line, at most 8 utilities; longer → a named App.css class with `@apply`.
-     Never store utilities in a variable (`const navLink = "..."`): reused lists are App.css classes.
+   - className on one line, at most 8 utilities; longer → a named index.css class with `@apply`.
+     Never store utilities in a variable (`const navLink = "..."`): reused lists are index.css classes.
      Every list prop passed explicitly.
    - Comments only where necessary, one short lowercase line. No block labels, no `//action creator`.
    - Types: beginner-friendly only, written by hand (STYLE_DNA T15), all in `src/interfaces/` (F3).
@@ -73,11 +72,11 @@ The user describes an app (pages, features, data source). You deliver **every fi
      submit handler (C22).
    - Data: no `fetch`; axios only in `helpers/`; components dispatch a thunk and abort it in the
      effect cleanup; urls only in `constants/api.ts` (STYLE_DNA C18, R12, R13).
-   - Never `!` important modifiers or `!important`; override with a modifier class in App.css.
+   - Never `!` important modifiers or `!important`; override with a modifier class in index.css.
    - No `aria-*` or `role`; icon-only buttons get `title`. Every `img` has a descriptive `alt`,
      never `loading="lazy"`.
    - Tailwind: px only, flex child widths `w-[N%]` only (never `basis-[...]`, never px or `calc`), no grid,
-     no `h-[...]`, desktop first `base max-lg: max-md: max-sm:`, font sizes only through App.css variables.
+     no `h-[...]`, desktop first `base max-lg: max-md: max-sm:`, font sizes only through index.css variables.
 
 4. **Self-check before answering.** Go through STYLE_DNA §17 and the `<before_you_finish>` list in
    `style_prompt.xml`. Then search your own output for: `grid`, `rem`, `vw`, `vh`, `svh`, `clamp(`,
@@ -93,7 +92,7 @@ The user describes an app (pages, features, data source). You deliver **every fi
 ## Output format
 
 - One short plan section.
-- Then each file as a fenced block headed by its path (`src/component/pages/Cart.tsx`), in the order above.
+- Then each file as a fenced block headed by its path (`src/components/pages/Cart.tsx`), in the order above.
 - Then an **Assets** list: file name → what the picture should show → where it is used.
 - Then a 3 to 6 line note: what persists to localStorage, routes, anything the user must provide.
 

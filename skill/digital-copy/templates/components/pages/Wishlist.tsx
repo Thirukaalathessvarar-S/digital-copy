@@ -1,6 +1,6 @@
 import {Link} from 'react-router-dom'
-import {Header} from '../Header.tsx'
-import {Footer} from '../Footer.tsx'
+import {Header} from '../layout/Header.tsx'
+import {Footer} from '../layout/Footer.tsx'
 import {useDispatch , useSelector} from 'react-redux'
 import type {AppDispatch , RootState} from '../../store/store.ts'
 import {removeWish} from '../../store/slice/wish/wishSlice.ts'
