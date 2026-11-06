@@ -1,16 +1,12 @@
-import glowingSkin from '../../assets/glowing-skin.png'
-import bottlePerfume from '../../assets/bottle-perfume.png'
-import armchair from '../../assets/armchair.png'
-import grocery from '../../assets/grocery.png'
-import deskLamp from '../../assets/desk-lamp.png'
-import laptop from '../../assets/laptop.png'
-import shirt from '../../assets/shirt.png'
+import glowingSkin from '../assets/images/glowing-skin.png'
+import bottlePerfume from '../assets/images/bottle-perfume.png'
+import armchair from '../assets/images/armchair.png'
+import grocery from '../assets/images/grocery.png'
+import deskLamp from '../assets/images/desk-lamp.png'
+import laptop from '../assets/images/laptop.png'
+import shirt from '../assets/images/shirt.png'
+import type {categoryType} from '../interfaces/category.ts'
 
-export type categoryType ={
-    category:string ,
-    label:string,
-    image:string
-}
 export const categoryProps : categoryType[] = [
     {category:'beauty' , label:'Beauty' , image:glowingSkin},
     {category:'fragrances' , label:'Fragrances' , image:bottlePerfume},

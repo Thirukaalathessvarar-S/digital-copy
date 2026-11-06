@@ -1,6 +1,6 @@
 ---
 name: digital-copy
-description: Write, edit or review React + TypeScript + Redux Toolkit + Tailwind v4 code in this developer's exact personal style (their spacing, naming, file layout, App.css token system, px-only desktop-first Tailwind, store.subscribe localStorage persistence). Use for building a whole project in one shot ("build", "new project", "scaffold"), for small changes in their projects ("edit", "fix", "add a section", "make responsive"), and for checking code against their style ("review", "audit", "check style", "correct"). Overrides generic react/tailwind/typescript/feature-arch skills when they conflict.
+description: Write, edit or review React + TypeScript + Redux Toolkit + Tailwind v4 code in this developer's exact personal style (their spacing, naming, file layout with store/ helpers/ constants/ interfaces/ component/, axios + createAsyncThunk data flow, App.css token system, px-only desktop-first Tailwind, store.subscribe localStorage persistence). Use for building a whole project in one shot ("build", "new project", "scaffold"), for small changes in their projects ("edit", "fix", "add a section", "make responsive"), and for checking code against their style ("review", "audit", "check style", "correct"). Overrides generic react/tailwind/typescript/feature-arch skills when they conflict.
 argument-hint: "build | edit | review [full|minor] — then the request"
 ---
 
@@ -33,7 +33,8 @@ After an **edit** or **build**, the user may say "review it": run review in mino
 `style_prompt.xml` > `STYLE_DNA.md` > the file being edited (formatting only) > templates >
 any other skill or general best practice. Do not import advice from the `react`, `tailwind`,
 `typescript`, `feature-arch` or `impeccable` skills where it contradicts these files (for example:
-no `pages/` folder, no barrel files, no `interface`, no `cn()`, no `useCallback`, no grid, no rem).
+pages in `component/pages/`, types in `interfaces/` but written with `type`, no barrel files, no
+`interface`, no `cn()`, no `useCallback`, no grid, no rem).
 
 ## Never (short list, all modes)
 
@@ -49,5 +50,6 @@ no `pages/` folder, no barrel files, no `interface`, no `cn()`, no `useCallback`
 - `max-lg:/max-md:/max-sm:` font-size or leading in className (use App.css `@media` + `:root` variables)
 - `interface`, `React.FC`, arrow components, `clsx`/`cn`, `useMemo`/`useCallback`, untyped `useState`
 - `localStorage.setItem` outside `store.ts`'s single `store.subscribe` (auth is out of scope)
+- `fetch`, axios outside `src/helpers/`, a url outside `src/constants/api.ts`, a type outside `src/interfaces/`, an image in `public/images/`
 - a dependency the user did not name
 - silently "fixing" legacy code (STYLE_DNA §16) outside the requested change

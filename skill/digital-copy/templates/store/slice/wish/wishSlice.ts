@@ -1,11 +1,6 @@
 import {createSlice , type PayloadAction} from '@reduxjs/toolkit'
+import type {Wish} from '../../../interfaces/wish.ts'
 
-export type Wish = {
-    id:number;
-    title:string;
-    image:string;
-    price:number;
-}
 function loadWish(): Wish[] {
     try{
         return JSON.parse(localStorage.getItem('wish') ?? '[]');

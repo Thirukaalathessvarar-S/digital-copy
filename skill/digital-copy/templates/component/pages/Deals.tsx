@@ -1,39 +1,26 @@
-import {Header} from './Header.tsx'
-import {Footer} from './Footer.tsx'
-import {ProductCard} from './ProductCard.tsx'
-import {ProductCardSkeleton} from './ProductCardSkeleton.tsx'
+import {Header} from '../Header.tsx'
+import {Footer} from '../Footer.tsx'
+import {ProductCard} from '../card/ProductCard.tsx'
+import {ProductCardSkeleton} from '../card/ProductCardSkeleton.tsx'
 import {useEffect , useState} from 'react'
 import {useDispatch , useSelector} from 'react-redux'
-import type {AppDispatch , RootState} from '../app/store'
-import {setItems} from '../features/items/itemSlice.ts'
+import type {AppDispatch , RootState} from '../../store/store.ts'
+import {fetchProducts} from '../../store/asyncThunk/productThunk.ts'
+import {DEALS_URL} from '../../constants/api.ts'
 import {Link} from 'react-router-dom'
-import notFound from '../assets/not-found.jpg'
+import notFound from '../../assets/images/not-found.jpg'
 
 export function Deals(){
     const dispatch = useDispatch<AppDispatch>();
-    const products = useSelector((state:RootState)=>state.items);
-    const [loading , setLoading] = useState<boolean>(true);
+    const {items , loading , error} = useSelector((state:RootState)=>state.product);
     const [minDiscount , setMinDiscount] = useState<number>(0);
 
-    const visibleProducts = products.filter((product)=>product.discountPercentage >= minDiscount);
+    const visibleProducts = items.filter((product)=>product.discountPercentage >= minDiscount);
 
     useEffect(()=>{
-        let ignore = false;      // skip a stale response
-        setLoading(true);
-        fetch('https://dummyjson.com/products?limit=20&sortBy=discountPercentage&order=desc')
-            .then(res => res.json())
-            .then(data => {
-              if(!ignore){
-                dispatch(setItems(data.products));
-              }
-            })
-            .finally(()=>{
-              if(!ignore){
-                setLoading(false);
-              }
-            });
+        const request = dispatch(fetchProducts(DEALS_URL));
         return ()=>{
-          ignore = true;
+            request.abort();      // skip a stale response
         };
     },[])
 
@@ -66,10 +53,10 @@ export function Deals(){
                         ))}
                     </div> :
 
-                    visibleProducts.length===0 ?
+                    error!=='' || visibleProducts.length===0 ?
                     <div className="container flex flex-col items-center justify-center gap-[20px]">
                         <img src={notFound} alt="No deals found" className="block max-w-[480px] max-md:max-w-[360px] max-sm:max-w-[280px]"></img>
-                        <h2>No deals right now</h2>
+                        <h2>{error!=='' ? 'Could not load deals' : 'No deals right now'}</h2>
                         <Link to="/" className="btn">Continue shopping</Link>
                     </div> :
 

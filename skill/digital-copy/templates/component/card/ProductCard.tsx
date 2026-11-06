@@ -1,8 +1,8 @@
-import type {Product} from '../App.tsx'
+import type {Product} from '../../interfaces/product.ts'
 import {Link} from 'react-router-dom'
 import {useDispatch , useSelector} from 'react-redux'
-import type {AppDispatch , RootState} from '../app/store'
-import {addItems} from '../features/cart/cartSlice'
+import type {AppDispatch , RootState} from '../../store/store.ts'
+import {addItems} from '../../store/slice/cart/cartSlice.ts'
 import toast from 'react-hot-toast'
 
 export function ProductCard({id , title , price , category , rating , images , discountPercentage , index} : Product & {index?:number}){

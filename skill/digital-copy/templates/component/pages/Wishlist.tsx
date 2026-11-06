@@ -1,11 +1,11 @@
 import {Link} from 'react-router-dom'
-import {Header} from './Header.tsx'
-import {Footer} from './Footer.tsx'
+import {Header} from '../Header.tsx'
+import {Footer} from '../Footer.tsx'
 import {useDispatch , useSelector} from 'react-redux'
-import type {AppDispatch , RootState} from '../app/store.ts'
-import {removeWish} from '../features/wishlist/wishSlice.ts'
+import type {AppDispatch , RootState} from '../../store/store.ts'
+import {removeWish} from '../../store/slice/wish/wishSlice.ts'
 import toast from 'react-hot-toast'
-import notFound from '../assets/not-found.jpg'
+import notFound from '../../assets/images/not-found.jpg'
 
 export function Wishlist(){
     const dispatch = useDispatch<AppDispatch>();

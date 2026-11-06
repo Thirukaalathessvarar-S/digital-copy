@@ -13,4 +13,7 @@ This project is written in my personal style. For every code change in this repo
 5. Never `!` important modifiers or `!important`; override with a new App.css class. No `aria-*` or `role`. Every `img` has a descriptive `alt`, never `loading="lazy"`.
 6. Beginner-friendly types only (no `Omit`, `Partial`, `Record`, `keyof`). Comments only when necessary, one short line.
    Font sizes per screen only through App.css `:root` variables inside `@media` blocks.
-7. localStorage is written only from `src/app/store.ts` via `store.subscribe`.
+7. localStorage is written only from `src/store/store.ts` via `store.subscribe`.
+8. Layout: `src/store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `src/helpers/` (axios),
+   `src/constants/` (props, api urls), `src/interfaces/` (all types, written with `type`),
+   `src/component/` (`card/`, `common/`, `pages/`), `src/assets/images/` + `src/assets/vector/`.

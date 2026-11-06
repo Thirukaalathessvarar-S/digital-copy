@@ -1,9 +1,10 @@
 import {useState} from 'react'
-import {Header} from './Header.tsx'
-import {Footer} from './Footer.tsx'
+import {Header} from '../Header.tsx'
+import {Footer} from '../Footer.tsx'
 import * as yup from 'yup'
 import toast from 'react-hot-toast'
 import {useNavigate} from 'react-router-dom'
+import type {FormErrors , Field} from '../../interfaces/form.ts'
 
 const schema = yup.object({
     name:yup.string().required('name is required'),
@@ -11,15 +12,6 @@ const schema = yup.object({
     phone:yup.string().required('phone number is required').matches(/^[6-9]\d{9}$/, "Enter a valid phone number"),
     message:yup.string().required('message is required').min(10 , 'message must be at least 10 characters')
 })
-
-type FormErrors = {
-    name?:string;
-    email?:string;
-    phone?:string;
-    message?:string;
-}
-
-type Field = 'name' | 'email' | 'phone' | 'message'
 
 export function Contact(){
     const [errors , setErrors] = useState<FormErrors>({});

@@ -31,10 +31,10 @@ Rule IDs in brackets (`[T3]`, `[C7]` ...) are used by the review mode to cite vi
 | UI | React 19, function components | class components |
 | Language | TypeScript ~6 (`.tsx` / `.ts`) | plain JS |
 | Styling | Tailwind CSS v4 via `@tailwindcss/vite` + `src/App.css` | tailwind.config.js, CSS modules, styled-components, inline `style={{}}` |
-| State | Redux Toolkit 2 + react-redux 9 (`createSlice`, `configureStore`) | Zustand, Context-for-state, RTK Query |
+| State | Redux Toolkit 2 + react-redux 9 (`createSlice`, `createAsyncThunk`, `configureStore`) | Zustand, Context-for-state, RTK Query |
 | Persistence | `store.subscribe` → `localStorage` | redux-persist |
 | Routing | react-router-dom 7, `BrowserRouter` + `Routes` + `Route` | data routers, file routing |
-| Data | `fetch(...).then(res => res.json())` | axios, TanStack Query, SWR |
+| Data | `axios` inside a `src/helpers/` function, called by a `createAsyncThunk` in `src/store/asyncThunk/` | `fetch`, TanStack Query, SWR, axios called straight from a component |
 | Forms | uncontrolled inputs + `FormData` + `yup` | react-hook-form, zod, Formik |
 | Toasts | `react-hot-toast` (`<Toaster position="top-center" />`, `toast.success(...)`) | other toast libs |
 | JS breakpoints | `react-responsive` `useMediaQuery` | custom resize listeners |
@@ -62,6 +62,7 @@ Rule IDs in brackets (`[T3]`, `[C7]` ...) are used by the review mode to cite vi
   "dependencies": {
     "@reduxjs/toolkit": "^2.13.0",
     "@tailwindcss/vite": "^4.3.3",
+    "axios": "^1.13.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-hot-toast": "^2.6.1",
@@ -142,42 +143,69 @@ link, `<title>`.
 ```
 src/
 ├── main.tsx                      root render, providers, router, routes, global wrappers (ScrollToTop)
-├── App.tsx                       home page (default export) + shared types (Product) + extra home sections as named exports (Trending, SmallBanner)
+├── App.tsx                       home page (default export) + extra home sections as named exports (Trending, SmallBanner)
 ├── App.css                       design tokens (:root, @theme), reusable classes, font-size @media
 ├── index.css                     @import "tailwindcss";
-├── app/
-│   └── store.ts                  configureStore + store.subscribe persistence + RootState / AppDispatch
-├── features/
-│   ├── authentication/authSlice.ts
-│   ├── cart/cartSlice.ts
-│   ├── items/itemSlice.ts
-│   └── order/orderSlice.ts
-├── components/                   FLAT: pages AND small components together, PascalCase.tsx
-│   ├── Header.tsx  Footer.tsx  ProductCard.tsx  ProductCardSkeleton.tsx  CategoryButton.tsx ...
-│   ├── Cart.tsx  Login.tsx  User.tsx  Order.tsx  Special.tsx  CheckoutNew.tsx  Product.tsx ...
-│   └── constants/
-│       └── categoryProps.ts      static data arrays (camelCase file)
+├── store/
+│   ├── store.ts                  configureStore + store.subscribe persistence + RootState / AppDispatch
+│   ├── slice/                    one folder per feature
+│   │   ├── auth/authSlice.ts
+│   │   ├── product/productSlice.ts
+│   │   ├── cart/cartSlice.ts
+│   │   └── order/orderSlice.ts
+│   └── asyncThunk/
+│       └── productThunk.ts       createAsyncThunk calls, one file per feature
+├── helpers/
+│   └── api.ts                    axios fetch methods (getData ...)
+├── constants/
+│   ├── api.ts                    API urls (BASE_URL, PRODUCTS_URL ...)
+│   └── categoryProps.ts          static props / data arrays (camelCase file)
+├── interfaces/                   every type declaration, one file per domain
+│   ├── product.ts  cart.ts  order.ts  auth.ts  category.ts
+│   ├── props.ts                  component props types (HeaderProps ...)
+│   └── form.ts                   FormErrors , Field ...
+├── component/                    shared pieces, PascalCase.tsx
+│   ├── Header.tsx  Footer.tsx  CategoryButton.tsx ...
+│   ├── card/                     cards: ProductCard.tsx  PetCard.tsx  ProductCardSkeleton.tsx ...
+│   ├── common/                   small reusable bits: buttons, spans, badges (Button.tsx  Badge.tsx ...)
+│   └── pages/                    every page except home: Cart.tsx  Login.tsx  Order.tsx  Product.tsx ...
 ├── hooks/
 │   └── UseScroll.ts              file name PascalCase, hook inside is camelCase (useScroll)
-└── assets/                       all images, flat, no subfolders
+└── assets/
+    ├── images/                   .png / .jpg
+    └── vector/                   .svg
 ```
 
-- `[F1]` Pages are not in a `pages/` folder. They live in `components/` next to small components.
-  A page file is named after the thing (`Cart.tsx`, `Order.tsx`, `Special.tsx`); the exported
-  function may differ (`Product.tsx` exports `ProductPage`, `CheckoutNew.tsx` exports `CheckOutNew`).
-- `[F2]` One slice per feature folder: `features/<folder>/<name>Slice.ts`. The folder can be longer
-  or plural, the slice name is short and singular: `authentication/authSlice.ts`,
-  `items/itemSlice.ts`.
-- `[F3]` No `index.ts` barrel files. No `types/` folder: a type lives in and is exported from the
-  file that owns the data (`Product` from `App.tsx`, `Cart` from `cartSlice.ts`, `Order` from
-  `orderSlice.ts`, `categoryType` from `categoryProps.ts`).
-- `[F4]` Static lists that pair data with imported images go in `components/constants/<camelName>.ts`.
+- `[F1]` Pages live in `component/pages/`. The home page is the only exception: it stays in
+  `App.tsx`. The folder is `component` (singular), never `components`. A page file is named after
+  the thing (`Cart.tsx`, `Order.tsx`, `Special.tsx`); the exported function may differ
+  (`Product.tsx` exports `ProductPage`, `CheckoutNew.tsx` exports `CheckOutNew`).
+  Cards go in `component/card/`, small reusable buttons / spans / badges in `component/common/`,
+  everything else shared (`Header`, `Footer`, `CategoryButton`) sits directly in `component/`.
+- `[F2]` One slice per feature folder: `store/slice/<feature>/<feature>Slice.ts`, short and
+  singular: `slice/auth/authSlice.ts`, `slice/product/productSlice.ts`. Its thunks go in
+  `store/asyncThunk/<feature>Thunk.ts`.
+- `[F3]` No `index.ts` barrel files. **Every type lives in `src/interfaces/`** and is imported
+  from there (`Product` from `interfaces/product.ts`, `Cart` from `interfaces/cart.ts`,
+  `categoryType` from `interfaces/category.ts`, `HeaderProps` from `interfaces/props.ts`,
+  `FormErrors` / `Field` from `interfaces/form.ts`). The folder is called `interfaces` but the
+  files still use `type`, never `interface` (T10). Only two exceptions stay where they are:
+  `RootState` / `AppDispatch` at the end of `store.ts`, and a C22
+  `type FormValues = yup.InferType<typeof schema>` next to its schema.
+- `[F4]` Static props / data lists (often paired with imported images) go in
+  `src/constants/<camelName>.ts`. API urls go in `src/constants/api.ts`; never write a url
+  inside a component, thunk or helper.
 - `[F5]` Small helpers used by one page stay in that page file above the component
   (`ratingCount`, `percentage`, `widthClass` in `Product.tsx`). Small sub-components used by one
   page also stay in that file (`Tile` in `SampleImage.tsx`; `Address`, `Shipping`, `Payment`,
-  `LoadingModal` in `CheckoutNew.tsx`).
+  `LoadingModal` in `CheckoutNew.tsx`). Network code is the exception: it always goes in
+  `src/helpers/` (F7).
 - `[F6]` A newer version of a page is a new file with a suffix, the old one is kept:
   `Checkout.tsx` (old) and `CheckoutNew.tsx` (routed). Do not delete the old one unless asked.
+- `[F7]` `src/helpers/*.ts` hold the axios fetch methods (C18). Only helpers import `axios`.
+- `[F8]` Images go in `src/assets/images/` (`.png`, `.jpg`), svgs in `src/assets/vector/`.
+  Every image is imported from `src/assets/`; nothing is stored in `public/images/` or referenced
+  by a `/images/...` string path.
 
 ---
 
@@ -199,7 +227,7 @@ Observed files: `glowing-skin.png`, `bottle-perfume.png`, `desk-lamp.png`, `armc
   describes it (`glowing-skin`, `credit-card`).
 - `[A5]` Import variable = camelCase of the file name: `glowingSkin`, `bottlePerfume`, `deskLamp`,
   `gPay`, `applePay`, `creditCard`, `notFound`, `groceryBanner`. When the image fills a role on a
-  page, the variable is named by the role: `import banner from "./assets/new-banner.png"`.
+  page, the variable is named by the role: `import banner from "./assets/images/new-banner.png"`.
 - `[A6]` Import path casing must match the file exactly (Linux builds are case-sensitive). Old
   files exported from a design tool keep their PascalCase (`Location.png`, `Payment.svg`,
   `Shipping.svg`, `PlayStation.png`); do not rename them, but new files are always kebab-case.
@@ -224,7 +252,11 @@ Observed files: `glowing-skin.png`, `bottle-perfume.png`, `desk-lamp.png`, `armc
 | Derived boolean | `isX` / descriptive | `isHome`, `isSearching`, `buttonState` |
 | Derived list | `visibleX` | `visibleProducts`, `visibleItems` |
 | Load helper in slice | `load<Name>()` | `loadCart()`, `loadOrder()` |
-| Slice actions | verb + noun | `addItems`, `addQuantity`, `reduceQuantity`, `clearCart`, `setItems`, `addOrder` |
+| Slice actions | verb + noun | `addItems`, `addQuantity`, `reduceQuantity`, `clearCart`, `addOrder` |
+| Async thunk | `fetch` + noun, action type `'<slice>/<thunk>'` | `fetchProducts` (`'product/fetchProducts'`), `fetchProduct`, `fetchCategories` |
+| Axios helper | `get` / `post` + noun | `getData`, `postData` |
+| API url const | UPPER_SNAKE + `_URL` | `BASE_URL`, `PRODUCTS_URL`, `DEALS_URL` |
+| Slice state type | `<Name>State` | `ProductState` |
 | Static data const | camelCase or UPPER for module config lists | `categoryProps`, `paymentMethods`, `FONTS`, `COLORS` |
 | Section `id` | kebab-case | `product-listing`, `special-category`, `small-banner`, `cart-empty`, `related-product` |
 | Route path | lowercase, kebab, `:param` | `/product/:id`, `/special/:category`, `/sample-image/:id` |
@@ -245,10 +277,12 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   ```ts
   import {Link} from 'react-router-dom'
   import {useDispatch , useSelector} from 'react-redux'
-  import type {AppDispatch , RootState} from '../app/store'
-  import {addItems} from '../features/cart/cartSlice.ts'
-  import {Header} from './Header.tsx'
-  import notFound from '../assets/not-found.jpg'
+  import type {AppDispatch , RootState} from '../../store/store.ts'
+  import {addItems} from '../../store/slice/cart/cartSlice.ts'
+  import {fetchProducts} from '../../store/asyncThunk/productThunk.ts'
+  import type {Product} from '../../interfaces/product.ts'
+  import {Header} from '../Header.tsx'
+  import notFound from '../../assets/images/not-found.jpg'
   import {createSlice , type PayloadAction} from '@reduxjs/toolkit'
   import * as yup from 'yup'
   ```
@@ -274,8 +308,8 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   }
   ```
 - `[T6]` **Arrows**: no spaces around `=>` in handlers and selectors: `()=>setOpen(false)`,
-  `(state:RootState)=>state.cart`, `prev=>!prev`, `.map((item)=>(`. Inside `fetch` chains spaces
-  are used: `.then(res => res.json())`, `.then(data => setRelated(data.products))`.
+  `(state:RootState)=>state.cart`, `prev=>!prev`, `.map((item)=>(`. Inside `.then` chains spaces
+  are used: `.then(data => setRelated(data.products))`, `.catch(()=>setFailed(true))`.
 - `[T7]` **Equality** usually without spaces: `start===0`, `userName===''`, `hash==='#product-listing'`,
   `item.id!==action.payload.id`. Relational operators usually with spaces: `cartCount > 0`,
   `(item.quantity ?? 0) > 0`.
@@ -284,7 +318,8 @@ This is hand formatting; no Prettier. Reproduce it character for character.
 - `[T9]` **Quotes**: single quotes in logic (`'beauty'`, `'/cart'`). In JSX, `className`, `id`,
   `alt`, `placeholder` use double quotes; `to='/'` may use either. Template literals for dynamic
   strings and classes.
-- `[T10]` **Types** use `type`, never `interface`. Members end with `;` and no space after colon:
+- `[T10]` **Types** use `type`, never `interface` (even inside `src/interfaces/`), and are exported
+  from `src/interfaces/` (F3). Members end with `;` and no space after colon:
   ```ts
   type HeaderProps = {
       isSearch:boolean;
@@ -426,33 +461,48 @@ return(
 
 ### 6.4 Effects and data
 
-- `[C18]` Fetch inside `useEffect` with a `.then` chain. When a newer request can race, use the
-  `ignore` flag with its comment:
-  ```tsx
-  useEffect(()=>{
-    let ignore = false;      // skip a stale response
-    setLoading(true);
-    fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          if(!ignore){
-            dispatch(setItems(data.products));
-          }
-        })
-        .finally(()=>{
-          if(!ignore){
-            setLoading(false);
-          }
-        });
-    return ()=>{
-      ignore = true;
-    };
-  },[useCategory , searchQuery])
-  ```
-  Simple fetches skip the flag: `.then(res => res.json()).then(data => setRelated(data.products));`.
-  Errors: `.then(res => res.ok ? res.json() : Promise.reject()).catch(()=>setFailed(true));`.
-- `[C19]` Lists fetched from the API go into Redux (`dispatch(setItems(data.products))`);
-  page-only extras (`related`, `productExtra`) stay in `useState`.
+- `[C18]` Data flows **url (constants) → axios helper (helpers) → async thunk (store/asyncThunk)
+  → slice `extraReducers` → component**. Never `fetch`, never `axios` in a component.
+  1. `src/constants/api.ts`:
+     ```ts
+     export const BASE_URL = 'https://dummyjson.com'
+     export const PRODUCTS_URL = `${BASE_URL}/products`
+     export const DEALS_URL = `${BASE_URL}/products?limit=20&sortBy=discountPercentage&order=desc`
+     ```
+  2. `src/helpers/api.ts` (pattern in `templates/api.ts`):
+     ```ts
+     import axios from 'axios'
+
+     export async function getData(url:string){
+         const response = await axios.get(url);
+         return response.data;
+     }
+     ```
+  3. `src/store/asyncThunk/productThunk.ts` (pattern in `templates/productThunk.ts`); the return
+     type is written so the slice gets a typed payload:
+     ```ts
+     export const fetchProducts = createAsyncThunk('product/fetchProducts' , async (url:string): Promise<Product[]> =>{
+         const data = await getData(url);
+         return data.products;
+     })
+     ```
+  4. The component dispatches it in `useEffect` and aborts a stale request in the cleanup:
+     ```tsx
+     const dispatch = useDispatch<AppDispatch>();
+     const {items , loading , error} = useSelector((state:RootState)=>state.product);
+
+     useEffect(()=>{
+         const request = dispatch(fetchProducts(`${PRODUCTS_URL}/category/${useCategory}`));
+         return ()=>{
+             request.abort();      // skip a stale response
+         };
+     },[useCategory])
+     ```
+  Loading and error come from the slice (`loading`, `error`), not from a page `useState`.
+- `[C19]` Lists fetched from the API go into Redux through a thunk. Page-only extras
+  (`related`, `productExtra`) may call the helper directly and stay in `useState`:
+  `` getData(`${PRODUCTS_URL}/${id}`).then(data => setProductExtra(data)); ``.
+  Errors on such a call: `.catch(()=>setFailed(true));`.
 - `[C20]` Dependency arrays list what is read, written `[id]`, `[category]`, `[useCategory , searchQuery]`.
   Exhaustive-deps is not enforced; do not add `dispatch` or setters.
 - `[C21]` Timers: `const timer = setTimeout(()=>setLoading(false) , 2000); return ()=>clearTimeout(timer);`.
@@ -465,17 +515,21 @@ const schema = yup.object({
     phone:yup.string().required('phone number is required').matches(/^[6-9]\d{9}$/, "Enter a valid phone number"),
     pincode:yup.string().required('pincode is required').matches(/^\d+$/ , 'pincode must contain only digits').min(6 , 'pincode must be at least 6 digits'),
 })
+```
 
-type FormErrors = {
+`src/interfaces/form.ts`:
+
+```ts
+export type FormErrors = {
     name?:string;
     phone?:string;
     pincode?:string;
 }
 
-type Field = 'name' | 'phone' | 'pincode'
+export type Field = 'name' | 'phone' | 'pincode'
 ```
 
-- `[C22]` Forms with two or more fields (one-field forms: C30). Schema and its types at module top, above the component. Types are written by hand
+- `[C22]` Forms with two or more fields (one-field forms: C30). Schema at module top, above the component; `FormErrors` and `Field` in `interfaces/form.ts` (F3), named after the form when there are several (`ContactErrors`, `ContactField`). Types are written by hand
   (`[T15]`): one optional `string` per field in `FormErrors`, and a `Field` union of the field names.
   Never `Partial<Record<keyof FormValues , string>>` and never `error.path as keyof FormValues`:
   write `FormErrors` and `Field` out and cast with `error.path as Field`.
@@ -591,11 +645,11 @@ type Field = 'name' | 'phone' | 'pincode'
 
 ## 8. Redux `[R]`
 
-### 8.1 Slice (exact pattern)
+### 8.1 Slice (exact pattern) `store/slice/cart/cartSlice.ts`
+
+The type lives in `src/interfaces/cart.ts`:
 
 ```ts
-import {createSlice , type PayloadAction} from '@reduxjs/toolkit'
-
 export type Cart = {
     id:number;
     category:string;
@@ -604,6 +658,12 @@ export type Cart = {
     quantity?:number | undefined;
     price:number;
 }
+```
+
+```ts
+import {createSlice , type PayloadAction} from '@reduxjs/toolkit'
+import type {Cart} from '../../../interfaces/cart.ts'
+
 function loadCart(): Cart[] {
     try{
         return JSON.parse(localStorage.getItem('cart') ?? '[]');
@@ -641,8 +701,10 @@ export const {addItems , addQuantity , clearCart} = cartSlice.actions
 export default cartSlice.reducer
 ```
 
-- `[R1]` The state **is** the array (or the object), not wrapped: `Cart[]`, `Product[]`, `Order[]`, `Auth`.
-- `[R2]` Type exported at the top; the `load<Name>()` function follows **with no blank line**.
+- `[R1]` A local slice's state **is** the array (or the object), not wrapped: `Cart[]`, `Order[]`, `Auth`.
+  A slice filled by a thunk is `{items , loading , error}` (8.2).
+- `[R2]` Imports at the top (the type from `interfaces/`); the `load<Name>()` function follows
+  **with no blank line**.
 - `[R3]` `const initialState: X = loadX();` (or `= [];` when not persisted).
 - `[R4]` Reducers are method shorthand. Replace state by `return action.payload;` / `return [];`.
   Unused state param is `_state`. Payload is typed `action : PayloadAction<X>` (spaces around the
@@ -651,17 +713,74 @@ export default cartSlice.reducer
 - `[R6]` Bottom two lines, no semicolons: `export const {...} = xSlice.actions` and
   `export default xSlice.reducer`.
 
-### 8.2 Store + store.subscribe persistence
+### 8.2 Async thunk + API slice `store/slice/product/productSlice.ts`
+
+`src/interfaces/product.ts` holds `Product` and the slice state:
+
+```ts
+export type ProductState = {
+    items:Product[];
+    loading:boolean;
+    error:string;
+}
+```
+
+```ts
+import {createSlice} from '@reduxjs/toolkit'
+import {fetchProducts} from '../../asyncThunk/productThunk.ts'
+import type {ProductState} from '../../../interfaces/product.ts'
+
+const initialState: ProductState = {
+    items:[],
+    loading:false,
+    error:''
+}
+
+const productSlice = createSlice({
+    name:'product',
+    initialState,
+    reducers:{},
+    extraReducers:(builder)=>{
+        builder
+            .addCase(fetchProducts.pending , (state)=>{
+                state.loading = true;
+                state.error = '';
+            })
+            .addCase(fetchProducts.fulfilled , (state , action)=>{
+                state.loading = false;
+                state.items = action.payload;
+            })
+            .addCase(fetchProducts.rejected , (state , action)=>{
+                if(action.meta.aborted){
+                    return;      // a newer request is already loading
+                }
+                state.loading = false;
+                state.error = action.error.message ?? 'something went wrong';
+            })
+    },
+})
+
+export default productSlice.reducer
+```
+
+- `[R12]` Thunks live in `store/asyncThunk/<feature>Thunk.ts`, are named `fetch<Noun>`, use the
+  action type `'<slice name>/<thunk name>'`, take the url (from `constants/api.ts`) as their one
+  argument, call a `helpers/` function and write the return type (`Promise<Product[]>`).
+- `[R13]` The slice handles `pending` / `fulfilled` / `rejected` in `extraReducers` with a
+  `builder` chain, in that order. `rejected` returns early when `action.meta.aborted`.
+  `reducers:{}` stays even when empty. API slices are not persisted.
+
+### 8.3 Store + store.subscribe persistence
 
 ```ts
 import { configureStore } from '@reduxjs/toolkit'
-import itemReducer from '../features/items/itemSlice'
-import cartReducer from '../features/cart/cartSlice'
-import orderReducer from '../features/order/orderSlice'
+import productReducer from './slice/product/productSlice'
+import cartReducer from './slice/cart/cartSlice'
+import orderReducer from './slice/order/orderSlice'
 
 export const store = configureStore({
   reducer: {
-    items:itemReducer,
+    product:productReducer,
     cart:cartReducer,
     order:orderReducer
   },
@@ -704,7 +823,7 @@ export type AppDispatch = typeof store.dispatch
 - `[R9]` localStorage key = store key = slice `name` (`'cart'`, `'order'`).
 - `[R10]` Reducer imports are `<name>Reducer` default imports without extension; store keys are
   `key:reducer` with no space. Only data the user must keep across reloads is persisted
-  (cart, order). The list from the API (`items`) is not.
+  (cart, order). The list from the API (`product`) is not.
 - `[R11]` Components read with `useSelector((state:RootState)=>state.cart)` and write with
   `const dispatch = useDispatch<AppDispatch>();` (`useDispatch()` without the generic also appears).
   No typed `useAppSelector` hooks file.
@@ -713,18 +832,24 @@ export type AppDispatch = typeof store.dispatch
 
 ---
 
-## 9. Constants: `components/constants/categoryProps.ts` `[D]`
+## 9. Constants: `constants/categoryProps.ts` `[D]`
+
+The type lives in `src/interfaces/category.ts`:
 
 ```ts
-import glowingSkin from '../../assets/glowing-skin.png'
-import bottlePerfume from '../../assets/bottle-perfume.png'
-import armchair from '../../assets/armchair.png'
-
 export type categoryType ={
     category:string ,
     label:string,
     image:string
 }
+```
+
+```ts
+import glowingSkin from '../assets/images/glowing-skin.png'
+import bottlePerfume from '../assets/images/bottle-perfume.png'
+import armchair from '../assets/images/armchair.png'
+import type {categoryType} from '../interfaces/category.ts'
+
 export const categoryProps : categoryType[] = [
     {category:'beauty' , label:'Beauty' , image:glowingSkin},
     {category:'fragrances' , label:'Fragrances' , image:bottlePerfume},
@@ -732,11 +857,13 @@ export const categoryProps : categoryType[] = [
 ]
 ```
 
-- `[D1]` Images imported at the top (`../../assets/...`), type then array, **one object per line**,
+- `[D1]` Images imported at the top (`../assets/images/...`), then the type import, then the array, **one object per line**,
   ` , ` between fields, no trailing comma after the last item.
 - `[D2]` `category` = the API slug (used in URLs and fetches), `label` = display text,
   `image` = imported asset.
-- `[D3]` The type is camelCase + `Type` and written `={` (no space after `=`).
+- `[D3]` The type is camelCase + `Type`, written `={` (no space after `=`), in `interfaces/`.
+- `[D6]` `constants/api.ts` holds every url as an UPPER_SNAKE `const`, built from `BASE_URL`
+  with a template literal. No logic, no types, no axios in it.
 - `[D4]` Consumed by slicing a window for a carousel and mapping to a component with explicit props:
   ```tsx
   const categoryList = categoryProps.slice(start , start + visibleCount);
@@ -761,8 +888,8 @@ import './index.css'
 import { BrowserRouter, Routes, Route , useLocation } from 'react-router-dom'
 import App from './App.tsx'
 import {Provider} from 'react-redux'
-import {store} from './app/store.ts'
-import {Cart} from './components/Cart.tsx'
+import {store} from './store/store.ts'
+import {Cart} from './component/pages/Cart.tsx'
 import {Toaster} from 'react-hot-toast'
 import {useEffect} from 'react'
 
@@ -800,7 +927,8 @@ createRoot(document.getElementById('root')!).render(
 - `[M2]` Behaviour-only wrappers (render `null`) are plain `function` declarations **inside
   main.tsx** above `createRoot`, not exported, not in their own file. This file keeps the Vite
   template spacing (`{ useLocation }`, `if (...) {`, 2-space indent).
-- `[M3]` Every page is imported on its own line with its extension, then listed as a `Route`.
+- `[M3]` Every page is imported on its own line with its extension (`./component/pages/<Name>.tsx`),
+  then listed as a `Route`.
   Flat routes, no nested layouts.
 - `[M4]` Hash sections: the Header links to `/#product-listing`, `/#special-category`; the
   `useScroll(ready)` hook in `hooks/UseScroll.ts` returns refs (`homeRef`, `exploreRef`,
@@ -1117,17 +1245,25 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L17 | `{/* label */}` on every block, `//action creator`, banner comments | everywhere in old code | comments only when necessary, one short line |
 | L18 | class-string consts (`const crumb = "shrink-0 ..."`, `const navLink = "p-[13px_10px] ..."`) and utility defaults on props | Header, breadcrumb, old components | a named App.css class (W12) |
 | L19 | `!` modifiers (`!py-[11px]`, `max-sm:!rounded-[28px]`, `hover:!bg-...`) and `!important` | old components, App.css classes | a modifier class or a separate class (W9) |
+| L20 | old layout: `src/app/store.ts`, `src/features/<folder>/<name>Slice.ts`, flat `src/components/` with pages inside, `components/constants/`, flat `src/assets/`, images in `public/images/`, types exported from `App.tsx` / slices / constants | e-commerce project | the section 2 layout (F1 to F8) |
+| L21 | `fetch(...).then(res => res.json())` in `useEffect`, the `ignore` flag, `setItems(data.products)`, page `loading` state for API lists, urls written inside components | e-commerce project | constants url → `helpers/` axios → `asyncThunk/` → `extraReducers` (C18, R12, R13) |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
 It is positioning, not sizing, appears everywhere, and is not a violation.
+
+**Editing a project that still has the L20 / L21 layout**: put new files where that project keeps
+the same kind of file (like B3 for breakpoints). Do not move files, rename folders or convert
+`fetch` calls to thunks unless the user asks for the migration. New projects always use section 2.
 
 ---
 
 ## 17. Final checklist (run before you answer)
 
 - [ ] Stack and dependencies unchanged (S1). No new library.
-- [ ] Files in the right place and named per F / A / N.
+- [ ] Files in the right place and named per F / A / N: `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `component/` (`card/`, `common/`, `pages/`), `assets/images/` + `assets/vector/`.
+- [ ] Every type in `interfaces/` (except `RootState` / `AppDispatch` and a C22 `FormValues`); every url in `constants/api.ts`.
+- [ ] API data: axios only in `helpers/`, thunk in `asyncThunk/`, `pending` / `fulfilled` / `rejected` in the slice, `request.abort()` in the effect cleanup (C18, R12, R13).
 - [ ] Formatting: indent of the file, ` , ` commas, `if(`, `else{` on a new line, `()=>`, no semicolon on imports, `.tsx` extensions on local imports.
 - [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 8 utilities (longer → App.css class).
 - [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are App.css classes.
