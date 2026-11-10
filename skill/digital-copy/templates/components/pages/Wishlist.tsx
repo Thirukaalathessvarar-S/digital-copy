@@ -20,7 +20,7 @@ export function Wishlist(){
         return(
             <>
                 <Header isSearch={false}></Header>
-                <section id="wishlist-empty" className="bg-[var(--bg-soft)] p-[30px_0px]">
+                <section id="wishlist-empty" className="bg-[var(--bg-soft)] py-[30px] px-[0px]">
                     <div className="container flex justify-center">
                         <div className="empty-card">
                             <img src={notFound} alt="No items in wishlist" className="block max-w-[320px] max-sm:max-w-[240px]"></img>
@@ -40,7 +40,7 @@ export function Wishlist(){
     return(
         <>
             <Header isSearch={false}></Header>
-            <section id="wishlist" className="bg-[var(--bg-soft)] p-[30px_0px]">
+            <section id="wishlist" className="bg-[var(--bg-soft)] py-[30px] px-[0px]">
                 <div className="container mb-[30px]">
                     <h2>Wishlist <span className="text-muted-sm">{wishItems.length} items</span></h2>
                 </div>

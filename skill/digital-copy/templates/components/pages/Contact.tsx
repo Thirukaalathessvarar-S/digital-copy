@@ -54,7 +54,7 @@ export function Contact(){
     return(
         <>
             <Header isSearch={false}></Header>
-            <section id="contact" className="bg-[var(--bg-soft)] p-[30px_0px]">
+            <section id="contact" className="bg-[var(--bg-soft)] py-[30px] px-[0px]">
                 <div className="container flex justify-center">
                     <form onSubmit={handleSubmit} className="contact-form">
                         <div>

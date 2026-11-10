@@ -32,7 +32,7 @@
     </rule>
     <rule>
       Never store Tailwind utilities in a .tsx / .ts variable, const, object or default prop
-      value (const navLink = "p-[13px_10px] ..."). Write them as a named class in index.css
+      value (const navLink = "py-[13px] px-[10px] ..."). Write them as a named class in index.css
       with @apply and use the class name in className, whatever the length.
     </rule>
     <rule>
@@ -168,7 +168,8 @@
     <pattern name="background color">bg-(color:--surface)</pattern>
     <pattern name="border color">border-(color:--line-strong)</pattern>
     <pattern name="outline color">outline-(color:--primary)</pattern>
-    <pattern name="arbitrary padding">p-[16px_56px]</pattern>
+    <pattern name="arbitrary padding">py-[16px] px-[56px]</pattern>
+    <rule>Never write padding as an underscore shorthand. p-[10px_20px] is py-[10px] px-[20px]; p-[10px_20px_30px_20px] is pt-[10px] pr-[20px] pb-[30px] pl-[20px]. A single value stays p-[20px].</rule>
     <pattern name="arbitrary radius">rounded-[10px]</pattern>
     <rule>Sizes and colors come from the variables in :root, for example var(--card-title-size), var(--ink), var(--primary), var(--line).</rule>
     <rule>Line height is always the font-size variable plus 4px: leading-[calc(var(--x-size)+4px)].</rule>
@@ -188,6 +189,8 @@
     <check>No rem, em, vw, vh, fr, fractions, clamp().</check>
     <check>Percentage used only on w-[N%] widths; no basis-[...] anywhere.</check>
     <check>Every flex child width is w-[N%]: no basis-[...], no w-[Npx], no w-[calc(...)] on a flex child.</check>
+    <check>No p-[A_B] or p-[A_B_C_D] padding; it is py-[A] px-[B] or pt-[A] pr-[B] pb-[C] pl-[D].</check>
+    <check>public/favicon.svg is an svg fetched from an internet source and linked in index.html.</check>
     <check>No aria-* and no role attribute anywhere.</check>
     <check>No ! important modifier on any Tailwind class and no !important anywhere; overrides are new classes.</check>
     <check>Every img has a descriptive, non-empty alt and no loading="lazy".</check>

@@ -24,7 +24,7 @@ export function ProductCard({id , title , price , category , rating , images , d
 
     return(
         <Link to={`/product/${id}`} className={(index ?? 0)>3 ? 'hidden' : 'product-card'}>
-            <div className="relative bg-[var(--tint)] p-[40px_0px_0px_0px]">
+            <div className="relative bg-[var(--tint)] pt-[40px] pr-[0px] pb-[0px] pl-[0px]">
                 <img className="w-full aspect-square object-contain" src={images?.[0]} alt={title}></img>
                 <p className="chip rating-chip"><i className="fa-solid fa-star text-[var(--tertiary)]"></i>{rating}</p>
             </div>

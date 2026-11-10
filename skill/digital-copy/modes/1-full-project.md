@@ -38,7 +38,10 @@ The user describes an app (pages, features, data source). You deliver **every fi
 2. **Write files in this order**
    1. `package.json` (exact dependency set from STYLE_DNA §1, rename `"name"` only), `vite.config.ts`,
       `.oxlintrc.json`, `tsconfig*.json` (stock Vite React-TS), `.gitignore` (stock Vite), `index.html`
-      (fonts + Font Awesome links from STYLE_DNA §1).
+      (fonts + Font Awesome links from STYLE_DNA §1, favicon link `/favicon.svg`), and `public/favicon.svg`:
+      an svg icon that fits the app, fetched from an internet source (STYLE_DNA F9), e.g.
+      `curl -L -o public/favicon.svg https://api.iconify.design/<set>/<icon>.svg`. Delete the stock `vite.svg`.
+      If you cannot run commands, give the user the exact url and command.
    2. `src/index.css` from `templates/index.css` (the only stylesheet, no `App.css`): keep the whole token system and classes, add the new
       variables the app needs to `:root` **and** to each of the three `@media` blocks (1023 / 767 / 639).
    3. `src/interfaces/*.ts`: every type the app uses (`templates/interfaces/`).
@@ -77,11 +80,12 @@ The user describes an app (pages, features, data source). You deliver **every fi
      never `loading="lazy"`.
    - Tailwind: px only, flex child widths `w-[N%]` only (never `basis-[...]`, never px or `calc`), no grid,
      no `h-[...]`, desktop first `base max-lg: max-md: max-sm:`, font sizes only through index.css variables.
+   - Padding: never `p-[A_B]` / `p-[A_B_C_D]`; write `py-[A] px-[B]` / `pt-[A] pr-[B] pb-[C] pl-[D]` (STYLE_DNA W2).
 
 4. **Self-check before answering.** Go through STYLE_DNA §17 and the `<before_you_finish>` list in
    `style_prompt.xml`. Then search your own output for: `grid`, `rem`, `vw`, `vh`, `svh`, `clamp(`,
    `/2"`, `w-1/`, `h-[`, `interface `, `fetch(`, `axios` outside `helpers/`, `https://` outside `constants/api.ts`, `useMemo`, `useCallback`, `React.FC`, `clsx`, `max-md:text-[`,
-   `max-sm:text-[`, `max-lg:leading-`, `aria-`, `role=`, `loading=`, `alt=""`, `basis-[`, `w-[` followed by
+   `max-sm:text-[`, `max-lg:leading-`, `aria-`, `role=`, `loading=`, `alt=""`, `p-[` with a `_` inside, `basis-[`, `w-[` followed by
    a digit and `px` or `calc` on a flex child, `!important`, a `!` before a class name, `Omit<`, `Pick<`, `Partial<`, `Record`, `keyof`, `InferType`. Fix every hit
    (the input-icon centring idiom `top-[50%] -translate-y-1/2`, `RootState` in `store.ts` and a C22
    `type FormValues = yup.InferType<typeof schema>` used outside the submit handler are allowed).

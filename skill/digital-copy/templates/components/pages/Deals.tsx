@@ -32,7 +32,7 @@ export function Deals(){
         <>
             <Header isSearch={false}></Header>
 
-            <section id="deals" className="bg-[var(--bg-soft)] p-[60px_0px] max-md:p-[40px_0px]">
+            <section id="deals" className="bg-[var(--bg-soft)] py-[60px] px-[0px] max-md:py-[40px] max-md:px-[0px]">
                 <div className="container flex flex-wrap items-center justify-between gap-x-[20px] gap-y-[12px] mb-[40px] max-md:mb-[24px]">
                     <div className="flex flex-col gap-[4px]">
                         <p className="eyebrow text-[color:var(--muted)]">Offers</p>

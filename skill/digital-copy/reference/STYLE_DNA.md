@@ -121,7 +121,7 @@ export default defineConfig({
 `allowImportingTsExtensions` is what lets imports end in `.tsx` / `.ts` (section 5).
 `verbatimModuleSyntax` is why types are imported with `import type` / `type X`.
 
-`index.html` head, in this order: charset, favicon, viewport, two Google Fonts `preconnect`s,
+`index.html` head, in this order: charset, favicon (`/favicon.svg`, F9), viewport, two Google Fonts `preconnect`s,
 Google Fonts link (Manrope 200..800 + Inter 100..800), Fontshare Satoshi link, Font Awesome 6.5.2 CDN
 link, `<title>`.
 
@@ -142,6 +142,8 @@ imported once, by `main.tsx` (`import './index.css'`); `App.tsx` imports no css.
 ## 2. File structure `[F]`
 
 ```
+public/
+└── favicon.svg                   svg icon fetched from the internet for the app (F9)
 src/
 ├── main.tsx                      root render, providers, router, routes, global wrappers (ScrollToTop)
 ├── App.tsx                       home page (default export) + extra home sections as named exports (Trending, SmallBanner)
@@ -209,6 +211,10 @@ src/
 - `[F8]` Images go in `src/assets/images/` (`.png`, `.jpg`), svgs in `src/assets/vector/`.
   Every image is imported from `src/assets/`; nothing is stored in `public/images/` or referenced
   by a `/images/...` string path.
+- `[F9]` `public/favicon.svg` is an svg icon **fetched from an internet source** that fits the app
+  (for example `https://api.iconify.design/<set>/<icon>.svg`), never the stock Vite favicon. It is linked in
+  `index.html` as `<link rel="icon" type="image/svg+xml" href="/favicon.svg" />`. The stock `vite.svg` is deleted;
+  `favicon.svg` is the only file in `public/`.
 
 ---
 
@@ -438,7 +444,7 @@ Every page component returns this shape:
 return(
     <>
         <Header isSearch={false}></Header>
-        <section id="cart" className="bg-[var(--bg-soft)] p-[30px_0px]">
+        <section id="cart" className="bg-[var(--bg-soft)] py-[30px] px-[0px]">
             <div className="container mb-[30px]">
                 <h2>Shopping Cart</h2>
             </div>
@@ -456,8 +462,8 @@ return(
 - `[C14]` Header is per page, not in a layout route (`isSearch={true}` only on home, which also
   passes `resultRef`, `query`, `onSearch`). Footer closes every page.
 - `[C15]` Each `<section>` has a kebab-case `id` and vertical padding as shorthand with explicit
-  `0px`: `p-[30px_0px]`, `p-[60px_0px]`, `p-[90px_0px] max-md:p-[60px_0px]`,
-  `p-[0px_0px_90px_0px] max-md:p-[0px_0px_60px_0px]`. The `.container` div inside gives width.
+  `0px`, written per side (W2): `py-[30px] px-[0px]`, `py-[60px] px-[0px]`, `py-[90px] px-[0px] max-md:py-[60px] max-md:px-[0px]`,
+  `pt-[0px] pr-[0px] pb-[90px] pl-[0px] max-md:pt-[0px] max-md:pr-[0px] max-md:pb-[60px] max-md:pl-[0px]`. The `.container` div inside gives width.
 - `[C16]` White card on a soft page: section `bg-[var(--bg-soft)]` (old code: `bg-[#F5F6FA]`),
   card `bg-[#ffffff] rounded-[24px] p-[30px] max-sm:p-[20px]`, or the `.card` class.
 - `[C17]` Empty states show `notFound` image + `h2` + `text-muted-sm` line + `btn` link back.
@@ -944,9 +950,13 @@ createRoot(document.getElementById('root')!).render(
 Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
 
 - `[W1]` Arbitrary **px** values for everything: `gap-[20px]`, `mb-[30px]`, `rounded-[24px]`,
-  `w-[80px]`, `border-[1px]`. Zero is written `0px`: `p-[30px_0px]`, `p-[0px_0px_90px_0px]`.
-- `[W2]` Multi-side padding/border as one underscore shorthand: `p-[10px_42px_10px_10px]`,
-  `p-[44px_0px_44px_56px]`, `border-[0px_0px_1px_0px]`, `p-[4px_12px]`.
+  `w-[80px]`, `border-[1px]`. Zero is written `0px`: `py-[30px] px-[0px]`, `pt-[0px] pr-[0px] pb-[90px] pl-[0px]`.
+- `[W2]` **Padding is never an underscore shorthand.** Two values → `py-[A] px-[B]`:
+  `p-[10px_20px]` → `py-[10px] px-[20px]`, `p-[4px_12px]` → `py-[4px] px-[12px]`.
+  Four values → `pt-[A] pr-[B] pb-[C] pl-[D]`: `p-[10px_20px_30px_20px]` →
+  `pt-[10px] pr-[20px] pb-[30px] pl-[20px]`, `p-[44px_0px_44px_56px]` → `pt-[44px] pr-[0px] pb-[44px] pl-[56px]`.
+  Three values → `pt-[A] px-[B] pb-[C]`. Breakpoint overrides do the same (`max-md:py-[60px] max-md:px-[0px]`).
+  A single value stays `p-[20px]`. Borders keep their shorthand: `border-[0px_0px_1px_0px]`.
 - `[W3]` Borders spell out every part: `border-solid border-[1px] border-[var(--line)]`.
 - `[W4]` Colors from variables. In className the usual forms are `bg-[var(--tint)]`,
   `text-[var(--muted)]`, `border-[var(--line-strong)]`; `style_prompt.xml` patterns
@@ -995,7 +1005,8 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
   ```css
   .nav-link {
       @apply
-      p-[13px_10px]
+      py-[13px]
+      px-[10px]
       text-[length:var(--nav-size)]
       leading-[calc(var(--nav-size)+4px)]
       font-semibold
@@ -1008,7 +1019,7 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
   }
   ```
   Used as `className="nav-link"` or ``className={`nav-link ${isActive ? 'link-active' : ''}`}``.
-  Never `const navLink = "p-[13px_10px] ..."` + `className={navLink}`.
+  Never `const navLink = "py-[13px] px-[10px] ..."` + `className={navLink}`.
 - `[W13]` Components may accept a class-name prop, but it carries an **index.css class name**, not
   utilities: `variant = 'btn-outline'`, `bg = 'muted-soft-text'`, applied as
   ``className={`${variant} flex ...`}``.
@@ -1118,7 +1129,8 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
       max-md:w-[100%]
       max-md:order-4
       shrink
-      p-[0px_20px]
+      py-[0px]
+      px-[20px]
       rounded-full
       border-solid
       border-[1px]
@@ -1209,7 +1221,7 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
   mobile-only parts `hidden max-md:flex`.
 - **sm** (`max-sm:`): one per row or centered narrower card (`max-sm:mx-auto max-sm:w-[70%]`),
   `max-sm:flex-col max-sm:items-center`, padding to `12px`/`16px`/`20px`.
-- Section padding: `p-[90px_0px] max-md:p-[60px_0px]`; card padding `p-[30px] max-sm:p-[20px]`.
+- Section padding: `py-[90px] px-[0px] max-md:py-[60px] max-md:px-[0px]`; card padding `p-[30px] max-sm:p-[20px]`.
 
 ---
 
@@ -1246,11 +1258,12 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L15 | `aria-label`, `aria-hidden`, `role` | old components | no ARIA; `title` on icon-only buttons |
 | L16 | `Partial<Record<keyof ...>>`, `as keyof FormValues`, `yup.InferType` used only to build `FormErrors`, other utility types | old forms | hand-written `FormErrors` + `Field` (T15, C22) |
 | L17 | `{/* label */}` on every block, `//action creator`, banner comments | everywhere in old code | comments only when necessary, one short line |
-| L18 | class-string consts (`const crumb = "shrink-0 ..."`, `const navLink = "p-[13px_10px] ..."`) and utility defaults on props | Header, breadcrumb, old components | a named index.css class (W12) |
+| L18 | class-string consts (`const crumb = "shrink-0 ..."`, `const navLink = "py-[13px] px-[10px] ..."`) and utility defaults on props | Header, breadcrumb, old components | a named index.css class (W12) |
 | L19 | `!` modifiers (`!py-[11px]`, `max-sm:!rounded-[28px]`, `hover:!bg-...`) and `!important` | old components, index.css classes | a modifier class or a separate class (W9) |
 | L20 | old layout: `src/app/store.ts`, `src/features/<folder>/<name>Slice.ts`, flat `src/components/` with pages inside, `components/constants/`, flat `src/assets/`, images in `public/images/`, types exported from `App.tsx` / slices / constants | e-commerce project | the section 2 layout (F1 to F8) |
 | L21 | `fetch(...).then(res => res.json())` in `useEffect`, the `ignore` flag, `setItems(data.products)`, page `loading` state for API lists, urls written inside components | e-commerce project | constants url → `helpers/` axios → `asyncThunk/` → `extraReducers` (C18, R12, R13) |
 | L22 | a separate `src/App.css` imported by `App.tsx`, `index.css` holding only `@import "tailwindcss";`, Header / Footer directly in `components/`, a singular `component/` folder | older projects | everything in `index.css`; `components/layout/` |
+| L23 | underscore padding `p-[30px_0px]`, `p-[10px_20px_30px_20px]`, `max-md:p-[60px_0px]` | all code before this rule | `py-[30px] px-[0px]`, `pt-[10px] pr-[20px] pb-[30px] pl-[20px]` (W2) |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
@@ -1273,6 +1286,8 @@ the same kind of file (like B3 for breakpoints). Do not move files, rename folde
 - [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are index.css classes.
 - [ ] No `aria-*` or `role`; every `img` has a descriptive `alt` and no `loading="lazy"`.
 - [ ] Flex child widths are `w-[N%]` only, never `basis-[...]`.
+- [ ] No `p-[A_B]` / `p-[A_B_C_D]`: padding is `py-[A] px-[B]` or `pt-[A] pr-[B] pb-[C] pl-[D]` (W2).
+- [ ] `public/favicon.svg` exists, fetched from an internet source, linked in `index.html` (F9).
 - [ ] No `!` important modifier and no `!important`; overrides are new classes (W9).
 - [ ] Types with `type`, beginner-friendly only (T15), explicit `useState<T>`, no useMemo/useCallback.
 - [ ] Forms: two or more fields → object schema + `FormErrors` (C22 to C24); one field → `yup.string()` + one string error (C30).

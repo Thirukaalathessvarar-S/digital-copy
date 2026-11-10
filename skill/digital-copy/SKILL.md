@@ -40,10 +40,12 @@ pages in `components/pages/`, Header / Footer in `components/layout/`, all css i
 
 - grid · rem/em/vw/vh/svh/clamp · size fractions · `%` anywhere except `w-[N%]` · Tailwind spacing scale numbers (`p-5`) where px is meant
 - any `basis-[...]` (`basis-[25%]`, `basis-[120px]`, `basis-[calc(...)]`), or a flex child width in px: `w-[120px]`, `w-[calc(...)]` (use `w-[25%]`)
+- underscore padding `p-[10px_20px]` / `p-[10px_20px_30px_20px]`: write `py-[10px] px-[20px]` / `pt-[10px] pr-[20px] pb-[30px] pl-[20px]`
+- the stock Vite favicon: `public/favicon.svg` is an svg fetched from an internet source for the app
 - the `!` important modifier (`!py-[11px]`, `max-sm:!rounded-[28px]`) or `!important`: write a modifier class or a new class list instead
 - any `aria-*` or `role` attribute · an `img` with empty or missing `alt` · `loading="lazy"`
 - a className with more than 8 utilities (move it to a named index.css class with `@apply`)
-- Tailwind utilities in a `.tsx` / `.ts` variable (`const navLink = "p-[13px_10px] ..."`): write a named index.css class instead
+- Tailwind utilities in a `.tsx` / `.ts` variable (`const navLink = "py-[13px] px-[10px] ..."`): write a named index.css class instead
 - utility types (`Omit`, `Pick`, `Partial`, `Record`, `keyof` ...): beginner-friendly types only (`yup.InferType` only for a C22 `FormValues` used outside the submit handler)
 - comments that are not necessary; keep the needed ones to one short line
 - add an `h-[...]` or change an existing one

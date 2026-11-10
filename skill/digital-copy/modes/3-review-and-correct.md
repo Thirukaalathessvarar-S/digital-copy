@@ -18,14 +18,14 @@ Decide the scope from the request:
   Review only the changed lines and the lines right around them. Legacy patterns outside the
   changed lines are not reported.
 - **Full project**: "review the project", "audit everything", a repo or folder. Review every file
-  under `src/`, plus `package.json`, `vite.config.ts`, `index.html`, `index.css`. Skip
+  under `src/`, plus `package.json`, `vite.config.ts`, `index.html`, `index.css`, `public/favicon.svg` (F9). Skip
   theme slices (`src/store/slice/theme/`, old `src/features/theme/`) and auth/login localStorage handling (out of scope by the developer's choice).
 
 ## Severity
 
 | Level | Meaning | Examples |
 |---|---|---|
-| **MUST** | breaks `style_prompt.xml`, or breaks the app | grid, rem/vw/vh/svh, clamp, size fractions, new `h-[...]`, changed `h-[...]`, font size via `max-*:text-[...]` in className, new non-allowed index.css content, `localStorage.setItem` outside `store.ts`, missing `key`, import path case mismatch, any `basis-[...]`, `w-[Npx]` / `w-[calc(...)]` on a flex child, any `!` important modifier or `!important`, any `aria-*` or `role`, empty or missing `alt`, `loading="lazy"` |
+| **MUST** | breaks `style_prompt.xml`, or breaks the app | grid, rem/vw/vh/svh, clamp, size fractions, new `h-[...]`, changed `h-[...]`, font size via `max-*:text-[...]` in className, new non-allowed index.css content, `localStorage.setItem` outside `store.ts`, missing `key`, import path case mismatch, any `p-[A_B]` / `p-[A_B_C_D]` underscore padding, a missing or stock `public/favicon.svg` (full scope), any `basis-[...]`, `w-[Npx]` / `w-[calc(...)]` on a flex child, any `!` important modifier or `!important`, any `aria-*` or `role`, empty or missing `alt`, `loading="lazy"` |
 | **SHOULD** | breaks a STYLE_DNA habit in new or changed code | className over 8 utilities, Tailwind utilities stored in a variable or default prop, utility types (`Omit`, `Partial`, `Record`, `keyof`, `InferType`), unnecessary or long comments, `interface`, `React.FC`, arrow component, `clsx`, `useMemo`, untyped `useState`, `if (` spacing, `} else {` on one line, self-closed `<Footer />`, missing `{/* label */}`, spread props in lists, wrong file place or name (STYLE_DNA F1 to F8: types outside `interfaces/`, urls outside `constants/api.ts`, axios outside `helpers/`, images in `public/images/` or outside `assets/images/` / `assets/vector/`, a page outside `components/pages/`), `fetch` in new code, kebab-case violation in assets, new dependency |
 | **LEGACY** | old pattern from STYLE_DNA §16 that already existed | only in full-project scope; listed separately, never mixed with MUST/SHOULD |
 | **OK** | looks odd but is the developer's style | `top-[50%] -translate-y-1/2` centring, ` , ` commas, 2-space indent in main.tsx/store.ts, empty `catch{}` in store.ts, `[useCategory , setCategory]` naming, explicit `0px`, `RootState = ReturnType<...>` in `store.ts`, `max-w-[Npx]` on images |
@@ -53,6 +53,7 @@ from 'axios'                                                    → SHOULD unles
 https?://                                                       → SHOULD unless in src/constants/api.ts / F4
 ^export (type|interface) |^type \w+ ?=                         → SHOULD unless in src/interfaces/ / F3 (RootState / AppDispatch in store.ts and a C22 FormValues are OK)
 /images/|public/images                                          → SHOULD images live in src/assets/images/ / F8
+(^|[\s"'`:])p-\[[^\]\s]*_                                   → MUST  padding is py/px or pt/pr/pb/pl / W2
 basis-\[|\bw-\[calc                                            → MUST  no basis, flex child widths are w-[N%] / W7
 \baria-[a-z]+=|\brole=                                          → MUST  no ARIA / C28
 !important|className=.*[\s"'`{:]![a-z\[-]|^\s+([a-z-]+:)*![a-z\[-]   → MUST  no important / W9 (className and @apply lines only)
