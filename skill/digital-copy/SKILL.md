@@ -44,7 +44,7 @@ pages in `components/pages/`, Header / Footer in `components/layout/`, all css i
 - the stock Vite favicon: `public/favicon.svg` is an svg fetched from an internet source for the app
 - the `!` important modifier (`!py-[11px]`, `max-sm:!rounded-[28px]`) or `!important`: write a modifier class or a new class list instead
 - any `aria-*` or `role` attribute · an `img` with empty or missing `alt` · `loading="lazy"`
-- a className with more than 8 utilities (move it to a named index.css class with `@apply`)
+- a className with more than 20 utilities (move it to a named index.css class with `@apply`)
 - Tailwind utilities in a `.tsx` / `.ts` variable (`const navLink = "py-[13px] px-[10px] ..."`): write a named index.css class instead
 - utility types (`Omit`, `Pick`, `Partial`, `Record`, `keyof` ...): beginner-friendly types only (`yup.InferType` only for a C22 `FormValues` used outside the submit handler)
 - comments that are not necessary; keep the needed ones to one short line

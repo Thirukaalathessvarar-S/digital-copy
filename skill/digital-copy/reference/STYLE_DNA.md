@@ -1110,7 +1110,7 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
   `.price` `.price-lg` `.price-was`, `.link` `.link-active`.
   Semantic text classes: `.text-muted-sm`, `.green-text`, `.red-text`, `.label`, `.card-title`.
   Box classes: `.card`, `.input`, `.img-placeholder`, `.container`.
-- `[X7]` A `className` with **more than 8 utilities** moves into a new index.css class with
+- `[X7]` A `className` with **more than 20 utilities** moves into a new index.css class with
   `@apply` (one utility per line, same order as in className). Name it kebab-case after what the
   element is (`.search-bar`, `.rating-chip`). Conditional parts (`${isOpen ? ... : ''}`) stay in
   `className`. index.css classes are unlayered and beat utilities, so a utility in className cannot
@@ -1282,7 +1282,7 @@ the same kind of file (like B3 for breakpoints). Do not move files, rename folde
 - [ ] Every type in `interfaces/` (except `RootState` / `AppDispatch` and a C22 `FormValues`); every url in `constants/api.ts`.
 - [ ] API data: axios only in `helpers/`, thunk in `asyncThunk/`, `pending` / `fulfilled` / `rejected` in the slice, `request.abort()` in the effect cleanup (C18, R12, R13).
 - [ ] Formatting: indent of the file, ` , ` commas, `if(`, `else{` on a new line, `()=>`, no semicolon on imports, `.tsx` extensions on local imports.
-- [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 8 utilities (longer → index.css class).
+- [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 20 utilities (longer → index.css class).
 - [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are index.css classes.
 - [ ] No `aria-*` or `role`; every `img` has a descriptive `alt` and no `loading="lazy"`.
 - [ ] Flex child widths are `w-[N%]` only, never `basis-[...]`.
