@@ -34,7 +34,7 @@ Rule IDs in brackets (`[T3]`, `[C7]` ...) are used by the review mode to cite vi
 | State | Redux Toolkit 2 + react-redux 9 (`createSlice`, `createAsyncThunk`, `configureStore`) | Zustand, Context-for-state, RTK Query |
 | Persistence | `store.subscribe` → `localStorage` | redux-persist |
 | Routing | react-router-dom 7, `BrowserRouter` + `Routes` + `Route` | data routers, file routing |
-| Data | `axios` inside a `src/helpers/` function, called by a `createAsyncThunk` in `src/store/asyncThunk/` | `fetch`, TanStack Query, SWR, axios called straight from a component |
+| Data | one `axios` instance in `src/helpers/api_client.ts`, one function per endpoint in `src/helpers/backend_helper.ts`, called by a `createAsyncThunk` in `src/store/asyncThunk/` | `fetch`, TanStack Query, SWR, axios called straight from a component |
 | Forms | uncontrolled inputs + `FormData` + `yup` | react-hook-form, zod, Formik |
 | Toasts | `react-hot-toast` (`<Toaster position="top-center" />`, `toast.success(...)`) | other toast libs |
 | JS breakpoints | `react-responsive` `useMediaQuery` | custom resize listeners |
@@ -158,10 +158,11 @@ src/
 │   └── asyncThunk/
 │       └── productThunk.ts       createAsyncThunk calls, one file per feature
 ├── helpers/
-│   └── api.ts                    axios fetch methods (getData ...)
+│   ├── url_helper.ts             API_BASE_URL + one path const per backend resource (PRODUCT , CATEGORY ...)
+│   ├── api_client.ts             the one axios instance: get , post , put , del
+│   └── backend_helper.ts         one function per endpoint (getProductsByCategory , postProduct ...)
 ├── constants/
-│   ├── api.ts                    API urls (BASE_URL, PRODUCTS_URL ...)
-│   └── categoryProps.ts          static props / data arrays (camelCase file)
+│   └── categoryProps.ts          static props / data arrays (camelCase file), no urls
 ├── interfaces/                   every type declaration, one file per domain
 │   ├── product.ts  cart.ts  order.ts  auth.ts  category.ts
 │   ├── props.ts                  component props types (HeaderProps ...)
@@ -198,8 +199,10 @@ src/
   `RootState` / `AppDispatch` at the end of `store.ts`, and a C22
   `type FormValues = yup.InferType<typeof schema>` next to its schema.
 - `[F4]` Static props / data lists (often paired with imported images) go in
-  `src/constants/<camelName>.ts`. API urls go in `src/constants/api.ts`; never write a url
-  inside a component, thunk or helper.
+  `src/constants/<camelName>.ts`. The API base url and the resource paths go in
+  `src/helpers/url_helper.ts` (D6); only `backend_helper.ts` builds a path from them. Never write
+  a url or an API path inside a component, thunk or slice. The deployed base url comes from
+  `.env` as `VITE_BACKEND_URL`; `API_BASE_URL` is the local fallback.
 - `[F5]` Small helpers used by one page stay in that page file above the component
   (`ratingCount`, `percentage`, `widthClass` in `Product.tsx`). Small sub-components used by one
   page also stay in that file (`Tile` in `SampleImage.tsx`; `Address`, `Shipping`, `Payment`,
@@ -207,7 +210,11 @@ src/
   `src/helpers/` (F7).
 - `[F6]` A newer version of a page is a new file with a suffix, the old one is kept:
   `Checkout.tsx` (old) and `CheckoutNew.tsx` (routed). Do not delete the old one unless asked.
-- `[F7]` `src/helpers/*.ts` hold the axios fetch methods (C18). Only helpers import `axios`.
+- `[F7]` `src/helpers/` holds the network code (C18). Only `api_client.ts` imports `axios`;
+  `backend_helper.ts` imports `get` / `post` / `put` / `del` from it and `* as url` from
+  `url_helper.ts`. Components and thunks import endpoint functions from `backend_helper.ts` only.
+  The three helper files keep their own standard formatting (spaces inside `{ }`, `, ` commas,
+  semicolons, `// Product` group comments): copy it as it is, do not convert it to the T rules.
 - `[F8]` Images go in `src/assets/images/` (`.png`, `.jpg`), svgs in `src/assets/vector/`.
   Every image is imported from `src/assets/`; nothing is stored in `public/images/` or referenced
   by a `/images/...` string path.
@@ -263,8 +270,8 @@ Observed files: `glowing-skin.png`, `bottle-perfume.png`, `desk-lamp.png`, `armc
 | Load helper in slice | `load<Name>()` | `loadCart()`, `loadOrder()` |
 | Slice actions | verb + noun | `addItems`, `addQuantity`, `reduceQuantity`, `clearCart`, `addOrder` |
 | Async thunk | `fetch` + noun, action type `'<slice>/<thunk>'` | `fetchProducts` (`'product/fetchProducts'`), `fetchProduct`, `fetchCategories` |
-| Axios helper | `get` / `post` + noun | `getData`, `postData` |
-| API url const | UPPER_SNAKE + `_URL` | `BASE_URL`, `PRODUCTS_URL`, `DEALS_URL` |
+| Endpoint function (`backend_helper.ts`) | `get` / `post` / `put` / `update` / `delete` / `search` + noun | `getProductsByCategory`, `getProductDetails`, `getCategories`, `postProduct`, `updateProduct`, `putCategory`, `deleteProduct`, `searchProducts` |
+| API base url / path const (`url_helper.ts`) | `API_BASE_URL`; resource paths UPPER, singular | `API_BASE_URL`, `PRODUCT`, `CATEGORY`, `REVIEW`, `AUTH` |
 | Slice state type | `<Name>State` | `ProductState` |
 | Static data const | camelCase or UPPER for module config lists | `categoryProps`, `paymentMethods`, `FONTS`, `COLORS` |
 | Section `id` | kebab-case | `product-listing`, `special-category`, `small-banner`, `cart-empty`, `related-product` |
@@ -470,38 +477,48 @@ return(
 
 ### 6.4 Effects and data
 
-- `[C18]` Data flows **url (constants) → axios helper (helpers) → async thunk (store/asyncThunk)
-  → slice `extraReducers` → component**. Never `fetch`, never `axios` in a component.
-  1. `src/constants/api.ts`:
+- `[C18]` Data flows **path (`helpers/url_helper.ts`) → endpoint function (`helpers/backend_helper.ts`,
+  through the axios instance in `helpers/api_client.ts`) → async thunk (`store/asyncThunk`) → slice
+  `extraReducers` → component**. Never `fetch`, never `axios` in a component.
+  1. `src/helpers/url_helper.ts` (pattern in `templates/helpers/url_helper.ts`):
      ```ts
-     export const BASE_URL = 'https://dummyjson.com'
-     export const PRODUCTS_URL = `${BASE_URL}/products`
-     export const DEALS_URL = `${BASE_URL}/products?limit=20&sortBy=discountPercentage&order=desc`
+     export const API_BASE_URL = 'http://localhost:3000';
+     export const PRODUCT = 'product';
+     export const CATEGORY = 'category';
      ```
-  2. `src/helpers/api.ts` (pattern in `templates/api.ts`):
+  2. `src/helpers/api_client.ts` (pattern in `templates/helpers/api_client.ts`): one
+     `axios.create({ baseURL })` with `baseURL = import.meta.env.VITE_BACKEND_URL || API_BASE_URL`,
+     a response interceptor that returns `response.data`, and `get` / `post` / `put` / `del` exports.
+     So every endpoint resolves to the backend body `{success , statusCode , data , message}`.
+  3. `src/helpers/backend_helper.ts` (pattern in `templates/helpers/backend_helper.ts`), one arrow
+     function per endpoint, grouped under `// Product`, `// Category` ... comments:
      ```ts
-     import axios from 'axios'
+     import { get, post, put, del } from './api_client';
+     import * as url from './url_helper';
+     import type { ProductBody } from '../interfaces/types';
 
-     export async function getData(url:string){
-         const response = await axios.get(url);
-         return response.data;
-     }
+     // Product
+     export const getProductsByCategory = (category: string) => get(`/${url.PRODUCT}/category/${category}`);
+     export const searchProducts = (search: string) => get(`/${url.PRODUCT}/search`, { params: { search } });
+     export const postProduct = (data: ProductBody, token: string) => post(`/${url.PRODUCT}`, data, { headers: { Authorization: `Bearer ${token}` } });
      ```
-  3. `src/store/asyncThunk/productThunk.ts` (pattern in `templates/productThunk.ts`); the return
-     type is written so the slice gets a typed payload:
+     Query strings go in `{ params }`, never in the path. A protected endpoint takes the token as
+     its last argument and sends `Authorization: Bearer`.
+  4. `src/store/asyncThunk/productThunk.ts` (pattern in `templates/store/asyncThunk/productThunk.ts`);
+     the return type is written so the slice gets a typed payload, and the list is `data.data`:
      ```ts
-     export const fetchProducts = createAsyncThunk('product/fetchProducts' , async (url:string): Promise<Product[]> =>{
-         const data = await getData(url);
-         return data.products;
+     export const fetchProducts = createAsyncThunk('product/fetchProducts' , async (category:string): Promise<Product[]> =>{
+         const data = await getProductsByCategory(category);
+         return data.data;
      })
      ```
-  4. The component dispatches it in `useEffect` and aborts a stale request in the cleanup:
+  5. The component dispatches it in `useEffect` and aborts a stale request in the cleanup:
      ```tsx
      const dispatch = useDispatch<AppDispatch>();
      const {items , loading , error} = useSelector((state:RootState)=>state.product);
 
      useEffect(()=>{
-         const request = dispatch(fetchProducts(`${PRODUCTS_URL}/category/${useCategory}`));
+         const request = dispatch(fetchProducts(useCategory));
          return ()=>{
              request.abort();      // skip a stale response
          };
@@ -509,9 +526,13 @@ return(
      ```
   Loading and error come from the slice (`loading`, `error`), not from a page `useState`.
 - `[C19]` Lists fetched from the API go into Redux through a thunk. Page-only extras
-  (`related`, `productExtra`) may call the helper directly and stay in `useState`:
-  `` getData(`${PRODUCTS_URL}/${id}`).then(data => setProductExtra(data)); ``.
+  (`related`, `productExtra`, one product's details for an edit form) may call the endpoint function
+  directly and stay in `useState`:
+  `getProductDetails(id).then(data => setProductExtra(data.data));`.
   Errors on such a call: `.catch(()=>setFailed(true));`.
+  Writes (`post` / `put` / `update` / `delete` functions) are called straight from the submit or
+  click handler with the token from the `auth` slice, then the list thunk is dispatched again so
+  the slice reloads: `await postProduct(body , auth.accessToken ?? ''); dispatch(fetchAdminProducts());`.
 - `[C20]` Dependency arrays list what is read, written `[id]`, `[category]`, `[useCategory , searchQuery]`.
   Exhaustive-deps is not enforced; do not add `dispatch` or setters.
 - `[C21]` Timers: `const timer = setTimeout(()=>setLoading(false) , 2000); return ()=>clearTimeout(timer);`.
@@ -792,8 +813,11 @@ export default productSlice.reducer
 ```
 
 - `[R12]` Thunks live in `store/asyncThunk/<feature>Thunk.ts`, are named `fetch<Noun>`, use the
-  action type `'<slice name>/<thunk name>'`, take the url (from `constants/api.ts`) as their one
-  argument, call a `helpers/` function and write the return type (`Promise<Product[]>`).
+  action type `'<slice name>/<thunk name>'`, call one or more `backend_helper.ts` endpoint functions
+  (never a url or `axios`), return `data.data` and write the return type (`Promise<Product[]>`).
+  The argument is only the value the endpoint function needs: none (`fetchCategories()`), one
+  value (`fetchProducts(category)`), or a query type from `interfaces/` when there is a choice
+  (`fetchProducts({category , search})`, where a search wins over the category).
 - `[R13]` The slice handles `pending` / `fulfilled` / `rejected` in `extraReducers` with a
   `builder` chain, in that order. `rejected` returns early when `action.meta.aborted`.
   `reducers:{}` stays even when empty. API slices are not persisted.
@@ -890,8 +914,9 @@ export const categoryProps : categoryType[] = [
 - `[D2]` `category` = the API slug (used in URLs and fetches), `label` = display text,
   `image` = imported asset.
 - `[D3]` The type is camelCase + `Type`, written `={` (no space after `=`), in `interfaces/`.
-- `[D6]` `constants/api.ts` holds every url as an UPPER_SNAKE `const`, built from `BASE_URL`
-  with a template literal. No logic, no types, no axios in it.
+- `[D6]` `helpers/url_helper.ts` holds `API_BASE_URL` and one plain string `const` per backend
+  resource (`export const PRODUCT = 'product';`). No full urls per endpoint, no logic, no types,
+  no axios in it. Endpoint paths are built in `backend_helper.ts`: `` `/${url.PRODUCT}/category/${category}` ``.
 - `[D4]` Consumed by slicing a window for a carousel and mapping to a component with explicit props:
   ```tsx
   const categoryList = categoryProps.slice(start , start + visibleCount);
@@ -1280,10 +1305,11 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L18 | class-string consts (`const crumb = "shrink-0 ..."`, `const navLink = "py-[13px] px-[10px] ..."`) and utility defaults on props | Header, breadcrumb, old components | a named index.css class (W12) |
 | L19 | `!` modifiers (`!py-[11px]`, `max-sm:!rounded-[28px]`, `hover:!bg-...`) and `!important` | old components, index.css classes | a modifier class or a separate class (W9) |
 | L20 | old layout: `src/app/store.ts`, `src/features/<folder>/<name>Slice.ts`, flat `src/components/` with pages inside, `components/constants/`, flat `src/assets/`, images in `public/images/`, types exported from `App.tsx` / slices / constants | e-commerce project | the section 2 layout (F1 to F8) |
-| L21 | `fetch(...).then(res => res.json())` in `useEffect`, the `ignore` flag, `setItems(data.products)`, page `loading` state for API lists, urls written inside components | e-commerce project | constants url → `helpers/` axios → `asyncThunk/` → `extraReducers` (C18, R12, R13) |
+| L21 | `fetch(...).then(res => res.json())` in `useEffect`, the `ignore` flag, `setItems(data.products)`, page `loading` state for API lists, urls written inside components | e-commerce project | `url_helper.ts` path → `backend_helper.ts` function → `asyncThunk/` → `extraReducers` (C18, R12, R13) |
 | L22 | a separate `src/App.css` imported by `App.tsx`, `index.css` holding only `@import "tailwindcss";`, Header / Footer directly in `components/`, a singular `component/` folder | older projects | everything in `index.css`; `components/layout/` |
 | L23 | underscore padding `p-[30px_0px]`, `p-[10px_20px_30px_20px]`, `max-md:p-[60px_0px]` | all code before this rule | `py-[30px] px-[0px]`, `pt-[10px] pr-[20px] pb-[30px] pl-[20px]` (W2) |
 | L24 | labels with no `*` on required fields, yup messages like `'name is required'` or `'please enter valid email'` that do not start with the label | all forms before this rule | `Receiver name <span className="red-text">*</span>`, `'Receiver name is required'` (C31, C32) |
+| L25 | `src/constants/api.ts` with full urls (`BASE_URL`, `PRODUCTS_URL`, `DEALS_URL`), a generic `getData(url)` helper in `helpers/api.ts`, thunks that take a url | older projects | `helpers/url_helper.ts` + `helpers/api_client.ts` + `helpers/backend_helper.ts`; thunks call named endpoint functions (C18, R12) |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
@@ -1299,8 +1325,8 @@ the same kind of file (like B3 for breakpoints). Do not move files, rename folde
 
 - [ ] Stack and dependencies unchanged (S1). No new library.
 - [ ] Files in the right place and named per F / A / N: `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `components/` (`card/`, `common/`, `pages/`), `assets/images/` + `assets/vector/`.
-- [ ] Every type in `interfaces/` (except `RootState` / `AppDispatch` and a C22 `FormValues`); every url in `constants/api.ts`.
-- [ ] API data: axios only in `helpers/`, thunk in `asyncThunk/`, `pending` / `fulfilled` / `rejected` in the slice, `request.abort()` in the effect cleanup (C18, R12, R13).
+- [ ] Every type in `interfaces/` (except `RootState` / `AppDispatch` and a C22 `FormValues`); the base url and resource paths only in `helpers/url_helper.ts`, endpoint paths built only in `helpers/backend_helper.ts`.
+- [ ] API data: axios only in `helpers/api_client.ts`, endpoint functions in `helpers/backend_helper.ts`, every API list through a thunk in `asyncThunk/` that calls them, `pending` / `fulfilled` / `rejected` in the slice, `request.abort()` in the effect cleanup (C18, C19, R12, R13).
 - [ ] Formatting: indent of the file, ` , ` commas, `if(`, `else{` on a new line, `()=>`, no semicolon on imports, `.tsx` extensions on local imports.
 - [ ] Explicit closing tags on components and `img` / `input`; className on one line, at most 20 utilities (longer → index.css class).
 - [ ] No Tailwind utilities in a `.tsx` / `.ts` variable, const or default prop (W12): reused lists are index.css classes.

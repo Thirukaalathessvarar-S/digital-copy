@@ -28,7 +28,8 @@ The user describes an app (pages, features, data source). You deliver **every fi
    - Pages → `src/components/pages/<Name>.tsx` (home stays in `App.tsx`) and their routes.
    - Data → which Redux slices (`store/slice/<feature>/<feature>Slice.ts`), which ones persist to
      localStorage, which ones are filled by a thunk (`store/asyncThunk/<feature>Thunk.ts`).
-   - API urls → `src/constants/api.ts`; static lists with images → `src/constants/<camelName>.ts`.
+   - API → base url and resource paths in `src/helpers/url_helper.ts`, one endpoint function each in
+     `src/helpers/backend_helper.ts`; static lists with images → `src/constants/<camelName>.ts`.
    - Types → `src/interfaces/<domain>.ts` (written with `type`, never `interface`).
    - Assets → kebab-case names describing what each picture shows (`desk-lamp.png`), in
      `src/assets/images/` (png / jpg) or `src/assets/vector/` (svg), listed so the user can drop them in.
@@ -45,8 +46,9 @@ The user describes an app (pages, features, data source). You deliver **every fi
    2. `src/index.css` from `templates/index.css` (the only stylesheet, no `App.css`): keep the whole token system and classes, add the new
       variables the app needs to `:root` **and** to each of the three `@media` blocks (1023 / 767 / 639).
    3. `src/interfaces/*.ts`: every type the app uses (`templates/interfaces/`).
-   4. `src/constants/api.ts` (urls) and `src/constants/*.ts` (props / data lists) (`templates/constants/`).
-   5. `src/helpers/api.ts`: the axios fetch methods (`templates/helpers/api.ts`).
+   4. `src/constants/*.ts`: props / data lists, no urls (`templates/constants/`).
+   5. `src/helpers/url_helper.ts`, `src/helpers/api_client.ts`, `src/helpers/backend_helper.ts`
+      (`templates/helpers/`), plus `VITE_BACKEND_URL` in `.env`.
    6. `src/store/asyncThunk/<feature>Thunk.ts` (`templates/store/asyncThunk/productThunk.ts`).
    7. `src/store/slice/<feature>/<feature>Slice.ts`: API slices with `extraReducers`
       (`templates/store/slice/product/productSlice.ts`), local / persisted slices with `load<Name>()`
@@ -75,8 +77,9 @@ The user describes an app (pages, features, data source). You deliver **every fi
      submit handler (C22).
    - Forms: a `.required(...)` field gets ` <span className="red-text">*</span>` at the end of its label,
      optional ones none (C31); every yup message starts with the field's label (`'Receiver name is required'`, C32).
-   - Data: no `fetch`; axios only in `helpers/`; components dispatch a thunk and abort it in the
-     effect cleanup; urls only in `constants/api.ts` (STYLE_DNA C18, R12, R13).
+   - Data: no `fetch`; axios only in `helpers/api_client.ts`; endpoint functions only in
+     `helpers/backend_helper.ts`, paths from `helpers/url_helper.ts`; every API list goes through a
+     thunk that the component dispatches and aborts in the effect cleanup (STYLE_DNA C18, C19, R12, R13).
    - Never `!` important modifiers or `!important`; override with a modifier class in index.css.
    - No `aria-*` or `role`; icon-only buttons get `title`. Every `img` has a descriptive `alt`,
      never `loading="lazy"`.
@@ -86,7 +89,7 @@ The user describes an app (pages, features, data source). You deliver **every fi
 
 4. **Self-check before answering.** Go through STYLE_DNA §17 and the `<before_you_finish>` list in
    `style_prompt.xml`. Then search your own output for: `grid`, `rem`, `vw`, `vh`, `svh`, `clamp(`,
-   `/2"`, `w-1/`, `h-[`, `interface `, `fetch(`, `axios` outside `helpers/`, `https://` outside `constants/api.ts`, `useMemo`, `useCallback`, `React.FC`, `clsx`, `max-md:text-[`,
+   `/2"`, `w-1/`, `h-[`, `interface `, `fetch(`, `axios` outside `helpers/api_client.ts`, `https://` or an API path outside `helpers/url_helper.ts` / `backend_helper.ts`, an endpoint function called for a list outside `store/asyncThunk/`, `useMemo`, `useCallback`, `React.FC`, `clsx`, `max-md:text-[`,
    `max-sm:text-[`, `max-lg:leading-`, `aria-`, `role=`, `loading=`, `alt=""`, `p-[` with a `_` inside, `basis-[`, `w-[` followed by
    a digit and `px` or `calc` on a flex child, `!important`, a `!` before a class name, `Omit<`, `Pick<`, `Partial<`, `Record`, `keyof`, `InferType`. Fix every hit
    (the input-icon centring idiom `top-[50%] -translate-y-1/2`, `RootState` in `store.ts` and a C22

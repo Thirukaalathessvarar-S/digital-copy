@@ -35,10 +35,14 @@ They sit in `reference/` next to this file, or are attached. If missing, say so 
 - **New file** → follow STYLE_DNA §2 to §4 for place and name, and copy the closest `templates/` file's shape.
   In a project that still has the old layout (`app/`, `features/`, flat `components/`, STYLE_DNA L20),
   put it next to the files of the same kind there; do not migrate folders unless asked.
-- **New type** → `src/interfaces/<domain>.ts` (written with `type`). **New url** → `src/constants/api.ts`.
-- **New API data** → axios method in `src/helpers/`, thunk in `src/store/asyncThunk/`, `pending` /
-  `fulfilled` / `rejected` in the slice's `extraReducers` (STYLE_DNA C18, R12, R13). Never `fetch`,
-  never axios in a component. A project still on `fetch` (L21) keeps it unless the user asks.
+- **New type** → `src/interfaces/<domain>.ts` (written with `type`). **New backend resource** → a path
+  const in `src/helpers/url_helper.ts`.
+- **New API data** → an endpoint function in `src/helpers/backend_helper.ts`, a thunk in
+  `src/store/asyncThunk/` that calls it, `pending` / `fulfilled` / `rejected` in the slice's
+  `extraReducers` (STYLE_DNA C18, C19, R12, R13). Every list goes through the thunk, even when nearby
+  code calls the helper straight into `useState`; only page-only extras and writes call it directly.
+  Never `fetch`, never axios in a component. A project still on `fetch` (L21) or on
+  `constants/api.ts` + `getData(url)` (L25) keeps it unless the user asks.
 - **Lines you add** follow the newest rules even when the file around them does not: flex child
   widths `w-[N%]` only (never `basis-[...]`), padding as `py-[A] px-[B]` / `pt-[A] pr-[B] pb-[C] pl-[D]` (never `p-[A_B]`), no `!` important modifier or `!important` (write a modifier class), no `aria-*` / `role`, descriptive `alt`, no `loading="lazy"`,
   beginner-friendly types, comments only when necessary, a className of more than 20 utilities

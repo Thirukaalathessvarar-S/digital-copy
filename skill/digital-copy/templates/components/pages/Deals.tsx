@@ -6,7 +6,6 @@ import {useEffect , useState} from 'react'
 import {useDispatch , useSelector} from 'react-redux'
 import type {AppDispatch , RootState} from '../../store/store.ts'
 import {fetchProducts} from '../../store/asyncThunk/productThunk.ts'
-import {DEALS_URL} from '../../constants/api.ts'
 import {Link} from 'react-router-dom'
 import notFound from '../../assets/images/not-found.jpg'
 
@@ -18,7 +17,7 @@ export function Deals(){
     const visibleProducts = items.filter((product)=>product.discountPercentage >= minDiscount);
 
     useEffect(()=>{
-        const request = dispatch(fetchProducts(DEALS_URL));
+        const request = dispatch(fetchProducts());
         return ()=>{
             request.abort();      // skip a stale response
         };

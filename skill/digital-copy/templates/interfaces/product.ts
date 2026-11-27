@@ -8,6 +8,13 @@ export type Product = {
     images:string[];
 }
 
+export type ProductBody = {
+    title:string;
+    price:number;
+    category:string;
+    images:string[];
+}
+
 export type ProductState = {
     items:Product[];
     loading:boolean;

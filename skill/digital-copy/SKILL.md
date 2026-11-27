@@ -54,6 +54,6 @@ pages in `components/pages/`, Header / Footer in `components/layout/`, all css i
 - `max-lg:/max-md:/max-sm:` font-size or leading in className (use index.css `@media` + `:root` variables)
 - `interface`, `React.FC`, arrow components, `clsx`/`cn`, `useMemo`/`useCallback`, untyped `useState`
 - `localStorage.setItem` outside `store.ts`'s single `store.subscribe` (auth is out of scope)
-- `fetch`, axios outside `src/helpers/`, a url outside `src/constants/api.ts`, a type outside `src/interfaces/`, an image in `public/images/`
+- `fetch`, axios outside `src/helpers/api_client.ts`, a url or API path outside `src/helpers/url_helper.ts` / `backend_helper.ts`, an API list loaded into `useState` instead of a thunk (C19), a type outside `src/interfaces/`, an image in `public/images/`
 - a dependency the user did not name
 - silently "fixing" legacy code (STYLE_DNA §16) outside the requested change
