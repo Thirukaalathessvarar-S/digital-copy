@@ -1,13 +1,11 @@
-import {Header} from '../layout/Header.tsx'
-import {Footer} from '../layout/Footer.tsx'
-import {ProductCard} from '../card/ProductCard.tsx'
-import {ProductCardSkeleton} from '../card/ProductCardSkeleton.tsx'
+import {ProductCard} from '../components/card/ProductCard.tsx'
+import {ProductCardSkeleton} from '../components/card/ProductCardSkeleton.tsx'
 import {useEffect , useState} from 'react'
 import {useDispatch , useSelector} from 'react-redux'
-import type {AppDispatch , RootState} from '../../store/store.ts'
-import {fetchProducts} from '../../store/asyncThunk/productThunk.ts'
-import {Link} from 'react-router-dom'
-import notFound from '../../assets/images/not-found.jpg'
+import type {AppDispatch , RootState} from '../store/store.ts'
+import {fetchProducts} from '../store/asyncThunk/productThunk.ts'
+import {Link} from 'react-router'
+import notFound from '../assets/images/not-found.jpg'
 
 export function Deals(){
     const dispatch = useDispatch<AppDispatch>();
@@ -29,7 +27,6 @@ export function Deals(){
 
     return(
         <>
-            <Header isSearch={false}></Header>
 
             <section id="deals" className="bg-[var(--bg-soft)] py-[60px] px-[0px] max-md:py-[40px] max-md:px-[0px]">
                 <div className="container flex flex-wrap items-center justify-between gap-x-[20px] gap-y-[12px] mb-[40px] max-md:mb-[24px]">
@@ -67,7 +64,6 @@ export function Deals(){
                 }
             </section>
 
-            <Footer></Footer>
         </>
     )
 }

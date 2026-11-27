@@ -1,11 +1,9 @@
-import {Link} from 'react-router-dom'
-import {Header} from '../layout/Header.tsx'
-import {Footer} from '../layout/Footer.tsx'
+import {Link} from 'react-router'
 import {useDispatch , useSelector} from 'react-redux'
-import type {AppDispatch , RootState} from '../../store/store.ts'
-import {removeWish} from '../../store/slice/wish/wishSlice.ts'
+import type {AppDispatch , RootState} from '../store/store.ts'
+import {removeWish} from '../store/slice/wish/wishSlice.ts'
 import toast from 'react-hot-toast'
-import notFound from '../../assets/images/not-found.jpg'
+import notFound from '../assets/images/not-found.jpg'
 
 export function Wishlist(){
     const dispatch = useDispatch<AppDispatch>();
@@ -19,7 +17,6 @@ export function Wishlist(){
     if(wishItems.length===0){
         return(
             <>
-                <Header isSearch={false}></Header>
                 <section id="wishlist-empty" className="bg-[var(--bg-soft)] py-[30px] px-[0px]">
                     <div className="container flex justify-center">
                         <div className="empty-card">
@@ -32,14 +29,12 @@ export function Wishlist(){
                         </div>
                     </div>
                 </section>
-                <Footer></Footer>
             </>
         )
     }
 
     return(
         <>
-            <Header isSearch={false}></Header>
             <section id="wishlist" className="bg-[var(--bg-soft)] py-[30px] px-[0px]">
                 <div className="container mb-[30px]">
                     <h2>Wishlist <span className="text-muted-sm">{wishItems.length} items</span></h2>
@@ -60,7 +55,6 @@ export function Wishlist(){
                     ))}
                 </div>
             </section>
-            <Footer></Footer>
         </>
     )
 }

@@ -1,5 +1,5 @@
 import type {Product} from '../../interfaces/product.ts'
-import {Link} from 'react-router-dom'
+import {Link} from 'react-router'
 import {useDispatch , useSelector} from 'react-redux'
 import type {AppDispatch , RootState} from '../../store/store.ts'
 import {addItems} from '../../store/slice/cart/cartSlice.ts'

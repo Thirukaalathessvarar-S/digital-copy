@@ -26,7 +26,7 @@ Decide the scope from the request:
 | Level | Meaning | Examples |
 |---|---|---|
 | **MUST** | breaks `style_prompt.xml`, or breaks the app | grid, rem/vw/vh/svh, clamp, size fractions, new `h-[...]`, changed `h-[...]`, font size via `max-*:text-[...]` in className, new non-allowed index.css content, `localStorage.setItem` outside `store.ts`, missing `key`, import path case mismatch, any `p-[A_B]` / `p-[A_B_C_D]` underscore padding, a missing or stock `public/favicon.svg` (full scope), any `basis-[...]`, `w-[Npx]` / `w-[calc(...)]` on a flex child, any `!` important modifier or `!important`, any `aria-*` or `role`, empty or missing `alt`, `loading="lazy"` |
-| **SHOULD** | breaks a STYLE_DNA habit in new or changed code | className over 20 utilities, Tailwind utilities stored in a variable or default prop, utility types (`Omit`, `Partial`, `Record`, `keyof`, `InferType`), unnecessary or long comments, `interface`, `React.FC`, arrow component, `clsx`, `useMemo`, untyped `useState`, `if (` spacing, `} else {` on one line, self-closed `<Footer />`, missing `{/* label */}`, spread props in lists, wrong file place or name (STYLE_DNA F1 to F8: types outside `interfaces/`, urls or API paths outside `helpers/url_helper.ts` / `backend_helper.ts`, axios outside `helpers/api_client.ts`, an API list loaded straight into `useState` instead of a thunk (C19), images in `public/images/` or outside `assets/images/` / `assets/vector/`, a page outside `components/pages/`), `fetch` in new code, kebab-case violation in assets, new dependency |
+| **SHOULD** | breaks a STYLE_DNA habit in new or changed code | className over 20 utilities, Tailwind utilities stored in a variable or default prop, utility types (`Omit`, `Partial`, `Record`, `keyof`, `InferType`), unnecessary or long comments, `interface`, `React.FC`, arrow component, `clsx`, `useMemo`, untyped `useState`, `if (` spacing, `} else {` on one line, self-closed `<Footer />`, missing `{/* label */}`, spread props in lists, wrong file place or name (STYLE_DNA F1 to F8: types outside `interfaces/`, urls or API paths outside `helpers/url_helper.ts` / `backend_helper.ts`, axios outside `helpers/api_client.ts`, an API list loaded straight into `useState` instead of a thunk (C19), images in `public/images/` or outside `assets/images/` / `assets/vector/`, a page outside `src/pages/`, a layout file in `src/layout/` with markup of its own, Header / Footer outside `components/`), a route outside `App.tsx`, a page rendering `<Header>` / `<Footer>` / `<main>` (C14), an import from `react-router-dom`, `fetch` in new code, kebab-case violation in assets, new dependency |
 | **LEGACY** | old pattern from STYLE_DNA §16 that already existed | only in full-project scope; listed separately, never mixed with MUST/SHOULD |
 | **OK** | looks odd but is the developer's style | `top-[50%] -translate-y-1/2` centring, ` , ` commas, 2-space indent in main.tsx/store.ts, empty `catch{}` in store.ts, `[useCategory , setCategory]` naming, explicit `0px`, `RootState = ReturnType<...>` in `store.ts`, `max-w-[Npx]` on images |
 
@@ -53,6 +53,10 @@ from 'axios'                                                    → SHOULD unles
 https?://                                                       → SHOULD unless in src/helpers/url_helper.ts (an input placeholder is OK) / F4
 \b(get|search)[A-Z]\w*\([^)]*\)\.then\(                         → in components/: a list into useState? SHOULD thunk / C19 (page-only extras are OK)
 constants/api|getData\(                                         → LEGACY L25 (full scope) / C18
+from 'react-router-dom'                                         → SHOULD import from 'react-router' / S (LEGACY L26 outside changed lines)
+<Routes|<Route                                                  → SHOULD unless in src/App.tsx / M2
+<Header|<Footer|<main                                           → SHOULD unless in src/layout/ / C14
+components/pages/|components/layout/                            → SHOULD pages in src/pages/ , Header / Footer in components/ / F1 F11 (LEGACY L26 in full scope)
 ^export (type|interface) |^type \w+ ?=                         → SHOULD unless in src/interfaces/ / F3 (RootState / AppDispatch in store.ts and a C22 FormValues are OK)
 /images/|public/images                                          → SHOULD images live in src/assets/images/ / F8
 (^|[\s"'`:])p-\[[^\]\s]*_                                   → MUST  padding is py/px or pt/pr/pb/pl / W2
@@ -81,7 +85,7 @@ comments, structure, Redux pattern, index.css order, asset names).
 
 - Stack `[S1]` · Files `[F1..F8]` · Assets `[A1..A6]` · Naming table §4
 - Formatting `[T1..T15]` · Components `[C1..C32]` · Comments `[K1..K7]` (K3, K4, K5, C6 retired)
-- Redux `[R1..R13]` · Constants `[D1..D6]` · main.tsx `[M1..M4]`
+- Redux `[R1..R13]` · Constants `[D1..D6]` · main.tsx / App.tsx routes `[M1..M4]` · Files `[F1..F11]`
 - Tailwind `[W1..W16]` · index.css `[X1..X10]` · Breakpoints `[B1..B3]`
 - `style_prompt.xml` `<before_you_finish>` (cite as `[SP:<check text>]`)
 
@@ -91,11 +95,11 @@ comments, structure, Redux pattern, index.css order, asset names).
 ## Review: <scope> (<n> files)
 
 ### MUST (<count>)
-1. `src/components/pages/Wishlist.tsx:24` [SP:layout] `basis-[40%]` on the card wrapper
+1. `src/pages/Wishlist.tsx:24` [SP:layout] `basis-[40%]` on the card wrapper
    → `w-[40%] max-sm:w-[100%]`
 
 ### SHOULD (<count>)
-1. `src/components/pages/Wish.tsx:12` [T5] `} else {`
+1. `src/pages/Wish.tsx:12` [T5] `} else {`
    → `}` newline `else{`
 
 ### LEGACY (<count>, full scope only, not fixed unless asked)

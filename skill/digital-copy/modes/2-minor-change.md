@@ -35,6 +35,10 @@ They sit in `reference/` next to this file, or are attached. If missing, say so 
 - **New file** → follow STYLE_DNA §2 to §4 for place and name, and copy the closest `templates/` file's shape.
   In a project that still has the old layout (`app/`, `features/`, flat `components/`, STYLE_DNA L20),
   put it next to the files of the same kind there; do not migrate folders unless asked.
+- **New page** → `src/pages/<Name>.tsx` (admin: `src/pages/admin/`), returning only its sections,
+  plus one `<Route>` in `App.tsx` under `AppLayout` (or `AdminLayout`). Never a route in `main.tsx`,
+  never a `<Header>` / `<Footer>` in the page (STYLE_DNA C14, M2, M3). In a project still on
+  `components/pages/` + routes in `main.tsx` (L26), add the page the old way unless the user asks to migrate.
 - **New type** → `src/interfaces/<domain>.ts` (written with `type`). **New backend resource** → a path
   const in `src/helpers/url_helper.ts`.
 - **New API data** → an endpoint function in `src/helpers/backend_helper.ts`, a thunk in

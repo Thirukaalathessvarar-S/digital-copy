@@ -33,7 +33,7 @@ Rule IDs in brackets (`[T3]`, `[C7]` ...) are used by the review mode to cite vi
 | Styling | Tailwind CSS v4 via `@tailwindcss/vite` + `src/index.css` | tailwind.config.js, CSS modules, styled-components, inline `style={{}}` |
 | State | Redux Toolkit 2 + react-redux 9 (`createSlice`, `createAsyncThunk`, `configureStore`) | Zustand, Context-for-state, RTK Query |
 | Persistence | `store.subscribe` → `localStorage` | redux-persist |
-| Routing | react-router-dom 7, `BrowserRouter` + `Routes` + `Route` | data routers, file routing |
+| Routing | react-router 7: `BrowserRouter` + `Routes` + `Route` + layout routes with `Outlet`; every router import comes from `'react-router'` | `react-router-dom`, data routers (`createBrowserRouter`), file routing |
 | Data | one `axios` instance in `src/helpers/api_client.ts`, one function per endpoint in `src/helpers/backend_helper.ts`, called by a `createAsyncThunk` in `src/store/asyncThunk/` | `fetch`, TanStack Query, SWR, axios called straight from a component |
 | Forms | uncontrolled inputs + `FormData` + `yup` | react-hook-form, zod, Formik |
 | Toasts | `react-hot-toast` (`<Toaster position="top-center" />`, `toast.success(...)`) | other toast libs |
@@ -68,7 +68,7 @@ Rule IDs in brackets (`[T3]`, `[C7]` ...) are used by the review mode to cite vi
     "react-hot-toast": "^2.6.1",
     "react-redux": "^9.3.0",
     "react-responsive": "^10.0.1",
-    "react-router-dom": "^7.18.4",
+    "react-router": "^7.18.4",
     "tailwindcss": "^4.3.3",
     "yup": "^1.7.1"
   },
@@ -145,8 +145,13 @@ imported once, by `main.tsx` (`import './index.css'`); `App.tsx` imports no css.
 public/
 └── favicon.svg                   svg icon fetched from the internet for the app (F9)
 src/
-├── main.tsx                      root render, providers, router, routes, global wrappers (ScrollToTop)
-├── App.tsx                       home page (default export) + extra home sections as named exports (Trending, SmallBanner)
+├── main.tsx                      root render only: StrictMode > Provider > BrowserRouter > App (no routes, no pages)
+├── App.tsx                       every route (layout routes + page routes) + global wrappers (ScrollToTop , Toaster)
+├── layout/                       route layouts only: they import pieces and place them around <Outlet>
+│   ├── AppLayout.tsx             Header + <main><Outlet></Outlet></main> + Footer
+│   └── AdminLayout.tsx           AdminSidebar + <main><Outlet></Outlet></main> (only when the app has admin pages)
+├── pages/                        every page, home included: Home.tsx  Cart.tsx  Login.tsx  Product.tsx ...
+│   └── admin/                    admin pages: AdminDashboard.tsx  AdminProducts.tsx ...
 ├── index.css                     @import "tailwindcss" + design tokens (:root, @theme), reusable classes, font-size @media (no App.css)
 ├── store/
 │   ├── store.ts                  configureStore + store.subscribe persistence + RootState / AppDispatch
@@ -165,14 +170,13 @@ src/
 │   └── categoryProps.ts          static props / data arrays (camelCase file), no urls
 ├── interfaces/                   every type declaration, one file per domain
 │   ├── product.ts  cart.ts  order.ts  auth.ts  category.ts
-│   ├── props.ts                  component props types (HeaderProps ...)
+│   ├── props.ts                  component props types (ProductCardProps ...)
 │   └── form.ts                   FormErrors , Field ...
-├── components/                   shared pieces, PascalCase.tsx
-│   ├── layout/                   Header.tsx  Footer.tsx  Heading.tsx (parts every page repeats)
-│   ├── CategoryButton.tsx ...    other shared pieces
+├── components/                   reusable pieces, PascalCase.tsx (no pages here)
+│   ├── Header.tsx  Footer.tsx    used once by AppLayout , take no props
+│   ├── Heading.tsx  AdminSidebar.tsx  CategoryButton.tsx ...   other shared pieces
 │   ├── card/                     cards: ProductCard.tsx  PetCard.tsx  ProductCardSkeleton.tsx ...
-│   ├── common/                   small reusable bits: buttons, spans, badges (Button.tsx  Badge.tsx ...)
-│   └── pages/                    every page except home: Cart.tsx  Login.tsx  Order.tsx  Product.tsx ...
+│   └── common/                   small reusable bits: buttons, spans, badges (Button.tsx  Badge.tsx ...)
 ├── hooks/
 │   └── UseScroll.ts              file name PascalCase, hook inside is camelCase (useScroll)
 └── assets/
@@ -180,20 +184,25 @@ src/
     └── vector/                   .svg
 ```
 
-- `[F1]` Pages live in `components/pages/`. The home page is the only exception: it stays in
-  `App.tsx`. The folder is `components` (plural). A page file is named after
-  the thing (`Cart.tsx`, `Order.tsx`, `Special.tsx`); the exported function may differ
-  (`Product.tsx` exports `ProductPage`, `CheckoutNew.tsx` exports `CheckOutNew`).
-  `Header`, `Footer` and `Heading` (the section heading) go in `components/layout/`, cards in
-  `components/card/`, small reusable buttons / spans / badges in `components/common/`; anything else
-  shared (`CategoryButton`) sits directly in `components/`. Pages import them as
-  `import {Header} from '../layout/Header.tsx'`.
+- `[F1]` **Every page lives in `src/pages/`**, the home page included (`pages/Home.tsx`, routed at
+  `'/'`); admin pages go in `pages/admin/`. A page file is PascalCase and named after the thing
+  (`Home.tsx`, `Cart.tsx`, `Order.tsx`, `Special.tsx`); the exported function may differ
+  (`Product.tsx` exports `ProductPage`, `CheckoutNew.tsx` exports `CheckOutNew`). Sections used only
+  by home (`Trending`, `SmallBanner`) stay in `Home.tsx` (F5). `App.tsx` is no longer a page.
+- `[F10]` **`src/layout/` holds route layouts only**: `AppLayout.tsx` always, `AdminLayout.tsx` when
+  the app has admin pages. A layout only imports pieces and places them around `<Outlet>` (C14);
+  it writes no Header, Footer or sidebar markup of its own.
+- `[F11]` **Reusable pieces live in `src/components/`**: `Header.tsx`, `Footer.tsx`, `Heading.tsx`,
+  `AdminSidebar.tsx`, `CategoryButton.tsx` sit directly in it, cards in `components/card/`, small
+  buttons / spans / badges in `components/common/`. The folder is `components` (plural) and holds
+  no pages. Pages import them as `import {ProductCard} from '../components/card/ProductCard.tsx'`;
+  layouts as `import {Header} from '../components/Header.tsx'`.
 - `[F2]` One slice per feature folder: `store/slice/<feature>/<feature>Slice.ts`, short and
   singular: `slice/auth/authSlice.ts`, `slice/product/productSlice.ts`. Its thunks go in
   `store/asyncThunk/<feature>Thunk.ts`.
 - `[F3]` No `index.ts` barrel files. **Every type lives in `src/interfaces/`** and is imported
   from there (`Product` from `interfaces/product.ts`, `Cart` from `interfaces/cart.ts`,
-  `categoryType` from `interfaces/category.ts`, `HeaderProps` from `interfaces/props.ts`,
+  `categoryType` from `interfaces/category.ts`, `ProductCardProps` from `interfaces/props.ts`,
   `FormErrors` / `Field` from `interfaces/form.ts`). The folder is called `interfaces` but the
   files still use `type`, never `interface` (T10). Only two exceptions stay where they are:
   `RootState` / `AppDispatch` at the end of `store.ts`, and a C22
@@ -256,7 +265,7 @@ Observed files: `glowing-skin.png`, `bottle-perfume.png`, `desk-lamp.png`, `armc
 |---|---|---|
 | Component | PascalCase function, named export | `export function ProductCard(` |
 | Page component | thing name, sometimes + `Page` | `Cart`, `Login`, `ProductPage`, `CheckOutNew` |
-| Props type | `<Component>Props` | `HeaderProps`, `MovingLinkProps`, `CategoryButtonProps` |
+| Props type | `<Component>Props` | `ProductCardProps`, `MovingLinkProps`, `CategoryButtonProps` |
 | Data type | PascalCase, singular | `Product`, `Cart`, `Order`, `Auth` |
 | Constant data type | camelCase + `Type` | `categoryType` |
 | Form types | `FormValues`, `FormErrors`, `LoginValues`, `CardErrors` | written by hand, field by field (T15) |
@@ -291,14 +300,14 @@ This is hand formatting; no Prettier. Reproduce it character for character.
 - `[T2]` **Imports**: one per line, no spaces inside braces, ` , ` between names, single quotes,
   **no semicolon**, local files keep their extension.
   ```ts
-  import {Link} from 'react-router-dom'
+  import {Link} from 'react-router'
   import {useDispatch , useSelector} from 'react-redux'
-  import type {AppDispatch , RootState} from '../../store/store.ts'
-  import {addItems} from '../../store/slice/cart/cartSlice.ts'
-  import {fetchProducts} from '../../store/asyncThunk/productThunk.ts'
-  import type {Product} from '../../interfaces/product.ts'
-  import {Header} from '../layout/Header.tsx'
-  import notFound from '../../assets/images/not-found.jpg'
+  import type {AppDispatch , RootState} from '../store/store.ts'
+  import {addItems} from '../store/slice/cart/cartSlice.ts'
+  import {fetchProducts} from '../store/asyncThunk/productThunk.ts'
+  import type {Product} from '../interfaces/product.ts'
+  import {ProductCard} from '../components/card/ProductCard.tsx'
+  import notFound from '../assets/images/not-found.jpg'
   import {createSlice , type PayloadAction} from '@reduxjs/toolkit'
   import * as yup from 'yup'
   ```
@@ -311,7 +320,7 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   `categoryProps.slice(start , start + visibleCount)`.
 - `[T4]` **Colons**: no space in object keys and type members: `id:number;`, `name:'cart'`,
   `{behavior:'smooth'}`. Spaces around the colon before a props type in a signature:
-  `({isSearch , resultRef} : HeaderProps)`. Return types: `function loadCart(): Cart[] {`.
+  `({title , price} : ProductCardProps)`. Return types: `function loadCart(): Cart[] {`.
 - `[T5]` **Keywords hug parens and braces**: `if(cond){`, `else if(cond){`, `else{`, `try{`,
   `catch{`, `catch(err){`, `return(`, `function handleBar(){`, `export function Cart(){`.
   `else` / `else if` / `catch` start a **new line** after the closing brace:
@@ -337,11 +346,12 @@ This is hand formatting; no Prettier. Reproduce it character for character.
 - `[T10]` **Types** use `type`, never `interface` (even inside `src/interfaces/`), and are exported
   from `src/interfaces/` (F3). Members end with `;` and no space after colon:
   ```ts
-  type HeaderProps = {
-      isSearch:boolean;
-      resultRef?:React.RefObject<HTMLElement | null>;
-      query?:string;                       // current search term , owned by the page
-      onSearch?:(query:string)=>void;      // tells the page a search was submitted
+  type ProductCardProps = {
+      id:number;
+      title:string;
+      price:number;
+      index?:number;                       // position in the list , hides cards past the 4th on phones
+      onRemove?:(id:number)=>void;         // only the wishlist passes it
   }
   ```
   Combine with intersection: `Product & {index?:number}`, `StepProps & {address:FormValues | null;}`.
@@ -349,7 +359,7 @@ This is hand formatting; no Prettier. Reproduce it character for character.
 - `[T11]` `useState` always gets an explicit generic: `useState<boolean>(false)`,
   `useState<string>('')`, `useState<number | null>(null)`, `useState<ProductType[]>([])`.
 - `[T12]` `??` for fallbacks everywhere (`item.quantity ?? 0`, `location.state ?? []`), `?.` for
-  optional refs and callbacks (`resultRef?.current?.scrollIntoView(...)`, `onSearch?.(...)`).
+  optional refs and callbacks (`homeRef.current?.scrollIntoView(...)`, `onRemove?.(id)`).
 - `[T13]` No `useMemo`, no `useCallback`, no `React.memo`. Derived values are plain `const`s
   computed in the body.
 - `[T15]` **Beginner-friendly types only.** Allowed: `type X = {...}` with plain members,
@@ -388,10 +398,10 @@ This is hand formatting; no Prettier. Reproduce it character for character.
 
 - `[C4]` Return shape: `return(` newline, fragment `<>`, content, `</>`, newline `)`.
 - `[C5]` **Explicit closing tags** for own components and for `img`, `input`, `textarea`:
-  `<Footer></Footer>`, `<Header isSearch={false}></Header>`, `<ProductCard ...></ProductCard>`,
+  `<Footer></Footer>`, `<Outlet></Outlet>`, `<ProductCard ...></ProductCard>`,
   `<img src={x} alt="..." className="..."></img>`, `<input name="city" ... className="input"></input>`.
-  `<br/>` is self-closed. In `main.tsx` routes both forms appear; new routes use
-  `<Route path="/x" element={<X/>}></Route>`.
+  `<br/>` is self-closed. Routes in `App.tsx` are written
+  `<Route path="/x" element={<X/>}></Route>` (the element inside `element={...}` is self-closed).
 - `[C6]` (retired) JSX blocks no longer get a label comment. Existing `{/* label */}` comments in a
   file you edit stay as they are.
 - `[C7]` `className` is **one line**. No line breaks inside it, no `clsx`. More than 20 utilities
@@ -445,12 +455,12 @@ This is hand formatting; no Prettier. Reproduce it character for character.
 
 ### 6.3 Page template
 
-Every page component returns this shape:
+Every page component returns only its sections; the layout around it (Header, `<main>`, Footer)
+comes from `AppLayout`:
 
 ```tsx
 return(
     <>
-        <Header isSearch={false}></Header>
         <section id="cart" className="bg-[var(--bg-soft)] py-[30px] px-[0px]">
             <div className="container mb-[30px]">
                 <h2>Shopping Cart</h2>
@@ -461,13 +471,43 @@ return(
                 ...
             </div>
         </section>
-        <Footer></Footer>
     </>
 )
 ```
 
-- `[C14]` Header is per page, not in a layout route (`isSearch={true}` only on home, which also
-  passes `resultRef`, `query`, `onSearch`). Footer closes every page.
+The layout (`templates/layout/AppLayout.tsx`):
+
+```tsx
+import {Outlet} from 'react-router'
+import {Header} from '../components/Header.tsx'
+import {Footer} from '../components/Footer.tsx'
+
+export function AppLayout(){
+    return(
+        <>
+            <Header></Header>
+
+            <main>
+                <Outlet></Outlet>
+            </main>
+
+            <Footer></Footer>
+        </>
+    )
+}
+```
+
+- `[C14]` **Header, `<main>` and Footer belong to the layout, never to a page.** A page renders no
+  `<Header>`, `<Footer>` or `<main>`. `AdminLayout` does the same with `AdminSidebar` and its own
+  `<main>` (`templates/layout/AdminLayout.tsx`); admin pages render only their content.
+  Header and Footer take **no props**. What the Header needs comes from the route and the URL:
+  - it shows the search bar only on home: `const isHome = useLocation().pathname==='/';`
+  - a search is a URL param, not a prop: Header submits with
+    `` navigate(`/?search=${encodeURIComponent(query)}#product-listing`) ``, and reads the current
+    term with `const [searchParams] = useSearchParams();` `searchParams.get('search') ?? ''` for its
+    `defaultValue`;
+  - `Home` reads the same param and dispatches `fetchProducts({category , search})` in an effect
+    with `[search]` in its dependency array; the `#product-listing` hash scrolls to the results (M4).
 - `[C15]` Each `<section>` has a kebab-case `id` and vertical padding as shorthand with explicit
   `0px`, written per side (W2): `py-[30px] px-[0px]`, `py-[60px] px-[0px]`, `py-[90px] px-[0px] max-md:py-[60px] max-md:px-[0px]`,
   `pt-[0px] pr-[0px] pb-[90px] pl-[0px] max-md:pt-[0px] max-md:pr-[0px] max-md:pb-[60px] max-md:pl-[0px]`. The `.container` div inside gives width.
@@ -932,60 +972,94 @@ export const categoryProps : categoryType[] = [
 
 ---
 
-## 10. main.tsx and wrapper components `[M]`
+## 10. main.tsx, App.tsx and routes `[M]`
+
+`src/main.tsx` (`templates/main.tsx`) only renders the app:
 
 ```tsx
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { BrowserRouter, Routes, Route , useLocation } from 'react-router-dom'
+import { BrowserRouter } from 'react-router'
 import App from './App.tsx'
 import {Provider} from 'react-redux'
 import {store} from './store/store.ts'
-import {Cart} from './components/pages/Cart.tsx'
-import {Toaster} from 'react-hot-toast'
-import {useEffect} from 'react'
-
-function ScrollToTop() {
-  const { pathname, hash } = useLocation();
-
-  useEffect(() => {
-    if (hash === '') {
-      window.scrollTo(0, 0);
-    }
-  }, [pathname]);
-
-  return null;
-}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <ScrollToTop />
-        <Toaster position="top-center" />
-        <Routes>
-          <Route path="/" element={<App />}></Route>
-          <Route path="/product/:id" element={<ProductPage />} />
-          <Route path="/cart" element={<Cart/>} />
-        </Routes>
+        <App />
       </BrowserRouter>
     </Provider>
   </StrictMode>,
 )
 ```
 
-- `[M1]` Nesting order: `StrictMode` > `Provider store={store}` > `BrowserRouter` > global
-  wrappers (`<ScrollToTop />`, `<Toaster position="top-center" />`, floating panels) > `Routes`.
-- `[M2]` Behaviour-only wrappers (render `null`) are plain `function` declarations **inside
-  main.tsx** above `createRoot`, not exported, not in their own file. This file keeps the Vite
-  template spacing (`{ useLocation }`, `if (...) {`, 2-space indent).
-- `[M3]` Every page is imported on its own line with its extension (`./components/pages/<Name>.tsx`),
-  then listed as a `Route`.
-  Flat routes, no nested layouts.
+`src/App.tsx` (`templates/App.tsx`) holds **every route**:
+
+```tsx
+import {useEffect} from 'react'
+import {Routes , Route , useLocation} from 'react-router'
+import {Toaster} from 'react-hot-toast'
+import {AppLayout} from './layout/AppLayout.tsx'
+import {AdminLayout} from './layout/AdminLayout.tsx'
+import {Home} from './pages/Home.tsx'
+import {Cart} from './pages/Cart.tsx'
+import {AdminDashboard} from './pages/admin/AdminDashboard.tsx'
+
+function ScrollToTop(){
+    const {pathname , hash} = useLocation();
+
+    useEffect(()=>{
+        if(hash===''){
+            window.scrollTo(0 , 0);
+        }
+    },[pathname])
+
+    return null;
+}
+
+function App(){
+    return(
+        <>
+            <ScrollToTop></ScrollToTop>
+            <Toaster position="top-center"></Toaster>
+            <Routes>
+                <Route element={<AppLayout/>}>
+                    <Route path="/" element={<Home/>}></Route>
+                    <Route path="/cart" element={<Cart/>}></Route>
+                </Route>
+                <Route element={<AdminLayout/>}>
+                    <Route path="/admin/dashboard" element={<AdminDashboard/>}></Route>
+                </Route>
+            </Routes>
+        </>
+    )
+}
+
+export default App
+```
+
+- `[M1]` `main.tsx` nesting: `StrictMode` > `Provider store={store}` > `BrowserRouter` > `<App />`.
+  It imports no page, no layout and writes no `Routes`. It keeps the Vite template spacing
+  (`{ BrowserRouter }`, 2-space indent) and is the only file that imports `index.css`.
+- `[M2]` **Routes are written only in `App.tsx`.** `App` is the one default-export component
+  (`function App(){ ... }` + `export default App`). It returns the global wrappers first
+  (`<ScrollToTop></ScrollToTop>`, `<Toaster position="top-center"></Toaster>`, floating panels),
+  then `<Routes>`. Behaviour-only wrappers (render `null`) are plain `function` declarations inside
+  `App.tsx` above `App`, not exported, not in their own file. `App.tsx` is written in the normal
+  T rules (4-space indent, `if(`, `()=>`).
+- `[M3]` Layout routes: one pathless `<Route element={<AppLayout/>}>` holds every customer page as a
+  child with its **full path** (`path="/"` for `Home`, `path="/cart"`, `path="/product/:id"`);
+  admin pages sit in a second `<Route element={<AdminLayout/>}>` with `/admin/...` paths. A page
+  without the site chrome (an admin login, a 404 with its own look) is a route outside both layouts.
+  A guard component, when the app has one, wraps the layout element:
+  `<Route element={<AdminRoute><AdminLayout/></AdminRoute>}>`. Every page and layout is imported on
+  its own line with its extension (`./pages/<Name>.tsx`, `./layout/<Name>.tsx`).
 - `[M4]` Hash sections: the Header links to `/#product-listing`, `/#special-category`; the
   `useScroll(ready)` hook in `hooks/UseScroll.ts` returns refs (`homeRef`, `exploreRef`,
-  `trendingRef`) and scrolls to them once the page has loaded.
+  `trendingRef`) that `Home` puts on its sections, and scrolls to them once the page has loaded.
 
 ---
 
@@ -1306,10 +1380,11 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L19 | `!` modifiers (`!py-[11px]`, `max-sm:!rounded-[28px]`, `hover:!bg-...`) and `!important` | old components, index.css classes | a modifier class or a separate class (W9) |
 | L20 | old layout: `src/app/store.ts`, `src/features/<folder>/<name>Slice.ts`, flat `src/components/` with pages inside, `components/constants/`, flat `src/assets/`, images in `public/images/`, types exported from `App.tsx` / slices / constants | e-commerce project | the section 2 layout (F1 to F8) |
 | L21 | `fetch(...).then(res => res.json())` in `useEffect`, the `ignore` flag, `setItems(data.products)`, page `loading` state for API lists, urls written inside components | e-commerce project | `url_helper.ts` path → `backend_helper.ts` function → `asyncThunk/` → `extraReducers` (C18, R12, R13) |
-| L22 | a separate `src/App.css` imported by `App.tsx`, `index.css` holding only `@import "tailwindcss";`, Header / Footer directly in `components/`, a singular `component/` folder | older projects | everything in `index.css`; `components/layout/` |
+| L22 | a separate `src/App.css` imported by `App.tsx`, `index.css` holding only `@import "tailwindcss";`, a singular `component/` folder | older projects | everything in `index.css`; `components/` (plural) |
 | L23 | underscore padding `p-[30px_0px]`, `p-[10px_20px_30px_20px]`, `max-md:p-[60px_0px]` | all code before this rule | `py-[30px] px-[0px]`, `pt-[10px] pr-[20px] pb-[30px] pl-[20px]` (W2) |
 | L24 | labels with no `*` on required fields, yup messages like `'name is required'` or `'please enter valid email'` that do not start with the label | all forms before this rule | `Receiver name <span className="red-text">*</span>`, `'Receiver name is required'` (C31, C32) |
 | L25 | `src/constants/api.ts` with full urls (`BASE_URL`, `PRODUCTS_URL`, `DEALS_URL`), a generic `getData(url)` helper in `helpers/api.ts`, thunks that take a url | older projects | `helpers/url_helper.ts` + `helpers/api_client.ts` + `helpers/backend_helper.ts`; thunks call named endpoint functions (C18, R12) |
+| L26 | pages in `src/components/pages/`, the home page inside `App.tsx`, routes written in `main.tsx`, Header / Footer / Heading in `components/layout/`, every page rendering its own `<Header ...>` and `<Footer>` (Header props `isSearch`, `resultRef`, `query`, `onSearch`), admin pages rendering their own sidebar, imports from `'react-router-dom'` | e-commerce project | pages in `src/pages/` (`Home.tsx` at `'/'`), routes only in `App.tsx` under `AppLayout` / `AdminLayout` with `<Outlet>`, Header / Footer in `components/` with no props, search in the URL, imports from `'react-router'` (F1, F10, F11, C14, M1 to M3) |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
@@ -1324,7 +1399,8 @@ the same kind of file (like B3 for breakpoints). Do not move files, rename folde
 ## 17. Final checklist (run before you answer)
 
 - [ ] Stack and dependencies unchanged (S1). No new library.
-- [ ] Files in the right place and named per F / A / N: `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `components/` (`card/`, `common/`, `pages/`), `assets/images/` + `assets/vector/`.
+- [ ] Files in the right place and named per F / A / N: `pages/` (every page, `Home.tsx` included), `layout/` (`AppLayout.tsx`, `AdminLayout.tsx` only), `components/` (`Header.tsx`, `Footer.tsx`, shared pieces, `card/`, `common/`), `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `assets/images/` + `assets/vector/`.
+- [ ] Routes only in `App.tsx`, pages as children of `AppLayout` / `AdminLayout`; `main.tsx` renders `<App />` only; no page renders `<Header>`, `<Footer>` or `<main>`; every router import from `'react-router'` (C14, M1 to M3).
 - [ ] Every type in `interfaces/` (except `RootState` / `AppDispatch` and a C22 `FormValues`); the base url and resource paths only in `helpers/url_helper.ts`, endpoint paths built only in `helpers/backend_helper.ts`.
 - [ ] API data: axios only in `helpers/api_client.ts`, endpoint functions in `helpers/backend_helper.ts`, every API list through a thunk in `asyncThunk/` that calls them, `pending` / `fulfilled` / `rejected` in the slice, `request.abort()` in the effect cleanup (C18, C19, R12, R13).
 - [ ] Formatting: indent of the file, ` , ` commas, `if(`, `else{` on a new line, `()=>`, no semicolon on imports, `.tsx` extensions on local imports.

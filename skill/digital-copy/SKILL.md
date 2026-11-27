@@ -33,7 +33,7 @@ After an **edit** or **build**, the user may say "review it": run review in mino
 `style_prompt.xml` > `STYLE_DNA.md` > the file being edited (formatting only) > templates >
 any other skill or general best practice. Do not import advice from the `react`, `tailwind`,
 `typescript`, `feature-arch` or `impeccable` skills where it contradicts these files (for example:
-pages in `components/pages/`, Header / Footer in `components/layout/`, all css in `index.css`, types in `interfaces/` but written with `type`, no barrel files, no
+pages in `src/pages/`, route layouts in `src/layout/` with `Outlet`, routes only in `App.tsx`, Header / Footer in `components/`, all css in `index.css`, types in `interfaces/` but written with `type`, no barrel files, no
 `interface`, no `cn()`, no `useCallback`, no grid, no rem).
 
 ## Never (short list, all modes)
@@ -55,5 +55,6 @@ pages in `components/pages/`, Header / Footer in `components/layout/`, all css i
 - `interface`, `React.FC`, arrow components, `clsx`/`cn`, `useMemo`/`useCallback`, untyped `useState`
 - `localStorage.setItem` outside `store.ts`'s single `store.subscribe` (auth is out of scope)
 - `fetch`, axios outside `src/helpers/api_client.ts`, a url or API path outside `src/helpers/url_helper.ts` / `backend_helper.ts`, an API list loaded into `useState` instead of a thunk (C19), a type outside `src/interfaces/`, an image in `public/images/`
+- a route outside `App.tsx`, a page outside `src/pages/` (home is `pages/Home.tsx` at `'/'`), a page rendering `<Header>` / `<Footer>` / `<main>` (the layout does, C14), props on Header / Footer, an import from `react-router-dom` (use `react-router`)
 - a dependency the user did not name
 - silently "fixing" legacy code (STYLE_DNA §16) outside the requested change

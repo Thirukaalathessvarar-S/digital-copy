@@ -1,16 +1,14 @@
 import {useState} from 'react'
-import {Header} from '../layout/Header.tsx'
-import {Footer} from '../layout/Footer.tsx'
 import * as yup from 'yup'
 import toast from 'react-hot-toast'
-import {useNavigate} from 'react-router-dom'
-import type {FormErrors , Field} from '../../interfaces/form.ts'
+import {useNavigate} from 'react-router'
+import type {FormErrors , Field} from '../interfaces/form.ts'
 
 const schema = yup.object({
-    name:yup.string().required('name is required'),
-    email:yup.string().email('please enter valid email').required('email is required'),
-    phone:yup.string().required('phone number is required').matches(/^[6-9]\d{9}$/, "Enter a valid phone number"),
-    message:yup.string().required('message is required').min(10 , 'message must be at least 10 characters')
+    name:yup.string().required('Name is required'),
+    email:yup.string().email('Email is not valid').required('Email is required'),
+    phone:yup.string().required('Phone number is required').matches(/^[6-9]\d{9}$/, "Phone number must be a valid 10 digit number"),
+    message:yup.string().required('Message is required').min(10 , 'Message must be at least 10 characters')
 })
 
 export function Contact(){
@@ -53,7 +51,6 @@ export function Contact(){
 
     return(
         <>
-            <Header isSearch={false}></Header>
             <section id="contact" className="bg-[var(--bg-soft)] py-[30px] px-[0px]">
                 <div className="container flex justify-center">
                     <form onSubmit={handleSubmit} className="contact-form">
@@ -64,26 +61,26 @@ export function Contact(){
 
                         <div className="flex flex-wrap gap-[20px]">
                             <div className="flex-1 min-w-[150px]">
-                                <label htmlFor="name" className="block eyebrow">Name</label>
+                                <label htmlFor="name" className="block eyebrow">Name <span className="red-text">*</span></label>
                                 <input onChange={() => setErrors(prev => ({ ...prev, name: '' }))} name="name" placeholder="Rakesh" id="name" className="input mt-[8px]"></input>
                                 {errors.name && <p className="red-text">{errors.name}</p>}
                             </div>
 
                             <div className="flex-1 min-w-[150px]">
-                                <label htmlFor="phone" className="block eyebrow">Phone number</label>
+                                <label htmlFor="phone" className="block eyebrow">Phone number <span className="red-text">*</span></label>
                                 <input onChange={() => setErrors(prev => ({ ...prev, phone: '' }))} name="phone" placeholder="8788812341" id="phone" className="input mt-[8px]"></input>
                                 {errors.phone && <p className="red-text">{errors.phone}</p>}
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="email" className="block eyebrow">Email</label>
+                            <label htmlFor="email" className="block eyebrow">Email <span className="red-text">*</span></label>
                             <input onChange={() => setErrors(prev => ({ ...prev, email: '' }))} name="email" placeholder="you@example.com" id="email" className="input mt-[8px]"></input>
                             {errors.email && <p className="red-text">{errors.email}</p>}
                         </div>
 
                         <div>
-                            <label htmlFor="message" className="block eyebrow">Message</label>
+                            <label htmlFor="message" className="block eyebrow">Message <span className="red-text">*</span></label>
                             <textarea onChange={() => setErrors(prev => ({ ...prev, message: '' }))} name="message" placeholder="write your message" id="message" className="input mt-[8px] min-h-[100px] resize-none"></textarea>
                             {errors.message && <p className="red-text">{errors.message}</p>}
                         </div>
@@ -92,7 +89,6 @@ export function Contact(){
                     </form>
                 </div>
             </section>
-            <Footer></Footer>
         </>
     )
 }

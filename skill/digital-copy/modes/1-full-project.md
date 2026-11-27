@@ -25,7 +25,8 @@ The user describes an app (pages, features, data source). You deliver **every fi
 ## Procedure
 
 1. **Plan (short, shown to the user)**
-   - Pages → `src/components/pages/<Name>.tsx` (home stays in `App.tsx`) and their routes.
+   - Pages → `src/pages/<Name>.tsx` (home is `pages/Home.tsx`, admin pages in `pages/admin/`), and
+     which layout each one sits under in `App.tsx` (`AppLayout`, `AdminLayout` only if there is an admin side).
    - Data → which Redux slices (`store/slice/<feature>/<feature>Slice.ts`), which ones persist to
      localStorage, which ones are filled by a thunk (`store/asyncThunk/<feature>Thunk.ts`).
    - API → base url and resource paths in `src/helpers/url_helper.ts`, one endpoint function each in
@@ -55,19 +56,24 @@ The user describes an app (pages, features, data source). You deliver **every fi
       (`templates/store/slice/wish/wishSlice.ts`).
    8. `src/store/store.ts` (`templates/store/store.ts`, one `store.subscribe` for every persisted slice).
    9. `src/hooks/Use<Name>.ts` only if a page needs one (`templates/hooks/UseScroll.ts`).
-   10. Shared components: `components/layout/Header.tsx`, `Footer.tsx`, `Heading.tsx`, cards in `components/card/`,
-       buttons / spans / badges in `components/common/` (`templates/components/`).
-   11. Pages in `components/pages/`, each one `Header` → `<section id="kebab-id">` → `.container` →
-       `Footer` (`templates/components/pages/`).
-   12. `src/App.tsx` (home page, default export) and `src/main.tsx` (`templates/main.tsx`, with
-       `ScrollToTop` inside it).
+   10. Reusable components: `components/Header.tsx` and `components/Footer.tsx` (no props; Header
+       reads the route and the `?search=` param, STYLE_DNA C14), `Heading.tsx`, `AdminSidebar.tsx` if
+       there is an admin side, cards in `components/card/`, buttons / spans / badges in
+       `components/common/` (`templates/components/`).
+   11. Layouts in `src/layout/`: `AppLayout.tsx` (`templates/layout/AppLayout.tsx`) and, only with an
+       admin side, `AdminLayout.tsx` (`templates/layout/AdminLayout.tsx`).
+   12. Pages in `src/pages/`, `Home.tsx` included; each returns only `<section id="kebab-id">` →
+       `.container` blocks, no Header / Footer / `<main>` (`templates/pages/`).
+   13. `src/App.tsx` (every route under its layout, `ScrollToTop` and `Toaster`, `templates/App.tsx`)
+       and `src/main.tsx` (`<App />` inside the providers only, `templates/main.tsx`).
 
 3. **Write every file in the developer's hand** (STYLE_DNA §5 to §12). The ones models get wrong most:
    - ` , ` comma spacing; `if(x){`; `else{` and `catch{` on a new line; `()=>` with no spaces;
      no semicolons after imports; `.tsx` / `.ts` on local imports.
    - `export function Name(){`; handlers as inner `function handleX(){`; `useState<T>(...)` always typed;
      no `useMemo` / `useCallback` / `interface` / `React.FC` / `clsx`.
-   - Explicit closing tags: `<Footer></Footer>`, `<img ...></img>`, `<input ...></input>`.
+   - Explicit closing tags: `<Footer></Footer>`, `<Outlet></Outlet>`, `<img ...></img>`, `<input ...></input>`.
+   - Routes only in `App.tsx`, pages under `AppLayout` / `AdminLayout`; every router import from `'react-router'`.
    - className on one line, at most 20 utilities; longer → a named index.css class with `@apply`.
      Never store utilities in a variable (`const navLink = "..."`): reused lists are index.css classes.
      Every list prop passed explicitly.
@@ -88,7 +94,8 @@ The user describes an app (pages, features, data source). You deliver **every fi
    - Padding: never `p-[A_B]` / `p-[A_B_C_D]`; write `py-[A] px-[B]` / `pt-[A] pr-[B] pb-[C] pl-[D]` (STYLE_DNA W2).
 
 4. **Self-check before answering.** Go through STYLE_DNA §17 and the `<before_you_finish>` list in
-   `style_prompt.xml`. Then search your own output for: `grid`, `rem`, `vw`, `vh`, `svh`, `clamp(`,
+   `style_prompt.xml`. Then search your own output for: `react-router-dom`, `<Routes` outside `App.tsx`,
+   `<Header` / `<Footer` / `<main` in a page, `components/pages`, `grid`, `rem`, `vw`, `vh`, `svh`, `clamp(`,
    `/2"`, `w-1/`, `h-[`, `interface `, `fetch(`, `axios` outside `helpers/api_client.ts`, `https://` or an API path outside `helpers/url_helper.ts` / `backend_helper.ts`, an endpoint function called for a list outside `store/asyncThunk/`, `useMemo`, `useCallback`, `React.FC`, `clsx`, `max-md:text-[`,
    `max-sm:text-[`, `max-lg:leading-`, `aria-`, `role=`, `loading=`, `alt=""`, `p-[` with a `_` inside, `basis-[`, `w-[` followed by
    a digit and `px` or `calc` on a flex child, `!important`, a `!` before a class name, `Omit<`, `Pick<`, `Partial<`, `Record`, `keyof`, `InferType`. Fix every hit
@@ -101,7 +108,7 @@ The user describes an app (pages, features, data source). You deliver **every fi
 ## Output format
 
 - One short plan section.
-- Then each file as a fenced block headed by its path (`src/components/pages/Cart.tsx`), in the order above.
+- Then each file as a fenced block headed by its path (`src/pages/Cart.tsx`), in the order above.
 - Then an **Assets** list: file name → what the picture should show → where it is used.
 - Then a 3 to 6 line note: what persists to localStorage, routes, anything the user must provide.
 

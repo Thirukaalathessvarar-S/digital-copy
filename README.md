@@ -29,12 +29,14 @@ digital-copy/
     │   ├── STYLE_DNA.md           the full style, with rule IDs ([T3], [C7], [R8] ...)
     │   └── style_prompt.xml       my original styling rules (highest authority)
     └── templates/                 real files written in the style, laid out like src/
-        ├── index.css  main.tsx    index.css is the only stylesheet (no App.css)
+        ├── index.css  main.tsx  App.tsx    index.css is the only stylesheet (no App.css) · main.tsx renders <App /> · App.tsx holds every route
         ├── store/                 store.ts · slice/product/productSlice.ts · slice/wish/wishSlice.ts · asyncThunk/productThunk.ts
         ├── helpers/               url_helper.ts (paths) · api_client.ts (axios) · backend_helper.ts (endpoint functions)
         ├── constants/             categoryProps.ts (no urls)
         ├── interfaces/            product.ts · wish.ts · category.ts · props.ts · form.ts
-        ├── components/             card/ProductCard.tsx · common/Button.tsx · pages/Deals.tsx Wishlist.tsx Contact.tsx
+        ├── layout/                AppLayout.tsx · AdminLayout.tsx (Header / sidebar + <main><Outlet> + Footer)
+        ├── pages/                 Deals.tsx · Wishlist.tsx · Contact.tsx
+        ├── components/            card/ProductCard.tsx · common/Button.tsx
         └── hooks/UseScroll.ts
 ```
 
@@ -42,7 +44,7 @@ digital-copy/
 (`store/` · `helpers/` · `constants/` · `interfaces/` · `components/` · `assets/images` + `assets/vector`), asset naming,
 naming table, character-level formatting (` , ` commas, `if(`, `else{` on a new line, `()=>`,
 no semicolons on imports), component anatomy, JSX habits, forms with yup, comments, Redux slices,
-`url_helper` / `api_client` / `backend_helper` + `createAsyncThunk`, `store.subscribe` + localStorage, `constants/categoryProps.ts`, `main.tsx` + `ScrollToTop`,
+`url_helper` / `api_client` / `backend_helper` + `createAsyncThunk`, `store.subscribe` + localStorage, `constants/categoryProps.ts`, `main.tsx` + `App.tsx` routes with `AppLayout` / `AdminLayout` + `ScrollToTop`,
 Tailwind in `.tsx` / `.ts`, index.css (`:root`, `@theme`, classes, `@media`), screen widths in CSS,
 Tailwind and JS, and a list of legacy patterns not to repeat.
 
