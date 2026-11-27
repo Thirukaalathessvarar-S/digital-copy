@@ -73,6 +73,8 @@ The user describes an app (pages, features, data source). You deliver **every fi
    - Types: beginner-friendly only, written by hand (STYLE_DNA T15), all in `src/interfaces/` (F3).
      No `Omit`, `Partial`, `Record`, `keyof`. `yup.InferType` only for a `FormValues` used outside the
      submit handler (C22).
+   - Forms: a `.required(...)` field gets ` <span className="red-text">*</span>` at the end of its label,
+     optional ones none (C31); every yup message starts with the field's label (`'Receiver name is required'`, C32).
    - Data: no `fetch`; axios only in `helpers/`; components dispatch a thunk and abort it in the
      effect cleanup; urls only in `constants/api.ts` (STYLE_DNA C18, R12, R13).
    - Never `!` important modifiers or `!important`; override with a modifier class in index.css.

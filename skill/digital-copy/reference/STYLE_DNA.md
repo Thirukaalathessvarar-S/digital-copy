@@ -387,7 +387,7 @@ This is hand formatting; no Prettier. Reproduce it character for character.
   `<Route path="/x" element={<X/>}></Route>`.
 - `[C6]` (retired) JSX blocks no longer get a label comment. Existing `{/* label */}` comments in a
   file you edit stay as they are.
-- `[C7]` `className` is **one line**. No line breaks inside it, no `clsx`. More than 8 utilities
+- `[C7]` `className` is **one line**. No line breaks inside it, no `clsx`. More than 20 utilities
   → move the static part into a named index.css class (`[X7]`).
 - `[C8]` Short rows are written on a single line:
   `<div className="flex justify-between items-center"><span className="label">Subtotal</span><span className="label">₹ {subtotal.toFixed(2)}</span></div>`.
@@ -520,9 +520,10 @@ return(
 
 ```tsx
 const schema = yup.object({
-    name:yup.string().required('name is required'),
-    phone:yup.string().required('phone number is required').matches(/^[6-9]\d{9}$/, "Enter a valid phone number"),
-    pincode:yup.string().required('pincode is required').matches(/^\d+$/ , 'pincode must contain only digits').min(6 , 'pincode must be at least 6 digits'),
+    name:yup.string().required('Receiver name is required'),
+    phone:yup.string().required('Phone number is required').matches(/^[6-9]\d{9}$/, "Phone number must be a valid 10 digit number"),
+    pincode:yup.string().required('Pincode is required').matches(/^\d+$/ , 'Pincode must contain only digits').min(6 , 'Pincode must be at least 6 digits'),
+    landmark:yup.string(),
 })
 ```
 
@@ -533,9 +534,10 @@ export type FormErrors = {
     name?:string;
     phone?:string;
     pincode?:string;
+    landmark?:string;
 }
 
-export type Field = 'name' | 'phone' | 'pincode'
+export type Field = 'name' | 'phone' | 'pincode' | 'landmark'
 ```
 
 - `[C22]` Forms with two or more fields (one-field forms: C30). Schema at module top, above the component; `FormErrors` and `Field` in `interfaces/form.ts` (F3), named after the form when there are several (`ContactErrors`, `ContactField`). Types are written by hand
@@ -579,17 +581,33 @@ export type Field = 'name' | 'phone' | 'pincode'
 - `[C24]` Field block:
   ```tsx
   <div>
-      <label htmlFor="city" className="block eyebrow">City / Town</label>
-      <input name="city" placeholder="delhi" id="city" className="input mt-[8px]"></input>
-      {errors.city && <p className="red-text">{errors.city}</p>}
+      <label htmlFor="name" className="block eyebrow">Receiver name <span className="red-text">*</span></label>
+      <input name="name" placeholder="ravi kumar" id="name" className="input mt-[8px]"></input>
+      {errors.name && <p className="red-text">{errors.name}</p>}
+  </div>
+  <div>
+      <label htmlFor="landmark" className="block eyebrow">Landmark</label>
+      <input name="landmark" placeholder="near city mall" id="landmark" className="input mt-[8px]"></input>
+      {errors.landmark && <p className="red-text">{errors.landmark}</p>}
   </div>
   ```
-  Clearing an error on type: `onChange={() => setErrors(prev => ({ ...prev, city: '' }))}`.
+  Clearing an error on type: `onChange={() => setErrors(prev => ({ ...prev, name: '' }))}`.
+- `[C31]` **Required star.** Read the yup schema: every field with `.required(...)` gets a star at
+  the end of its label, `<span className="red-text">*</span>`, after one space inside the `<label>`.
+  A field without `.required(...)` gets no star and no "(optional)" text. The star follows the
+  schema, never the `required` HTML attribute (forms are `noValidate`). A field with no visible
+  label (a one-field newsletter box) gets no star.
+- `[C32]` **Error text names the label.** Every yup message for a field starts with that field's
+  label text, written as it appears in the label (without the star): label `Receiver name` →
+  `'Receiver name is required'`, `'Receiver name must be at least 3 characters'`, never
+  `'name is required'` or `'please enter name'`. Same for every rule on the field (`.matches`,
+  `.min`, `.max`, `.email`, `.url`, `.oneOf` ...). If the label changes, change its messages too.
+  A field with no visible label uses its placeholder word, capitalised (`'Email is required'`).
 - `[C25]` After success: `toast.success('...')`, `formElement.reset()`, `navigate('/')`.
 - `[C30]` **One-field forms** (newsletter, subscribe, single search box) do **not** use the object
   schema, `FormErrors`, `Field` or the `err.inner` loop above. They validate the one value directly:
   ```tsx
-  const emailSchema = yup.string().required('email is required').email('please enter valid email');
+  const emailSchema = yup.string().required('Email is required').email('Email is not valid');
 
   export function Footer(){
       const [newsError , setNewsError] = useState<string>('');
@@ -626,7 +644,8 @@ export type Field = 'name' | 'phone' | 'pincode'
 ### 6.6 Copy and locale
 
 - `[C26]` Messages are short and lowercase: `toast.success('added to cart')`, `'order placed'`,
-  `toast.error('you need to login')`, yup `'name is required'`. Placeholders lowercase:
+  `toast.error('you need to login')`. Yup messages are the exception: they start with the
+  field's label (C32), `'Receiver name is required'`. Placeholders lowercase:
   `"search"`, `"enter your address"`, `"delhi"`, `"000000"`. Headings are Title Case.
 - `[C27]` Indian locale: `₹`, pincode, phone regex `/^[6-9]\d{9}$/`,
   `toLocaleDateString('en-in' , {year:'numeric' , month:'short' , day:'numeric'})`.
@@ -1264,6 +1283,7 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L21 | `fetch(...).then(res => res.json())` in `useEffect`, the `ignore` flag, `setItems(data.products)`, page `loading` state for API lists, urls written inside components | e-commerce project | constants url → `helpers/` axios → `asyncThunk/` → `extraReducers` (C18, R12, R13) |
 | L22 | a separate `src/App.css` imported by `App.tsx`, `index.css` holding only `@import "tailwindcss";`, Header / Footer directly in `components/`, a singular `component/` folder | older projects | everything in `index.css`; `components/layout/` |
 | L23 | underscore padding `p-[30px_0px]`, `p-[10px_20px_30px_20px]`, `max-md:p-[60px_0px]` | all code before this rule | `py-[30px] px-[0px]`, `pt-[10px] pr-[20px] pb-[30px] pl-[20px]` (W2) |
+| L24 | labels with no `*` on required fields, yup messages like `'name is required'` or `'please enter valid email'` that do not start with the label | all forms before this rule | `Receiver name <span className="red-text">*</span>`, `'Receiver name is required'` (C31, C32) |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
@@ -1291,6 +1311,7 @@ the same kind of file (like B3 for breakpoints). Do not move files, rename folde
 - [ ] No `!` important modifier and no `!important`; overrides are new classes (W9).
 - [ ] Types with `type`, beginner-friendly only (T15), explicit `useState<T>`, no useMemo/useCallback.
 - [ ] Forms: two or more fields → object schema + `FormErrors` (C22 to C24); one field → `yup.string()` + one string error (C30).
+- [ ] Every `.required(...)` field has ` <span className="red-text">*</span>` in its label, optional fields have none (C31); every yup message starts with the field's label text (C32).
 - [ ] Redux: slice pattern R1..R6, persistence only via `store.subscribe` R7..R9.
 - [ ] Every `style_prompt.xml` `<before_you_finish>` check passes.
 - [ ] No legacy pattern from section 16 newly written; no legacy pattern silently changed.

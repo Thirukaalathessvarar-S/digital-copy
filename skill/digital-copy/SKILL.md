@@ -47,6 +47,8 @@ pages in `components/pages/`, Header / Footer in `components/layout/`, all css i
 - a className with more than 20 utilities (move it to a named index.css class with `@apply`)
 - Tailwind utilities in a `.tsx` / `.ts` variable (`const navLink = "py-[13px] px-[10px] ..."`): write a named index.css class instead
 - utility types (`Omit`, `Pick`, `Partial`, `Record`, `keyof` ...): beginner-friendly types only (`yup.InferType` only for a C22 `FormValues` used outside the submit handler)
+- a required (yup `.required`) field without a `*` star in its label, or a star on an optional one (C31)
+- a yup message that does not start with the field's label: label `Receiver name` → `'Receiver name is required'`, not `'name is required'` (C32)
 - comments that are not necessary; keep the needed ones to one short line
 - add an `h-[...]` or change an existing one
 - `max-lg:/max-md:/max-sm:` font-size or leading in className (use index.css `@media` + `:root` variables)

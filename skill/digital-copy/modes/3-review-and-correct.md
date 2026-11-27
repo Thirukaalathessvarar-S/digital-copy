@@ -67,13 +67,18 @@ className="([^" ]+ ){20,}[^" ]+"                                 → SHOULD clas
 
 `min-h-[100px]` on a `textarea` is the developer's own habit and is OK.
 
+Forms (regex cannot do this, read each form): put the yup schema next to its JSX. Every
+`.required(...)` field without a `*` star in its label, a star on an optional field, or a yup
+message that does not start with the field's label text (`'name is required'` under the label
+`Receiver name`) → SHOULD [C31] / [C32].
+
 Then read the files to confirm each hit and to catch what regex cannot (formatting, naming,
 comments, structure, Redux pattern, index.css order, asset names).
 
 ## Checklist by area (cite the ID)
 
 - Stack `[S1]` · Files `[F1..F8]` · Assets `[A1..A6]` · Naming table §4
-- Formatting `[T1..T15]` · Components `[C1..C29]` · Comments `[K1..K7]` (K3, K4, K5, C6 retired)
+- Formatting `[T1..T15]` · Components `[C1..C32]` · Comments `[K1..K7]` (K3, K4, K5, C6 retired)
 - Redux `[R1..R13]` · Constants `[D1..D6]` · main.tsx `[M1..M4]`
 - Tailwind `[W1..W16]` · index.css `[X1..X10]` · Breakpoints `[B1..B3]`
 - `style_prompt.xml` `<before_you_finish>` (cite as `[SP:<check text>]`)
