@@ -19,7 +19,9 @@ Decide the scope from the request:
   changed lines are not reported.
 - **Full project**: "review the project", "audit everything", a repo or folder. Review every file
   under `src/`, plus `package.json`, `vite.config.ts`, `index.html`, `index.css`, `public/favicon.svg` (F9). Skip
-  theme slices (`src/store/slice/theme/`, old `src/features/theme/`) and auth/login localStorage handling (out of scope by the developer's choice).
+  theme slices (`src/store/slice/theme/`, old `src/features/theme/`). The session is reviewed: it is saved
+  only by the one `store.subscribe` (R7), cleared with `clearUser()`, guarded by `ProtectedRoute` (M5)
+  and renewed by the `api_client.ts` interceptor (C33).
 
 ## Severity
 
@@ -47,7 +49,7 @@ max-(lg|md|sm|\[\d+px\]):!?(text-\[(length:)?\d|leading-\[\d)  → MUST  font si
 (^|[\s"'`!:])(p|px|py|pt|pb|pl|pr|m|mx|my|mt|mb|ml|mr|gap|gap-x|gap-y|w|size)-\d+(\.\d+)?\b   → SHOULD px only / L5
 (^|[\s"'`])(sm|md|lg|xl|min-\[\d+px\]):[a-z!-]                 → SHOULD desktop-first max-* only / L9
 interface |React\.FC|=\s*\(\{[^)]*\}\)\s*=>\s*\(|clsx|classnames|cn\(|useMemo|useCallback   → SHOULD
-localStorage\.setItem                                           → MUST unless in src/store/store.ts (auth excluded)
+localStorage\.(setItem|removeItem)                              → MUST unless in src/store/store.ts (clearing the session is clearUser()) / R7
 \bfetch\(                                                       → SHOULD use helpers/ + asyncThunk/ / C18 (LEGACY L21 outside changed lines)
 from 'axios'                                                    → SHOULD unless in src/helpers/api_client.ts / F7
 https?://                                                       → SHOULD unless in src/helpers/url_helper.ts (an input placeholder is OK) / F4
@@ -57,6 +59,11 @@ from 'react-router-dom'                                         → SHOULD impor
 <Routes|<Route                                                  → SHOULD unless in src/App.tsx / M2
 <Header|<Footer|<main                                           → SHOULD unless in src/layout/ / C14
 components/pages/|components/layout/                            → SHOULD pages in src/pages/ , Header / Footer in components/ / F1 F11 (LEGACY L26 in full scope)
+AdminRoute|element=\{<AdminLayout                              → SHOULD admin routes sit under utils/ProtectedRoute.tsx / M5
+/auth/refresh|_retry                                            → SHOULD unless in src/helpers/api_client.ts / C33
+axios\.create                                                   → SHOULD unless in src/helpers/api_client.ts / F7 C34
+type="file"                                                     → read the form: accept , no name , checks in utils/ , upload on save , no thunk / C34
+\.input\s*\{                                                    → index.css: must hold resize-none , hidden scrollbars , type=number spinner removal / C35
 ^export (type|interface) |^type \w+ ?=                         → SHOULD unless in src/interfaces/ / F3 (RootState / AppDispatch in store.ts and a C22 FormValues are OK)
 /images/|public/images                                          → SHOULD images live in src/assets/images/ / F8
 (^|[\s"'`:])p-\[[^\]\s]*_                                   → MUST  padding is py/px or pt/pr/pb/pl / W2
@@ -83,9 +90,9 @@ comments, structure, Redux pattern, index.css order, asset names).
 
 ## Checklist by area (cite the ID)
 
-- Stack `[S1]` · Files `[F1..F8]` · Assets `[A1..A6]` · Naming table §4
-- Formatting `[T1..T15]` · Components `[C1..C32]` · Comments `[K1..K7]` (K3, K4, K5, C6 retired)
-- Redux `[R1..R13]` · Constants `[D1..D6]` · main.tsx / App.tsx routes `[M1..M4]` · Files `[F1..F11]`
+- Stack `[S1]` · Files `[F1..F12]` · Assets `[A1..A6]` · Naming table §4
+- Formatting `[T1..T15]` · Components `[C1..C35]` · Comments `[K1..K7]` (K3, K4, K5, C6 retired)
+- Redux `[R1..R13]` · Constants `[D1..D6]` · main.tsx / App.tsx routes `[M1..M5]`
 - Tailwind `[W1..W16]` · index.css `[X1..X10]` · Breakpoints `[B1..B3]`
 - `style_prompt.xml` `<before_you_finish>` (cite as `[SP:<check text>]`)
 

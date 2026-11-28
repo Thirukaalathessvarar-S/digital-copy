@@ -33,10 +33,11 @@ digital-copy/
         ├── store/                 store.ts · slice/product/productSlice.ts · slice/wish/wishSlice.ts · asyncThunk/productThunk.ts
         ├── helpers/               url_helper.ts (paths) · api_client.ts (axios) · backend_helper.ts (endpoint functions)
         ├── constants/             categoryProps.ts (no urls)
-        ├── interfaces/            product.ts · wish.ts · category.ts · props.ts · form.ts
+        ├── interfaces/            product.ts · wish.ts · category.ts · props.ts · form.ts · auth.ts
         ├── layout/                AppLayout.tsx · AdminLayout.tsx (Header / sidebar + <main><Outlet> + Footer)
         ├── pages/                 Deals.tsx · Wishlist.tsx · Contact.tsx
         ├── components/            card/ProductCard.tsx · common/Button.tsx
+        ├── utils/                 ProtectedRoute.tsx (admin guard) · imageFile.ts (upload checks)
         └── hooks/UseScroll.ts
 ```
 

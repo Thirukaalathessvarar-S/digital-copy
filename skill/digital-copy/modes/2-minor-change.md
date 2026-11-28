@@ -36,7 +36,7 @@ They sit in `reference/` next to this file, or are attached. If missing, say so 
   In a project that still has the old layout (`app/`, `features/`, flat `components/`, STYLE_DNA L20),
   put it next to the files of the same kind there; do not migrate folders unless asked.
 - **New page** → `src/pages/<Name>.tsx` (admin: `src/pages/admin/`), returning only its sections,
-  plus one `<Route>` in `App.tsx` under `AppLayout` (or `AdminLayout`). Never a route in `main.tsx`,
+  plus one `<Route>` in `App.tsx` under `AppLayout` (admin pages under `ProtectedRoute`, M5). Never a route in `main.tsx`,
   never a `<Header>` / `<Footer>` in the page (STYLE_DNA C14, M2, M3). In a project still on
   `components/pages/` + routes in `main.tsx` (L26), add the page the old way unless the user asks to migrate.
 - **New type** → `src/interfaces/<domain>.ts` (written with `type`). **New backend resource** → a path
@@ -47,6 +47,12 @@ They sit in `reference/` next to this file, or are attached. If missing, say so 
   code calls the helper straight into `useState`; only page-only extras and writes call it directly.
   Never `fetch`, never axios in a component. A project still on `fetch` (L21) or on
   `constants/api.ts` + `getData(url)` (L25) keeps it unless the user asks.
+- **Expired tokens** → never handled in a component: the one refresh interceptor in `api_client.ts`
+  does it (C33). If the project has none and its admin saves start failing after 15 minutes, tell the user.
+- **File upload** → `uploadImage(file)` in `backend_helper.ts` over its own axios instance, file checks in
+  `src/utils/`, upload on save, no thunk (C34).
+- **Form fields** → `.input` only; it already hides scrollbars, removes number spinners and stops
+  textarea resizing (C35). Never add a spinner or scrollbar fix per field.
 - **Lines you add** follow the newest rules even when the file around them does not: flex child
   widths `w-[N%]` only (never `basis-[...]`), padding as `py-[A] px-[B]` / `pt-[A] pr-[B] pb-[C] pl-[D]` (never `p-[A_B]`), no `!` important modifier or `!important` (write a modifier class), no `aria-*` / `role`, descriptive `alt`, no `loading="lazy"`,
   beginner-friendly types, comments only when necessary, a className of more than 20 utilities

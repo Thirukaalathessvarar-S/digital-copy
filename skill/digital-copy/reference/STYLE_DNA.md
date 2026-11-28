@@ -179,6 +179,9 @@ src/
 │   └── common/                   small reusable bits: buttons, spans, badges (Button.tsx  Badge.tsx ...)
 ├── hooks/
 │   └── UseScroll.ts              file name PascalCase, hook inside is camelCase (useScroll)
+├── utils/                        shared code that is not network: route guards and checks used by several pages
+│   ├── ProtectedRoute.tsx        admin guard: returns <AdminLayout> only when auth.isAdmin (M5)
+│   └── imageFile.ts              isPng , isSmallImage: file checks before an upload (C34)
 └── assets/
     ├── images/                   .png / .jpg
     └── vector/                   .svg
@@ -197,6 +200,10 @@ src/
   buttons / spans / badges in `components/common/`. The folder is `components` (plural) and holds
   no pages. Pages import them as `import {ProductCard} from '../components/card/ProductCard.tsx'`;
   layouts as `import {Header} from '../components/Header.tsx'`.
+- `[F12]` **`src/utils/` holds shared code that is not network and not a component of the page**:
+  route guards (`ProtectedRoute.tsx`, M5) and small pure checks used by more than one page
+  (`imageFile.ts` with `isPng` / `isSmallImage`, C34). Written in the T rules, named exports, no axios.
+  A check used by one page only stays in that page (F5).
 - `[F2]` One slice per feature folder: `store/slice/<feature>/<feature>Slice.ts`, short and
   singular: `slice/auth/authSlice.ts`, `slice/product/productSlice.ts`. Its thunks go in
   `store/asyncThunk/<feature>Thunk.ts`.
@@ -485,17 +492,23 @@ import {Footer} from '../components/Footer.tsx'
 export function AppLayout(){
     return(
         <>
-            <Header></Header>
+            <div className="flex flex-col min-h-screen">
+                <Header></Header>
 
-            <main>
-                <Outlet></Outlet>
-            </main>
+                <main className="flex-1">
+                    <Outlet></Outlet>
+                </main>
 
-            <Footer></Footer>
+                <Footer></Footer>
+            </div>
         </>
     )
 }
 ```
+
+`min-h-screen` on the layout root (and `flex-1` on `<main>`) keeps the Footer at the bottom of short
+pages; `AdminLayout`'s root is `flex max-lg:flex-col min-h-screen` so the sidebar and main reach the
+bottom of the screen. This is the only place a screen-height class is allowed (`style_prompt.xml` `<units>`).
 
 - `[C14]` **Header, `<main>` and Footer belong to the layout, never to a page.** A page renders no
   `<Header>`, `<Footer>` or `<main>`. `AdminLayout` does the same with `AdminSidebar` and its own
@@ -576,6 +589,55 @@ export function AppLayout(){
 - `[C20]` Dependency arrays list what is read, written `[id]`, `[category]`, `[useCategory , searchQuery]`.
   Exhaustive-deps is not enforced; do not add `dispatch` or setters.
 - `[C21]` Timers: `const timer = setTimeout(()=>setLoading(false) , 2000); return ()=>clearTimeout(timer);`.
+- `[C33]` **An expired access token is renewed in one place: `helpers/api_client.ts`**
+  (`templates/helpers/api_client.ts`). Components keep passing `auth.accessToken` to the endpoint
+  functions; they never call `/auth/refresh` or retry by hand.
+  1. `interfaces/` holds `TokenPair` (`accessToken` , `refreshToken`) and `AuthHandlers`
+     (`getAccessToken` , `getRefreshToken` , `saveTokens` , `signOut`).
+  2. `api_client.ts` exports `setupAuthRefresh(handlers)`. Its response interceptor, on a **401**:
+     - passes the error on for `/${AUTH}/...` calls (a 401 there means a wrong password or a dead
+       session), for a request already retried, and when there is no refresh token;
+     - if another request already got a new token, retries with it; otherwise waits for **one shared**
+       `POST /auth/refresh` promise. A refresh token works only once, so parallel 401s must never
+       refresh twice;
+     - sets the new `Authorization` header and retries the request **once**;
+     - when the refresh itself is refused (401) calls `signOut()`; a network error does not end the session.
+  3. `store.ts` calls `setupAuthRefresh({...})` right after `configureStore` (`api_client.ts` never
+     imports the store, that would be a circular import):
+     ```ts
+     setupAuthRefresh({
+       getAccessToken:()=>store.getState().auth.accessToken ?? '',
+       getRefreshToken:()=>store.getState().auth.refreshToken ?? '',
+       saveTokens:(tokens)=>{
+         store.dispatch(updateTokens(tokens));
+       },
+       signOut:()=>{
+         store.dispatch(clearUser());
+         window.location.assign(window.location.pathname.startsWith('/admin') ? '/admin/login' : '/login');
+       }
+     })
+     ```
+     `updateTokens` in the auth slice replaces only the two tokens; the one `store.subscribe` saves them (R7).
+- `[C34]` **A file upload is a write too: no thunk, no slice.** The form calls `uploadImage(file)` from
+  `backend_helper.ts` and puts the returned url into the body it already sends; the backend keeps
+  receiving urls.
+  - A third-party upload service gets its **own** axios instance in `api_client.ts` (`uploadClient`
+    plus an `upload(data)` export): a different base url, no backend tokens, no refresh interceptor.
+    Its upload url and public settings live in `url_helper.ts`, the account values in `.env` as
+    `VITE_...`. Only public values (cloud name, unsigned preset) may be in the frontend; a secret never is.
+  - Files are checked **before** uploading with small functions in `utils/` (`isPng(file)`,
+    `isSmallImage(file)`), matching the limits set on the service. Messages follow C32:
+    `'Image must be a PNG file'`, `'Images must be 2 MB or smaller , huge.png was skipped'`;
+    several bad files get one line that names them all.
+  - The file input has `accept` (`accept="image/png"`), `multiple` when several files are allowed,
+    and no `name`: the files live in `useState`, not in `FormData`. After a pick, reset
+    `event.target.value = ''` so the same file can be picked again.
+  - Picked files are kept with a blob preview (`URL.createObjectURL`), freed with
+    `URL.revokeObjectURL` when removed. Upload happens **on save**, in the submit handler, after yup
+    passes: `uploaded = await Promise.all(newImages.map((image)=>uploadImage(image.file)));`. A failed
+    upload stops the save: `toast.error('image upload failed , try again')`.
+  - Editing keeps the saved urls: the body gets `[...keptImages , ...uploaded]`, and an edit with no new
+    file uploads nothing. The C31 star shows only when a file is really required (creating, or none left).
 
 ### 6.5 Forms (yup)
 
@@ -701,6 +763,15 @@ export type Field = 'name' | 'phone' | 'pincode' | 'landmark'
     the form has `noValidate`.
   - Error line: `{newsError!=='' && <p className="red-text">{newsError}</p>}`.
   - Use C22 to C24 only when the form has two or more fields.
+- `[C35]` **Every form field uses the `.input` class**, and `.input` (`templates/index.css`) also:
+  - hides scrollbars: `[scrollbar-width:none] [&::-webkit-scrollbar]:hidden`. A long textarea still
+    scrolls, with no bar;
+  - removes the number spinners, for `type="number"` only:
+    `[&[type=number]]:[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`.
+    Never a plain `appearance` rule on `.input`: selects use `.input` too and would lose their look;
+  - stops textareas from resizing: `resize-none`.
+  A dialog or overlay that scrolls hides its scrollbar the same way (inside `.modal-overlay`, or the
+  two utilities on a `<dialog>`), so no form ever shows a scrollbar.
 
 ### 6.6 Copy and locale
 
@@ -919,8 +990,9 @@ export type AppDispatch = typeof store.dispatch
 - `[R11]` Components read with `useSelector((state:RootState)=>state.cart)` and write with
   `const dispatch = useDispatch<AppDispatch>();` (`useDispatch()` without the generic also appears).
   No typed `useAppSelector` hooks file.
-- (Authentication storage is out of scope of this DNA. Do not copy the login/localStorage approach
-  from `Login.tsx` / `User.tsx`.)
+- The session is the `auth` slice, saved by the same `store.subscribe` under `'user'` with the
+  password blanked. Clearing it is `dispatch(clearUser())`, never `localStorage.removeItem('user')`
+  (old `User.tsx` does that; do not copy it). Guarding admin pages is M5, renewing tokens is C33.
 
 ---
 
@@ -1003,9 +1075,10 @@ import {useEffect} from 'react'
 import {Routes , Route , useLocation} from 'react-router'
 import {Toaster} from 'react-hot-toast'
 import {AppLayout} from './layout/AppLayout.tsx'
-import {AdminLayout} from './layout/AdminLayout.tsx'
+import {ProtectedRoute} from './utils/ProtectedRoute.tsx'
 import {Home} from './pages/Home.tsx'
 import {Cart} from './pages/Cart.tsx'
+import {AdminLogin} from './pages/admin/AdminLogin.tsx'
 import {AdminDashboard} from './pages/admin/AdminDashboard.tsx'
 
 function ScrollToTop(){
@@ -1030,7 +1103,8 @@ function App(){
                     <Route path="/" element={<Home/>}></Route>
                     <Route path="/cart" element={<Cart/>}></Route>
                 </Route>
-                <Route element={<AdminLayout/>}>
+                <Route path="/admin/login" element={<AdminLogin/>}></Route>
+                <Route element={<ProtectedRoute/>}>
                     <Route path="/admin/dashboard" element={<AdminDashboard/>}></Route>
                 </Route>
             </Routes>
@@ -1052,14 +1126,37 @@ export default App
   T rules (4-space indent, `if(`, `()=>`).
 - `[M3]` Layout routes: one pathless `<Route element={<AppLayout/>}>` holds every customer page as a
   child with its **full path** (`path="/"` for `Home`, `path="/cart"`, `path="/product/:id"`);
-  admin pages sit in a second `<Route element={<AdminLayout/>}>` with `/admin/...` paths. A page
-  without the site chrome (an admin login, a 404 with its own look) is a route outside both layouts.
-  A guard component, when the app has one, wraps the layout element:
-  `<Route element={<AdminRoute><AdminLayout/></AdminRoute>}>`. Every page and layout is imported on
-  its own line with its extension (`./pages/<Name>.tsx`, `./layout/<Name>.tsx`).
+  admin pages sit in a second layout route, `<Route element={<ProtectedRoute/>}>` (M5), with
+  `/admin/...` paths. A page without the site chrome (the admin login, a 404 with its own look) is a
+  route outside both. Every page and layout is imported on its own line with its extension
+  (`./pages/<Name>.tsx`, `./layout/<Name>.tsx`, `./utils/ProtectedRoute.tsx`).
 - `[M4]` Hash sections: the Header links to `/#product-listing`, `/#special-category`; the
   `useScroll(ready)` hook in `hooks/UseScroll.ts` returns refs (`homeRef`, `exploreRef`,
   `trendingRef`) that `Home` puts on its sections, and scrolls to them once the page has loaded.
+- `[M5]` **Admin pages are guarded by `src/utils/ProtectedRoute.tsx`** (`templates/utils/ProtectedRoute.tsx`):
+  ```tsx
+  // only the admin login sets isAdmin , a role from the shop login is not enough
+  export function ProtectedRoute(){
+      const auth = useSelector((state:RootState)=>state.auth);
+
+      if(!auth.isAdmin){
+          return <Navigate to='/admin/login'></Navigate>
+      }
+
+      return(
+          <>
+              <AdminLayout></AdminLayout>
+          </>
+      )
+  }
+  ```
+  - It **is** the admin layout route (`<Route element={<ProtectedRoute/>}>`), so the guard and the
+    layout never get out of step. No `AdminRoute` wrapper component.
+  - Only the admin login sets `isAdmin:true` in the `auth` slice. A shop login stores `role` but never
+    `isAdmin`; logging out (`clearUser()`) removes it.
+  - `isAdmin` only decides **which screens show**. It lives in `localStorage`, so a user can edit it:
+    every admin request must also be checked by the backend (the role inside the signed token).
+    Never treat the frontend flag as security.
 
 ---
 
@@ -1399,8 +1496,12 @@ the same kind of file (like B3 for breakpoints). Do not move files, rename folde
 ## 17. Final checklist (run before you answer)
 
 - [ ] Stack and dependencies unchanged (S1). No new library.
-- [ ] Files in the right place and named per F / A / N: `pages/` (every page, `Home.tsx` included), `layout/` (`AppLayout.tsx`, `AdminLayout.tsx` only), `components/` (`Header.tsx`, `Footer.tsx`, shared pieces, `card/`, `common/`), `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `assets/images/` + `assets/vector/`.
-- [ ] Routes only in `App.tsx`, pages as children of `AppLayout` / `AdminLayout`; `main.tsx` renders `<App />` only; no page renders `<Header>`, `<Footer>` or `<main>`; every router import from `'react-router'` (C14, M1 to M3).
+- [ ] Files in the right place and named per F / A / N: `pages/` (every page, `Home.tsx` included), `layout/` (`AppLayout.tsx`, `AdminLayout.tsx` only), `components/` (`Header.tsx`, `Footer.tsx`, shared pieces, `card/`, `common/`), `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `utils/` (`ProtectedRoute.tsx`, shared checks), `assets/images/` + `assets/vector/`.
+- [ ] Routes only in `App.tsx`, pages as children of `AppLayout` / `ProtectedRoute`; `main.tsx` renders `<App />` only; no page renders `<Header>`, `<Footer>` or `<main>`; every router import from `'react-router'` (C14, M1 to M3).
+- [ ] Admin pages behind `utils/ProtectedRoute.tsx` (returns `AdminLayout` only when `isAdmin`), never an `AdminRoute` wrapper; `isAdmin` treated as screens only, the backend checks every admin request (M5).
+- [ ] Token refresh only in `api_client.ts` (one shared refresh, retry once, no refresh for `/auth` calls, `signOut` on a refused refresh), wired in `store.ts` with `setupAuthRefresh` (C33).
+- [ ] Uploads: no thunk; checks in `utils/` before uploading; own axios instance with no tokens; upload on save; edit keeps saved urls (C34).
+- [ ] Form fields use `.input`: hidden scrollbars, no number spinners (`type=number` only), `resize-none`; scrolling dialogs hide their scrollbar (C35).
 - [ ] Every type in `interfaces/` (except `RootState` / `AppDispatch` and a C22 `FormValues`); the base url and resource paths only in `helpers/url_helper.ts`, endpoint paths built only in `helpers/backend_helper.ts`.
 - [ ] API data: axios only in `helpers/api_client.ts`, endpoint functions in `helpers/backend_helper.ts`, every API list through a thunk in `asyncThunk/` that calls them, `pending` / `fulfilled` / `rejected` in the slice, `request.abort()` in the effect cleanup (C18, C19, R12, R13).
 - [ ] Formatting: indent of the file, ` , ` commas, `if(`, `else{` on a new line, `()=>`, no semicolon on imports, `.tsx` extensions on local imports.

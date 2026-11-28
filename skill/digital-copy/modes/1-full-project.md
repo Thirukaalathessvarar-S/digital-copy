@@ -48,20 +48,24 @@ The user describes an app (pages, features, data source). You deliver **every fi
       variables the app needs to `:root` **and** to each of the three `@media` blocks (1023 / 767 / 639).
    3. `src/interfaces/*.ts`: every type the app uses (`templates/interfaces/`).
    4. `src/constants/*.ts`: props / data lists, no urls (`templates/constants/`).
-   5. `src/helpers/url_helper.ts`, `src/helpers/api_client.ts`, `src/helpers/backend_helper.ts`
-      (`templates/helpers/`), plus `VITE_BACKEND_URL` in `.env`.
+   5. `src/helpers/url_helper.ts`, `src/helpers/api_client.ts` (with the token refresh, C33),
+      `src/helpers/backend_helper.ts` (`templates/helpers/`), plus `VITE_BACKEND_URL` in `.env`. Only if
+      the app uploads files: the upload instance and `uploadImage` (C34) with its `VITE_...` values.
    6. `src/store/asyncThunk/<feature>Thunk.ts` (`templates/store/asyncThunk/productThunk.ts`).
    7. `src/store/slice/<feature>/<feature>Slice.ts`: API slices with `extraReducers`
       (`templates/store/slice/product/productSlice.ts`), local / persisted slices with `load<Name>()`
       (`templates/store/slice/wish/wishSlice.ts`).
-   8. `src/store/store.ts` (`templates/store/store.ts`, one `store.subscribe` for every persisted slice).
-   9. `src/hooks/Use<Name>.ts` only if a page needs one (`templates/hooks/UseScroll.ts`).
+   8. `src/store/store.ts` (`templates/store/store.ts`, one `store.subscribe` for every persisted slice,
+      and `setupAuthRefresh({...})` when the app has a login, C33).
+   9. `src/hooks/Use<Name>.ts` only if a page needs one (`templates/hooks/UseScroll.ts`); `src/utils/`
+      for route guards and shared checks (`templates/utils/`, F12).
    10. Reusable components: `components/Header.tsx` and `components/Footer.tsx` (no props; Header
        reads the route and the `?search=` param, STYLE_DNA C14), `Heading.tsx`, `AdminSidebar.tsx` if
        there is an admin side, cards in `components/card/`, buttons / spans / badges in
        `components/common/` (`templates/components/`).
    11. Layouts in `src/layout/`: `AppLayout.tsx` (`templates/layout/AppLayout.tsx`) and, only with an
-       admin side, `AdminLayout.tsx` (`templates/layout/AdminLayout.tsx`).
+       admin side, `AdminLayout.tsx` (`templates/layout/AdminLayout.tsx`) plus
+       `src/utils/ProtectedRoute.tsx` that returns it only for `isAdmin` (`templates/utils/ProtectedRoute.tsx`, M5).
    12. Pages in `src/pages/`, `Home.tsx` included; each returns only `<section id="kebab-id">` →
        `.container` blocks, no Header / Footer / `<main>` (`templates/pages/`).
    13. `src/App.tsx` (every route under its layout, `ScrollToTop` and `Toaster`, `templates/App.tsx`)
@@ -73,7 +77,7 @@ The user describes an app (pages, features, data source). You deliver **every fi
    - `export function Name(){`; handlers as inner `function handleX(){`; `useState<T>(...)` always typed;
      no `useMemo` / `useCallback` / `interface` / `React.FC` / `clsx`.
    - Explicit closing tags: `<Footer></Footer>`, `<Outlet></Outlet>`, `<img ...></img>`, `<input ...></input>`.
-   - Routes only in `App.tsx`, pages under `AppLayout` / `AdminLayout`; every router import from `'react-router'`.
+   - Routes only in `App.tsx`, pages under `AppLayout` / `ProtectedRoute` (M5); every router import from `'react-router'`.
    - className on one line, at most 20 utilities; longer → a named index.css class with `@apply`.
      Never store utilities in a variable (`const navLink = "..."`): reused lists are index.css classes.
      Every list prop passed explicitly.
@@ -83,6 +87,8 @@ The user describes an app (pages, features, data source). You deliver **every fi
      submit handler (C22).
    - Forms: a `.required(...)` field gets ` <span className="red-text">*</span>` at the end of its label,
      optional ones none (C31); every yup message starts with the field's label (`'Receiver name is required'`, C32).
+     Every field uses `.input`, which hides scrollbars, removes number spinners and stops textarea resizing (C35).
+     File inputs: checks in `utils/`, upload on save through `uploadImage`, no thunk (C34).
    - Data: no `fetch`; axios only in `helpers/api_client.ts`; endpoint functions only in
      `helpers/backend_helper.ts`, paths from `helpers/url_helper.ts`; every API list goes through a
      thunk that the component dispatches and aborts in the effect cleanup (STYLE_DNA C18, C19, R12, R13).

@@ -589,7 +589,13 @@ h3 {
     px-[12px]
     text-[length:var(--input-size)]
     leading-[calc(var(--input-size)+4px)]
-    text-[color:var(--ink)];
+    text-[color:var(--ink)]
+    resize-none
+    [scrollbar-width:none]
+    [&::-webkit-scrollbar]:hidden
+    [&[type=number]]:[appearance:textfield]
+    [&::-webkit-inner-spin-button]:appearance-none
+    [&::-webkit-outer-spin-button]:appearance-none;
 }
 
 .contact-form {

@@ -5,13 +5,15 @@ import {Footer} from '../components/Footer.tsx'
 export function AppLayout(){
     return(
         <>
-            <Header></Header>
+            <div className="flex flex-col min-h-screen">
+                <Header></Header>
 
-            <main>
-                <Outlet></Outlet>
-            </main>
+                <main className="flex-1">
+                    <Outlet></Outlet>
+                </main>
 
-            <Footer></Footer>
+                <Footer></Footer>
+            </div>
         </>
     )
 }

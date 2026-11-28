@@ -38,7 +38,7 @@ pages in `src/pages/`, route layouts in `src/layout/` with `Outlet`, routes only
 
 ## Never (short list, all modes)
 
-- grid · rem/em/vw/vh/svh/clamp · size fractions · `%` anywhere except `w-[N%]` · Tailwind spacing scale numbers (`p-5`) where px is meant
+- grid · rem/em/vw/vh/svh/clamp (only exception: `min-h-screen` on a `src/layout/` root) · size fractions · `%` anywhere except `w-[N%]` · Tailwind spacing scale numbers (`p-5`) where px is meant
 - any `basis-[...]` (`basis-[25%]`, `basis-[120px]`, `basis-[calc(...)]`), or a flex child width in px: `w-[120px]`, `w-[calc(...)]` (use `w-[25%]`)
 - underscore padding `p-[10px_20px]` / `p-[10px_20px_30px_20px]`: write `py-[10px] px-[20px]` / `pt-[10px] pr-[20px] pb-[30px] pl-[20px]`
 - the stock Vite favicon: `public/favicon.svg` is an svg fetched from an internet source for the app
@@ -53,8 +53,11 @@ pages in `src/pages/`, route layouts in `src/layout/` with `Outlet`, routes only
 - add an `h-[...]` or change an existing one
 - `max-lg:/max-md:/max-sm:` font-size or leading in className (use index.css `@media` + `:root` variables)
 - `interface`, `React.FC`, arrow components, `clsx`/`cn`, `useMemo`/`useCallback`, untyped `useState`
-- `localStorage.setItem` outside `store.ts`'s single `store.subscribe` (auth is out of scope)
+- `localStorage.setItem` / `removeItem` outside `store.ts`'s single `store.subscribe` (the session too: clear it with `clearUser()`)
 - `fetch`, axios outside `src/helpers/api_client.ts`, a url or API path outside `src/helpers/url_helper.ts` / `backend_helper.ts`, an API list loaded into `useState` instead of a thunk (C19), a type outside `src/interfaces/`, an image in `public/images/`
 - a route outside `App.tsx`, a page outside `src/pages/` (home is `pages/Home.tsx` at `'/'`), a page rendering `<Header>` / `<Footer>` / `<main>` (the layout does, C14), props on Header / Footer, an import from `react-router-dom` (use `react-router`)
+- an `AdminRoute` wrapper or admin pages without `src/utils/ProtectedRoute.tsx`; treating `isAdmin` as security (M5)
+- token refresh anywhere but the one interceptor in `api_client.ts` (C33); a thunk or slice for a file upload (C34)
+- a form field without `.input`, a visible form scrollbar, number spinners, a resizable textarea (C35)
 - a dependency the user did not name
 - silently "fixing" legacy code (STYLE_DNA §16) outside the requested change

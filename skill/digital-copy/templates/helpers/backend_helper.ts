@@ -1,4 +1,4 @@
-import { get, post, put, del } from './api_client';
+import { get, post, put, del, upload } from './api_client';
 import * as url from './url_helper';
 import type { ProductBody } from '../interfaces/product';
 
@@ -13,3 +13,12 @@ export const deleteProduct = (id: string, token: string) => del(`/${url.PRODUCT}
 
 // Category
 export const getCategories = () => get(`/${url.CATEGORY}`);
+
+// Upload (resolves to the image url that the backend stores)
+export const uploadImage = (file: File): Promise<string> => {
+  const data = new FormData();
+  data.append('file', file);
+  data.append('upload_preset', url.CLOUDINARY_UPLOAD_PRESET);
+  data.append('folder', url.CLOUDINARY_FOLDER);
+  return upload(data).then((body: any) => body.secure_url);
+};

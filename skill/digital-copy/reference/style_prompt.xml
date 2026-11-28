@@ -73,6 +73,11 @@
       (no flex-basis at all). Do not use a percentage for any other property.
     </exception>
     <exception>
+      The root element of a route layout in src/layout/ (AppLayout, AdminLayout) may use min-h-screen,
+      so short pages still fill one screen: AppLayout is flex flex-col min-h-screen with main flex-1,
+      AdminLayout is flex max-lg:flex-col min-h-screen. Nowhere else, and never h-screen or h-[...].
+    </exception>
+    <exception>
       Centring an absolute icon or button inside a relative input wrapper with
       top-[50%] -translate-y-1/2 (or top-1/2 -translate-y-1/2) is allowed. It is
       positioning, not sizing.
@@ -186,7 +191,7 @@
   </markup>
 
   <before_you_finish>
-    <check>No rem, em, vw, vh, fr, fractions, clamp().</check>
+    <check>No rem, em, vw, vh, fr, fractions, clamp(). The only screen-height class is min-h-screen on a src/layout/ root.</check>
     <check>Percentage used only on w-[N%] widths; no basis-[...] anywhere.</check>
     <check>Every flex child width is w-[N%]: no basis-[...], no w-[Npx], no w-[calc(...)] on a flex child.</check>
     <check>No p-[A_B] or p-[A_B_C_D] padding; it is py-[A] px-[B] or pt-[A] pr-[B] pb-[C] pl-[D].</check>
