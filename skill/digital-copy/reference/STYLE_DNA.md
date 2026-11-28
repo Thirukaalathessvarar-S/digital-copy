@@ -775,7 +775,8 @@ export type Field = 'name' | 'phone' | 'pincode' | 'landmark'
     scrolls, with no bar;
   - removes the number spinners, for `type="number"` only:
     `[&[type=number]]:[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`.
-    Never a plain `appearance` rule on `.input`: selects use `.input` too and would lose their look;
+    Never a plain `appearance` rule on `.input`: selects use `.input` too, and their arrow comes from `.select` (W18);
+  - gives the clear ✕ of search inputs a pointer: `[&::-webkit-search-cancel-button]:cursor-pointer` (W17);
   - stops textareas from resizing: `resize-none`.
   A dialog or overlay that scrolls hides its scrollbar the same way (inside `.modal-overlay`, or the
   two utilities on a `<dialog>`), so no form ever shows a scrollbar.
@@ -1251,6 +1252,25 @@ Rules from `style_prompt.xml` apply in full. Observed habits on top of them:
 - `[W15]` Images keep ratio with `aspect-square object-contain`, sized by `max-w-[...]` per
   breakpoint and the padding around them.
 - `[W16]` Layout width comes from `.container`. A section never sets its own width.
+- `[W17]` **Cursors, everywhere.** Everything a user can click shows `cursor-pointer`: every
+  `<button>`, `<Link>` / `<a>`, `<select>`, a `<label>` that toggles a radio / checkbox, a dialog's
+  close ✕ and Cancel button, and the native clear ✕ of `type="search"` inputs. Tailwind v4 gives
+  buttons the default arrow, so it is never left to the browser. Every **disabled** control shows
+  `cursor-not-allowed`: never `cursor-default`, never a pointer.
+  - Where: in the element's index.css class. Button, chip, link and select classes carry
+    `cursor-pointer` in its X4 slot and `disabled:cursor-not-allowed` after the `hover:` states
+    (`.btn`, `.btn-outline`, `.btn-icon`, `.btn-text`, `.chip`, `.select`, `.link` ... in
+    `templates/index.css`); `.input` carries `[&::-webkit-search-cancel-button]:cursor-pointer`.
+  - An element with no index.css class gets `cursor-pointer disabled:cursor-not-allowed` in className.
+  - Never `disabled:cursor-not-allowed` in className next to a class that sets the cursor: index.css
+    classes beat utilities (X7), so it does nothing. Add it to the class.
+  - A new button / chip / link class always gets both lines.
+- `[W18]` **Selects use the custom arrow, never the browser's.** Every `<select>` is
+  `className="input select"` (plus spacing such as `mt-[8px]`). `.select` sets `appearance-none`,
+  `cursor-pointer`, `pr-[40px]` and the chevron
+  `bg-[url('./assets/vector/chevron-down.svg')] bg-no-repeat bg-position-[right_14px_center]`.
+  The svg is `src/assets/vector/chevron-down.svg` (`templates/assets/vector/`). No select without
+  `.select`, no extra icon element for the arrow.
 
 ---
 
@@ -1449,7 +1469,7 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 
 ## 15. Interaction details they always add
 
-- Disabled arrows: `disabled:opacity-40 disabled:cursor-default`.
+- Disabled controls: `disabled:opacity-40` in className, `cursor-not-allowed` from the class (W17).
 - Links: `.link` (muted, underline on hover via `decoration-transparent` → `hover:decoration-current`).
 - Hover on cards / tiles: `hover:bg-[var(--line)] hover:border-[var(--line-strong)] transition-colors duration-300`.
 - Arrow nudge: `group` on the link, `group-hover:translate-x-[4px] transition-transform duration-300` on the icon.
@@ -1519,6 +1539,8 @@ the same kind of file (like B3 for breakpoints). Do not move files, rename folde
 - [ ] No `p-[A_B]` / `p-[A_B_C_D]`: padding is `py-[A] px-[B]` or `pt-[A] pr-[B] pb-[C] pl-[D]` (W2).
 - [ ] `public/favicon.svg` exists, fetched from an internet source, linked in `index.html` (F9).
 - [ ] No `!` important modifier and no `!important`; overrides are new classes (W9).
+- [ ] Every button, link, select, toggle label, cancel ✕ and search clear ✕ shows `cursor-pointer`; every disabled control shows `cursor-not-allowed`, set in its index.css class (W17).
+- [ ] Every `<select>` is `input select` with the custom chevron, never the browser's arrow (W18).
 - [ ] Types with `type`, beginner-friendly only (T15), explicit `useState<T>`, no useMemo/useCallback.
 - [ ] Forms: two or more fields → object schema + `FormErrors` (C22 to C24); one field → `yup.string()` + one string error (C30).
 - [ ] Every `.required(...)` field has ` <span className="red-text">*</span>` in its label, optional fields have none (C31); every yup message starts with the field's label text (C32).

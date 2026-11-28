@@ -85,7 +85,7 @@ export function Contact(){
                             {errors.message && <p className="red-text">{errors.message}</p>}
                         </div>
 
-                        <button type="submit" disabled={isSending} className="btn btn-block disabled:opacity-40 disabled:cursor-default">{isSending ? 'Sending...' : 'Send'}</button>
+                        <button type="submit" disabled={isSending} className="btn btn-block disabled:opacity-40">{isSending ? 'Sending...' : 'Send'}</button>
                     </form>
                 </div>
             </section>

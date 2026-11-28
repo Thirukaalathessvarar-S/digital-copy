@@ -153,6 +153,7 @@ h3 {
 .link {
     @apply
     font-bold
+    cursor-pointer
     text-[color:var(--muted)]
     underline
     decoration-transparent
@@ -237,7 +238,8 @@ h3 {
     text-white
     no-underline
     hover:bg-[var(--heading)]
-    hover:text-white;
+    hover:text-white
+    disabled:cursor-not-allowed;
 }
 
 .btn-plain {
@@ -255,7 +257,8 @@ h3 {
     leading-[calc(var(--btn-size)+4px)]
     font-bold
     text-white
-    no-underline;
+    no-underline
+    disabled:cursor-not-allowed;
 }
 
 .btn-lg {
@@ -273,6 +276,7 @@ h3 {
 .btn-new{
     @apply
     py-[var(--btn-new-py)]
+    cursor-pointer
     px-[var(--btn-new-px)]
     rounded-[6px]
     border-[#000000]
@@ -284,12 +288,14 @@ h3 {
     font-medium
     text-[#000000]
     hover:bg-[#000000]
-    hover:text-[#ffffff];
+    hover:text-[#ffffff]
+    disabled:cursor-not-allowed;
 }
 
 .btn-reverse{
     @apply
     py-[var(--btn-new-py)]
+    cursor-pointer
     px-[var(--btn-new-px)]
     rounded-[6px]
     border-[#ffffff]
@@ -302,7 +308,8 @@ h3 {
     text-[#ffffff]
     hover:border-[#000000]
     hover:bg-[#ffffff]
-    hover:text-[#000000];
+    hover:text-[#000000]
+    disabled:cursor-not-allowed;
 }
 
 .btn-outline {
@@ -323,7 +330,8 @@ h3 {
     text-[color:var(--ink)]
     no-underline
     hover:border-[var(--tertiary)]
-    hover:bg-[var(--surface)];
+    hover:bg-[var(--surface)]
+    disabled:cursor-not-allowed;
 }
 
 .outline {
@@ -342,7 +350,8 @@ h3 {
     leading-[calc(var(--btn-outline-size)+4px)]
     font-bold
     text-[color:var(--ink)]
-    no-underline;
+    no-underline
+    disabled:cursor-not-allowed;
 }
 
 .chip {
@@ -427,7 +436,8 @@ h3 {
     hover:border-(color:--ink)
     has-[:checked]:border-(color:--primary)
     has-[:checked]:bg-(color:--secondary)
-    has-[:checked]:text-white;
+    has-[:checked]:text-white
+    has-[:disabled]:cursor-not-allowed;
 }
 
 .chip-check input {
@@ -446,7 +456,8 @@ h3 {
     text-[length:calc(var(--chip-size)-2px)]
     leading-[calc(var(--chip-size)+2px)]
     font-bold
-    text-[color:var(--ink)];
+    text-[color:var(--ink)]
+    disabled:cursor-not-allowed;
 }
 
 .chip-active {
@@ -461,7 +472,8 @@ h3 {
     text-[length:var(--chip-active-size)]
     leading-[calc(var(--chip-active-size)+4px)]
     font-bold
-    text-white;
+    text-white
+    disabled:cursor-not-allowed;
 }
 
 .btn-text {
@@ -475,7 +487,8 @@ h3 {
     leading-[calc(var(--btn-text-size)+4px)]
     font-bold
     text-[color:var(--primary)]
-    underline;
+    underline
+    disabled:cursor-not-allowed;
 }
 
 .btn-icon {
@@ -488,7 +501,8 @@ h3 {
     text-[length:var(--btn-icon-size)]
     leading-[calc(var(--btn-icon-size)+4px)]
     font-bold
-    text-[color:var(--ink)];
+    text-[color:var(--ink)]
+    disabled:cursor-not-allowed;
 }
 
 .badge,
@@ -595,7 +609,19 @@ h3 {
     [&::-webkit-scrollbar]:hidden
     [&[type=number]]:[appearance:textfield]
     [&::-webkit-inner-spin-button]:appearance-none
-    [&::-webkit-outer-spin-button]:appearance-none;
+    [&::-webkit-outer-spin-button]:appearance-none
+    [&::-webkit-search-cancel-button]:cursor-pointer;
+}
+
+.select {
+    @apply
+    appearance-none
+    cursor-pointer
+    pr-[40px]
+    bg-[url('./assets/vector/chevron-down.svg')]
+    bg-no-repeat
+    bg-position-[right_14px_center]
+    disabled:cursor-not-allowed;
 }
 
 .contact-form {

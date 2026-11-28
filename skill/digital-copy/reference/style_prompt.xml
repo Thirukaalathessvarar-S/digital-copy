@@ -190,6 +190,27 @@
     <rule>Never add loading="lazy" to an img.</rule>
   </markup>
 
+  <interaction>
+    <rule>
+      Every element a user can click shows cursor-pointer: every button, every a / Link, every select,
+      a label that toggles a radio or checkbox, a dialog's close or cancel button, and the clear (x)
+      button of a type="search" input ([&amp;::-webkit-search-cancel-button]:cursor-pointer on .input).
+      Never leave it to the browser: Tailwind v4 gives buttons the default arrow cursor.
+    </rule>
+    <rule>Every disabled control shows cursor-not-allowed. Never cursor-default and never cursor-pointer on a disabled control.</rule>
+    <rule>
+      Both cursors live in the element's index.css class: cursor-pointer in its usual place, and
+      disabled:cursor-not-allowed after the hover states. An element with no class gets
+      cursor-pointer disabled:cursor-not-allowed in its className. index.css classes beat utilities,
+      so a disabled: cursor utility in className cannot override a class that sets the cursor: put it in the class.
+    </rule>
+    <rule>
+      A select never shows the browser's default down arrow. Every select uses the .select class
+      (className="input select"), which sets appearance-none, cursor-pointer, pr-[40px] and the custom
+      chevron src/assets/vector/chevron-down.svg as a no-repeat background on the right.
+    </rule>
+  </interaction>
+
   <before_you_finish>
     <check>No rem, em, vw, vh, fr, fractions, clamp(). The only screen-height class is min-h-screen on a src/layout/ root.</check>
     <check>Percentage used only on w-[N%] widths; no basis-[...] anywhere.</check>
@@ -199,6 +220,8 @@
     <check>No aria-* and no role attribute anywhere.</check>
     <check>No ! important modifier on any Tailwind class and no !important anywhere; overrides are new classes.</check>
     <check>Every img has a descriptive, non-empty alt and no loading="lazy".</check>
+    <check>Every button, link, select, toggle label, cancel button and search clear button shows cursor-pointer; every disabled control shows cursor-not-allowed, set in its index.css class.</check>
+    <check>Every select uses the .select class with the custom chevron; no select shows the browser's default arrow.</check>
     <check>No className has more than 20 utilities; longer lists live in a named index.css class.</check>
     <check>No Tailwind utilities stored in a .tsx / .ts variable, const, object or default prop; reused class lists are index.css classes.</check>
     <check>No grid utilities anywhere.</check>

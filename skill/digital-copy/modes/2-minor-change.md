@@ -56,8 +56,10 @@ They sit in `reference/` next to this file, or are attached. If missing, say so 
 - **Lines you add** follow the newest rules even when the file around them does not: flex child
   widths `w-[N%]` only (never `basis-[...]`), padding as `py-[A] px-[B]` / `pt-[A] pr-[B] pb-[C] pl-[D]` (never `p-[A_B]`), no `!` important modifier or `!important` (write a modifier class), no `aria-*` / `role`, descriptive `alt`, no `loading="lazy"`,
   beginner-friendly types, comments only when necessary, a className of more than 20 utilities
-  goes into a named index.css class, and no utilities are stored in a variable (reused lists are
-  index.css classes). Old code nearby is legacy (STYLE_DNA L14 to L19, L23): leave it.
+  goes into a named index.css class, no utilities are stored in a variable (reused lists are
+  index.css classes), everything clickable shows `cursor-pointer` and every disabled control
+  `cursor-not-allowed` (W17), and every select is `input select` with the custom arrow (W18).
+  Old code nearby is legacy (STYLE_DNA L14 to L19, L23): leave it.
 - **New dependency** → only if the user names it.
 - **Assets** → new images are kebab-case and named after what they show (STYLE_DNA §3), png / jpg in
   `src/assets/images/`, svg in `src/assets/vector/`, never in `public/images/`; the import path

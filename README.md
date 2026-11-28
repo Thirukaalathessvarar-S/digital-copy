@@ -38,6 +38,7 @@ digital-copy/
         ├── pages/                 Deals.tsx · Wishlist.tsx · Contact.tsx
         ├── components/            card/ProductCard.tsx · common/Button.tsx
         ├── utils/                 ProtectedRoute.tsx (admin guard) · imageFile.ts (upload checks)
+        ├── assets/vector/         chevron-down.svg (the custom select arrow , W18)
         └── hooks/UseScroll.ts
 ```
 
