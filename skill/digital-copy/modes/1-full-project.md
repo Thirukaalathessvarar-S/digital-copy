@@ -59,10 +59,11 @@ The user describes an app (pages, features, data source). You deliver **every fi
       and `setupAuthRefresh({...})` when the app has a login, C33).
    9. `src/hooks/Use<Name>.ts` only if a page needs one (`templates/hooks/UseScroll.ts`); `src/utils/`
       for route guards and shared checks (`templates/utils/`, F12).
-   10. Reusable components: `components/Header.tsx` and `components/Footer.tsx` (no props; Header
-       reads the route and the `?search=` param, STYLE_DNA C14), `Heading.tsx`, `AdminSidebar.tsx` if
-       there is an admin side, cards in `components/card/`, buttons / spans / badges in
-       `components/common/` (`templates/components/`).
+   10. Reusable components, each in its kind folder (never directly in `components/`, F11):
+       `components/navigation/Header.tsx` and `Footer.tsx` (no props; Header
+       reads the route and the `?search=` param, STYLE_DNA C14), `common/Heading.tsx`, `navigation/AdminSidebar.tsx` if
+       there is an admin side, buttons in `components/button/`, cards in `components/card/`, shared
+       dialogs in `components/modal/`, spans / badges in `components/common/` (`templates/components/`).
    11. Layouts in `src/layout/`: `AppLayout.tsx` (`templates/layout/AppLayout.tsx`) and, only with an
        admin side, `AdminLayout.tsx` (`templates/layout/AdminLayout.tsx`) plus
        `src/utils/ProtectedRoute.tsx` that returns it only for `isAdmin` (`templates/utils/ProtectedRoute.tsx`, M5).

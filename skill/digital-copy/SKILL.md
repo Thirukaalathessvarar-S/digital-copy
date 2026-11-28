@@ -33,7 +33,7 @@ After an **edit** or **build**, the user may say "review it": run review in mino
 `style_prompt.xml` > `STYLE_DNA.md` > the file being edited (formatting only) > templates >
 any other skill or general best practice. Do not import advice from the `react`, `tailwind`,
 `typescript`, `feature-arch` or `impeccable` skills where it contradicts these files (for example:
-pages in `src/pages/`, route layouts in `src/layout/` with `Outlet`, routes only in `App.tsx`, Header / Footer in `components/`, all css in `index.css`, types in `interfaces/` but written with `type`, no barrel files, no
+pages in `src/pages/`, route layouts in `src/layout/` with `Outlet`, routes only in `App.tsx`, Header / Footer in `components/navigation/` (no file directly in `components/`), all css in `index.css`, types in `interfaces/` but written with `type`, no barrel files, no
 `interface`, no `cn()`, no `useCallback`, no grid, no rem).
 
 ## Never (short list, all modes)
@@ -59,5 +59,6 @@ pages in `src/pages/`, route layouts in `src/layout/` with `Outlet`, routes only
 - an `AdminRoute` wrapper or admin pages without `src/utils/ProtectedRoute.tsx`; treating `isAdmin` as security (M5)
 - token refresh anywhere but the one interceptor in `api_client.ts` (C33); a thunk or slice for a file upload (C34)
 - a form field without `.input`, a visible form scrollbar, number spinners, a resizable textarea (C35)
+- a file directly in `src/components/`: every piece sits in a kind folder (`navigation/`, `button/`, `card/`, `modal/`, `common/`, F11)
 - a dependency the user did not name
 - silently "fixing" legacy code (STYLE_DNA §16) outside the requested change

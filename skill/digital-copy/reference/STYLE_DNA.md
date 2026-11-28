@@ -172,11 +172,12 @@ src/
 │   ├── product.ts  cart.ts  order.ts  auth.ts  category.ts
 │   ├── props.ts                  component props types (ProductCardProps ...)
 │   └── form.ts                   FormErrors , Field ...
-├── components/                   reusable pieces, PascalCase.tsx (no pages here)
-│   ├── Header.tsx  Footer.tsx    used once by AppLayout , take no props
-│   ├── Heading.tsx  AdminSidebar.tsx  CategoryButton.tsx ...   other shared pieces
+├── components/                   reusable pieces in kind folders only: never a file directly in components/ (F11)
+│   ├── navigation/               Header.tsx  Footer.tsx  AdminSidebar.tsx (Header / Footer used once by AppLayout , no props)
+│   ├── button/                   CategoryButton.tsx  DeliveryOption.tsx  RadioOption.tsx ...
 │   ├── card/                     cards: ProductCard.tsx  PetCard.tsx  ProductCardSkeleton.tsx ...
-│   └── common/                   small reusable bits: buttons, spans, badges (Button.tsx  Badge.tsx ...)
+│   ├── modal/                    dialogs used by pages: AddReviewModal.tsx ...
+│   └── common/                   small reusable bits: Heading.tsx  Button.tsx  Badge.tsx  Logo.tsx ...
 ├── hooks/
 │   └── UseScroll.ts              file name PascalCase, hook inside is camelCase (useScroll)
 ├── utils/                        shared code that is not network: route guards and checks used by several pages
@@ -195,11 +196,17 @@ src/
 - `[F10]` **`src/layout/` holds route layouts only**: `AppLayout.tsx` always, `AdminLayout.tsx` when
   the app has admin pages. A layout only imports pieces and places them around `<Outlet>` (C14);
   it writes no Header, Footer or sidebar markup of its own.
-- `[F11]` **Reusable pieces live in `src/components/`**: `Header.tsx`, `Footer.tsx`, `Heading.tsx`,
-  `AdminSidebar.tsx`, `CategoryButton.tsx` sit directly in it, cards in `components/card/`, small
-  buttons / spans / badges in `components/common/`. The folder is `components` (plural) and holds
-  no pages. Pages import them as `import {ProductCard} from '../components/card/ProductCard.tsx'`;
-  layouts as `import {Header} from '../components/Header.tsx'`.
+- `[F11]` **Reusable pieces live in `src/components/`, always inside a kind folder. No `.tsx` or any
+  other file ever sits directly in `components/`.** The kind folders are lowercase and singular:
+  - `navigation/`: `Header.tsx`, `Footer.tsx`, `AdminSidebar.tsx`;
+  - `button/`: `CategoryButton.tsx`, `DeliveryOption.tsx`, `RadioOption.tsx`;
+  - `card/`: cards and their skeletons;
+  - `modal/`: dialogs shared by pages (`AddReviewModal.tsx`);
+  - `common/`: small reusable bits (`Heading.tsx`, `Button.tsx`, `Badge.tsx`, `Logo.tsx`).
+  Put a new piece in the folder of its kind; add a new kind folder only when none of these fits.
+  The folder is `components` (plural) and holds no pages. Pages import them as
+  `import {ProductCard} from '../components/card/ProductCard.tsx'`; layouts as
+  `import {Header} from '../components/navigation/Header.tsx'`.
 - `[F12]` **`src/utils/` holds shared code that is not network and not a component of the page**:
   route guards (`ProtectedRoute.tsx`, M5) and small pure checks used by more than one page
   (`imageFile.ts` with `isPng` / `isSmallImage`, C34). Written in the T rules, named exports, no axios.
@@ -486,8 +493,8 @@ The layout (`templates/layout/AppLayout.tsx`):
 
 ```tsx
 import {Outlet} from 'react-router'
-import {Header} from '../components/Header.tsx'
-import {Footer} from '../components/Footer.tsx'
+import {Header} from '../components/navigation/Header.tsx'
+import {Footer} from '../components/navigation/Footer.tsx'
 
 export function AppLayout(){
     return(
@@ -1481,7 +1488,7 @@ Fonts (→ `font-manrope`, `font-inter`, `font-satoshi`) and color aliases point
 | L23 | underscore padding `p-[30px_0px]`, `p-[10px_20px_30px_20px]`, `max-md:p-[60px_0px]` | all code before this rule | `py-[30px] px-[0px]`, `pt-[10px] pr-[20px] pb-[30px] pl-[20px]` (W2) |
 | L24 | labels with no `*` on required fields, yup messages like `'name is required'` or `'please enter valid email'` that do not start with the label | all forms before this rule | `Receiver name <span className="red-text">*</span>`, `'Receiver name is required'` (C31, C32) |
 | L25 | `src/constants/api.ts` with full urls (`BASE_URL`, `PRODUCTS_URL`, `DEALS_URL`), a generic `getData(url)` helper in `helpers/api.ts`, thunks that take a url | older projects | `helpers/url_helper.ts` + `helpers/api_client.ts` + `helpers/backend_helper.ts`; thunks call named endpoint functions (C18, R12) |
-| L26 | pages in `src/components/pages/`, the home page inside `App.tsx`, routes written in `main.tsx`, Header / Footer / Heading in `components/layout/`, every page rendering its own `<Header ...>` and `<Footer>` (Header props `isSearch`, `resultRef`, `query`, `onSearch`), admin pages rendering their own sidebar, imports from `'react-router-dom'` | e-commerce project | pages in `src/pages/` (`Home.tsx` at `'/'`), routes only in `App.tsx` under `AppLayout` / `AdminLayout` with `<Outlet>`, Header / Footer in `components/` with no props, search in the URL, imports from `'react-router'` (F1, F10, F11, C14, M1 to M3) |
+| L26 | pages in `src/components/pages/`, the home page inside `App.tsx`, routes written in `main.tsx`, Header / Footer / Heading in `components/layout/`, every page rendering its own `<Header ...>` and `<Footer>` (Header props `isSearch`, `resultRef`, `query`, `onSearch`), admin pages rendering their own sidebar, imports from `'react-router-dom'` | e-commerce project | pages in `src/pages/` (`Home.tsx` at `'/'`), routes only in `App.tsx` under `AppLayout` / `AdminLayout` with `<Outlet>`, Header / Footer in `components/navigation/` with no props, search in the URL, imports from `'react-router'` (F1, F10, F11, C14, M1 to M3) |
 
 The one accepted positioning idiom: an icon or button centred inside a `relative` input wrapper is
 `absolute top-[50%] right-[20px] -translate-y-1/2` (or `left-[14px] top-1/2 -translate-y-1/2`).
@@ -1496,7 +1503,7 @@ the same kind of file (like B3 for breakpoints). Do not move files, rename folde
 ## 17. Final checklist (run before you answer)
 
 - [ ] Stack and dependencies unchanged (S1). No new library.
-- [ ] Files in the right place and named per F / A / N: `pages/` (every page, `Home.tsx` included), `layout/` (`AppLayout.tsx`, `AdminLayout.tsx` only), `components/` (`Header.tsx`, `Footer.tsx`, shared pieces, `card/`, `common/`), `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `utils/` (`ProtectedRoute.tsx`, shared checks), `assets/images/` + `assets/vector/`.
+- [ ] Files in the right place and named per F / A / N: `pages/` (every page, `Home.tsx` included), `layout/` (`AppLayout.tsx`, `AdminLayout.tsx` only), `components/` (kind folders only: `navigation/`, `button/`, `card/`, `modal/`, `common/`; no file directly in it), `store/` (`store.ts`, `slice/<feature>/`, `asyncThunk/`), `helpers/`, `constants/`, `interfaces/`, `utils/` (`ProtectedRoute.tsx`, shared checks), `assets/images/` + `assets/vector/`.
 - [ ] Routes only in `App.tsx`, pages as children of `AppLayout` / `ProtectedRoute`; `main.tsx` renders `<App />` only; no page renders `<Header>`, `<Footer>` or `<main>`; every router import from `'react-router'` (C14, M1 to M3).
 - [ ] Admin pages behind `utils/ProtectedRoute.tsx` (returns `AdminLayout` only when `isAdmin`), never an `AdminRoute` wrapper; `isAdmin` treated as screens only, the backend checks every admin request (M5).
 - [ ] Token refresh only in `api_client.ts` (one shared refresh, retry once, no refresh for `/auth` calls, `signOut` on a refused refresh), wired in `store.ts` with `setupAuthRefresh` (C33).
